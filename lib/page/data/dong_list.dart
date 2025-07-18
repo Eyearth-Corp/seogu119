@@ -157,7 +157,7 @@ class DongList {
     Dong(name: '마륵동', color: Color(0xFFe6bb39),
         area: Rect.fromLTWH(393, 1187, 586, 345),
         dongTagArea: Rect.fromLTWH(724, 1325, 132, 90),
-        areaAsset: 'assets/map/dong_마륵.png',
+        areaAsset: 'assets/map/dong_마륵동.png',
         dongTagAsset: 'assets/map/tag_마륵.png',
         merchantList : [
           Merchant(id: 52, name: "상무원마륵상인회", x: 475, y: 1421),

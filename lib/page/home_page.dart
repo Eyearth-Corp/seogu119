@@ -56,7 +56,11 @@ class _HomePageState extends State<HomePage> {
 
           final children = [
             Expanded(flex: dashboardFlex, child: const DashboardWidget()),
-            Expanded(flex: mapFlex, child: const MapWidget()),
+            Expanded(flex: mapFlex, child: MapWidget(
+              onMerchantSelected: (merchant) {
+                print('Selected merchant: ${merchant.id} - ${merchant.name}');
+              },
+            )),
           ];
 
           return Center(
