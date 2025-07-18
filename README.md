@@ -1,16 +1,181 @@
-# seogu119
+# 서구 골목경제 119 상황판
 
-A new Flutter project.
+84인치 터치 모니터를 위한 대한민국 서구 골목경제 현황 인터랙티브 맵 애플리케이션
 
-## Getting Started
+## 🚀 프로젝트 개요
 
-This project is a starting point for a Flutter application.
+서구 골목경제 119 상황판은 광주광역시 서구의 18개 행정구역에 분포된 119개 골목형상점가와 11,426개 점포를 시각화하는 Flutter 웹 애플리케이션입니다. 84인치 터치 모니터 환경에 최적화되어 공공 디스플레이 및 키오스크 용도로 설계되었습니다.
 
-A few resources to get you started if this is your first Flutter project:
+## ✨ 주요 기능
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 🎯 84인치 터치 모니터 최적화
+- **대형 터치 타겟**: 46px 크기의 터치하기 쉬운 상인 마커
+- **멀티 터치 제스처**: 더블 탭 줌 리셋, 롱 프레스 선택 모드
+- **햅틱 피드백**: 터치 시 진동 피드백 제공
+- **자동 리셋**: 5분 비활성 시 자동으로 초기 상태 복원
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 🎨 아름다운 디자인
+- **글래스모피즘**: GlassContainer를 활용한 세련된 반투명 UI
+- **스태거드 애니메이션**: 상인 마커의 부드러운 페이드인/슬라이드 효과
+- **펄스 애니메이션**: 선택된 마커의 실시간 펄스 효과
+- **그라데이션**: 부드러운 색상 전환과 그림자 효과
+
+### 🗺️ 인터랙티브 맵 기능
+- **줌/팬**: 핀치 줌과 드래그로 자유로운 지도 탐색
+- **18개 행정구역**: 동천동, 유촌동, 광천동 등 개별 선택 가능
+- **119개 상인회**: 각 상인회별 상세 정보 및 위치 표시
+- **애니메이션 줌**: 구역 선택 시 부드러운 애니메이션 전환
+
+### 🎮 사용자 상호작용
+- **단일 선택**: 상인 마커 터치로 상세 정보 모달 표시
+- **다중 선택**: 롱 프레스로 선택 모드 활성화 후 여러 상인 동시 선택
+- **좌표 복사**: 빈 공간 터치로 좌표 정보 클립보드 복사
+- **위치 이동**: 상세 정보에서 해당 위치로 자동 이동
+
+### 🔧 레이어 시스템
+- **지형 레이어**: 산/강 지형 정보 토글
+- **번호 레이어**: 상인 번호 표시/숨김
+- **동이름 레이어**: 행정구역 이름 토글
+- **구역 레이어**: 동 경계 영역 표시
+
+## 🏗️ 기술 스택
+
+### 프레임워크
+- **Flutter 3.8.1+**: 크로스 플랫폼 UI 프레임워크
+- **Dart**: 프로그래밍 언어
+
+### 주요 패키지
+- `glass_kit: ^3.0.0`: 글래스모피즘 UI 효과
+- `flutter_staggered_animations: ^1.1.1`: 스태거드 애니메이션
+- `animations: ^2.0.11`: 고급 애니메이션 효과
+- `shimmer: ^3.0.0`: 로딩 애니메이션
+- `fl_chart: ^1.0.0`: 차트 위젯
+- `flutter_svg: ^2.0.10+1`: SVG 렌더링
+
+## 📁 프로젝트 구조
+
+```
+lib/
+├── app.dart                    # 메인 앱 설정
+├── main.dart                   # 앱 엔트리 포인트
+└── page/
+    ├── home_page.dart          # 메인 화면 (대시보드 + 맵)
+    ├── data/
+    │   └── dong_list.dart      # 행정구역 및 상인 데이터
+    └── widget/
+        ├── chart_widget.dart           # 차트 위젯
+        ├── dashboard_widget.dart       # 대시보드 패널
+        ├── floating_action_buttons.dart # 플로팅 액션 버튼
+        ├── map_widget.dart            # 인터랙티브 맵 (메인)
+        └── merchant_list_dialog.dart   # 상인 목록 다이얼로그
+
+assets/
+├── images/         # 일반 이미지
+├── map/           # 지도 관련 이미지 (base, terrain, dong areas)
+├── svg/           # SVG 벡터 이미지
+└── temp/          # 임시 파일
+```
+
+## 🚀 시작하기
+
+### 필요 조건
+- Flutter SDK 3.8.1 이상
+- Chrome 브라우저 (웹 실행용)
+- 84인치 터치 모니터 (권장)
+
+### 설치 및 실행
+
+1. **저장소 클론**
+   ```bash
+   git clone <repository-url>
+   cd seogu119
+   ```
+
+2. **의존성 설치**
+   ```bash
+   flutter pub get
+   ```
+
+3. **웹에서 실행**
+   ```bash
+   flutter run -d chrome
+   ```
+
+4. **프로덕션 빌드**
+   ```bash
+   flutter build web
+   ```
+
+## 💡 사용 방법
+
+### 기본 조작
+1. **지도 탐색**: 마우스 드래그나 터치로 지도 이동
+2. **줌 조작**: 마우스 휠이나 핀치 제스처로 확대/축소
+3. **상인 선택**: 번호 마커를 클릭하여 상세 정보 확인
+4. **구역 선택**: 우측 패널에서 행정구역 선택
+
+### 고급 기능
+- **더블 탭**: 줌 리셋
+- **롱 프레스**: 다중 선택 모드 활성화
+- **레이어 토글**: 하단 글래스 패널에서 표시 옵션 조정
+- **자동 리셋**: 5분 후 자동으로 초기 상태로 복원
+
+## 📊 데이터 정보
+
+### 행정구역 (18개)
+동천동, 유촌동, 광천동, 치평동, 상무1동, 화정1동, 농성1동, 양동, 마륵동, 상무2동, 금고1동, 화정4동, 화정3동, 화정2동, 농성2동, 금고2동, 풍암동, 매월동
+
+### 상인회 데이터
+- **총 119개 상인회**
+- **11,426개 점포**
+- **100% 골목형상점가 지정 완료**
+
+## 🎯 84인치 터치 모니터 최적화 특징
+
+### 터치 인터페이스
+- 46px 최소 터치 타겟 크기
+- 터치 반응 영역 확대
+- 햅틱 피드백 지원
+- 제스처 기반 내비게이션
+
+### 키오스크 모드
+- 5분 자동 리셋 타이머
+- 세션 상태 관리
+- 사용자 활동 추적
+- 초기 상태 복원
+
+### 성능 최적화
+- 뷰포트 기반 렌더링
+- 효율적인 메모리 관리
+- 고해상도 이미지 지원
+- 부드러운 애니메이션
+
+## 🛠️ 개발 정보
+
+### 개발 명령어
+```bash
+# 의존성 설치
+flutter pub get
+
+# 개발 서버 실행
+flutter run -d chrome
+
+# 정적 분석
+flutter analyze
+
+# 테스트 실행
+flutter test
+
+# 웹 빌드
+flutter build web
+```
+
+### 개발 환경
+- **개발 도구**: VS Code, Android Studio 지원
+- **디버깅**: Flutter DevTools 활용
+- **버전 관리**: Git
+- **배포**: Flutter Web
+
+---
+
+**대한민국 골목경제 1번지, 서구 골목형상점가 지정 현황을 한눈에 확인하세요!**
