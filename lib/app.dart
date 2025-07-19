@@ -12,7 +12,14 @@ class App extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const HomePage(),
+      home: FittedBox(
+        fit: BoxFit.cover,
+        child: SizedBox(
+          width: 1920,
+          height: 1080,
+          child:  HomePage()
+        ),
+      ),
     );
   }
 }
