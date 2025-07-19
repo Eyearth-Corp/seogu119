@@ -1,0 +1,46 @@
+{
+  "collectionDate": "2025-06-20",
+  "phase": "6차",
+  "title": "6차 골목형상점가 지정 현황 (최종)",
+  "totalAreas": 7,
+  "totalStores": 525,
+  "summary": {
+    "areas": 119,
+    "stores": 11426,
+    "completionRate": 100.0
+  },
+  "storesByCategory": {
+    "일반음식점": 5135,
+    "수퍼마켓": 261,
+    "편의점": 298,
+    "학원": 473,
+    "병원의원": 259,
+    "이용뷰티": 551,
+    "일반주점": 379,
+    "여가시설": 912,
+    "부동산업": 310,
+    "가구인테리어": 344,
+    "생활서비스": 1350,
+    "기타도소매": 1154
+  },
+  "onNuriCardRate": 37.5,
+  "areaDetails": [
+    {
+      "name": "매월동",
+      "stores": 234,
+      "category": "상업지구"
+    },
+    {
+      "name": "서창동",
+      "stores": 291,
+      "category": "혼합지구"
+    }
+  ],
+  "onNuriTrendData": [
+    {"date": "6월 5일", "rate": 16.3},
+    {"date": "6월 13일", "rate": 24.9},
+    {"date": "6월 20일", "rate": 32.5},
+    {"date": "6월 27일", "rate": 35.4},
+    {"date": "7월 4일", "rate": 37.5}
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "collectionDate": "2025-05-01",
+  "phase": "3차",
+  "title": "3차 골목형상점가 지정 현황",
+  "totalAreas": 51,
+  "totalStores": 4478,
+  "summary": {
+    "areas": 72,
+    "stores": 6600,
+    "completionRate": 57.8
+  },
+  "storesByCategory": {
+    "일반음식점": 1842,
+    "수퍼마켓": 128,
+    "편의점": 142,
+    "학원": 186,
+    "병원의원": 124,
+    "이용뷰티": 245,
+    "일반주점": 198,
+    "여가시설": 356,
+    "부동산업": 128,
+    "가구인테리어": 167,
+    "생활서비스": 486,
+    "기타도소매": 476
+  },
+  "onNuriCardRate": 21.7,
+  "areaDetails": [
+    {
+      "name": "상무2동",
+      "stores": 234,
+      "category": "상업지구"
+    },
+    {
+      "name": "금고1동",
+      "stores": 189,
+      "category": "주거지구"
+    },
+    {
+      "name": "화정4동",
+      "stores": 178,
+      "category": "상업지구"
+    },
+    {
+      "name": "화정3동",
+      "stores": 203,
+      "category": "혼합지구"
+    },
+    {
+      "name": "화정2동",
+      "stores": 198,
+      "category": "상업지구"
+    }
+  ]
+}
