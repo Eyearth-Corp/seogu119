@@ -60,6 +60,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    
     _transformationController.value = Matrix4.identity();
     _animationController = AnimationController(
       vsync: this,
@@ -83,6 +84,11 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     
     _startAutoResetTimer();
     _calculateVisibleMerchants();
+    
+    // 시작시 전체 지도가 보이게 축소
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _zoomToFitEntireMap();
+    });
   }
 
   @override
@@ -114,7 +120,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         _showDongAreas = false;
         _showDongTags = false;
       });
-      _transformationController.value = Matrix4.identity();
+      _zoomToFitEntireMap();
       _startAutoResetTimer();
     }
   }
@@ -132,6 +138,31 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         }
       }
     }
+  }
+
+  void _zoomToFitEntireMap() {
+    final context = interactiveViewerKey.currentContext;
+    if (context == null) return;
+
+    final renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+    
+    final widgetSize = renderBox.size;
+    
+    // Calculate scale to fit entire map in the viewport
+    final scaleX = widgetSize.width / _mapWidth;
+    final scaleY = widgetSize.height / _mapHeight;
+    final scale = min(scaleX, scaleY) * 0.9; // 0.9 for some padding
+    
+    // Center the map
+    final dx = (widgetSize.width - _mapWidth * scale) / 2;
+    final dy = (widgetSize.height - _mapHeight * scale) / 2;
+    
+    final matrix = Matrix4.identity()
+      ..translate(dx, dy)
+      ..scale(scale);
+    
+    _transformationController.value = matrix;
   }
 
   @override
@@ -326,8 +357,8 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
 
   void _handleDoubleTap() {
     _startAutoResetTimer();
-    // Reset zoom or zoom to fit
-    _transformationController.value = Matrix4.identity();
+    // Reset zoom to fit entire map
+    _zoomToFitEntireMap();
   }
 
   void _handleLongPress() {
@@ -758,7 +789,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
               ),
             ),
             Container(
-              height: 280,
+              height: 160,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -795,39 +826,39 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                       _startAutoResetTimer();
                     },
                   ),
-                  _buildEnhancedToggle(
-                    title: '선택구역',
-                    icon: Icons.crop_free,
-                    value: _showDongAreas,
-                    onChanged: (value) {
-                      setState(() {
-                        _showDongAreas = value;
-                      });
-                      _startAutoResetTimer();
-                    },
-                  ),
-                  _buildEnhancedToggle(
-                    title: '비활성화',
-                    icon: Icons.blur_on,
-                    value: _showDisableDongAreas,
-                    onChanged: (value) {
-                      setState(() {
-                        _showDisableDongAreas = value;
-                      });
-                      _startAutoResetTimer();
-                    },
-                  ),
-                  _buildEnhancedToggle(
-                    title: '동태그',
-                    icon: Icons.label,
-                    value: _showDongTags,
-                    onChanged: (value) {
-                      setState(() {
-                        _showDongTags = value;
-                      });
-                      _startAutoResetTimer();
-                    },
-                  ),
+                  // _buildEnhancedToggle(
+                  //   title: '선택구역',
+                  //   icon: Icons.crop_free,
+                  //   value: _showDongAreas,
+                  //   onChanged: (value) {
+                  //     setState(() {
+                  //       _showDongAreas = value;
+                  //     });
+                  //     _startAutoResetTimer();
+                  //   },
+                  // ),
+                  // _buildEnhancedToggle(
+                  //   title: '비활성화',
+                  //   icon: Icons.blur_on,
+                  //   value: _showDisableDongAreas,
+                  //   onChanged: (value) {
+                  //     setState(() {
+                  //       _showDisableDongAreas = value;
+                  //     });
+                  //     _startAutoResetTimer();
+                  //   },
+                  // ),
+                  // _buildEnhancedToggle(
+                  //   title: '동태그',
+                  //   icon: Icons.label,
+                  //   value: _showDongTags,
+                  //   onChanged: (value) {
+                  //     setState(() {
+                  //       _showDongTags = value;
+                  //     });
+                  //     _startAutoResetTimer();
+                  //   },
+                  // ),
                 ],
               ),
             )
@@ -905,7 +936,8 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           if (dong != null) {
             _animateToRect(dong.area);
           } else {
-            _transformationController.value = Matrix4.identity();
+            // 전체를 선택하면 전체 지도가 보이게 축소한다.
+            _zoomToFitEntireMap();
           }
           
           _startAutoResetTimer();
@@ -1013,7 +1045,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     if (dong != null) {
       _animateToRect(dong.area);
     } else {
-      _transformationController.value = Matrix4.identity();
+      _zoomToFitEntireMap();
     }
     
     _startAutoResetTimer();
