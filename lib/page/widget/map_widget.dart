@@ -238,7 +238,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           ),
         ),
         // Enhanced legend
-        _buildEnhancedLegend(),
+        //_buildEnhancedLegend(),
         // Dong selection panel
         _buildDongSelectionPanel(),
         // Touch feedback overlay
@@ -254,7 +254,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     final renderBox = context.findRenderObject() as RenderBox;
     final widgetSize = renderBox.size;
 
-    final scale = min(widgetSize.width / rect.width, widgetSize.height / rect.height) * 0.8;
+    final scale = min(widgetSize.width / rect.width, widgetSize.height / rect.height) * 0.55;
     final dx = (widgetSize.width - rect.width * scale) / 2 - rect.left * scale;
     final dy = (widgetSize.height - rect.height * scale) / 2 - rect.top * scale;
 
@@ -654,13 +654,15 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     return GestureDetector(
       onTap: () => onChanged(!value),
       child: AnimatedContainer(
+        width: double.infinity,
         duration: const Duration(milliseconds: 200),
+        margin: EdgeInsets.symmetric(horizontal: 8),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: value ? Colors.blue.withOpacity(0.3) : Colors.transparent,
+          color: value ? Colors.black.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: value ? Colors.blue : Colors.grey.withOpacity(0.3),
+            color: value ? Colors.black : Colors.grey.withOpacity(0.3),
             width: 2,
           ),
         ),
@@ -669,14 +671,14 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           children: [
             Icon(
               icon,
-              color: value ? Colors.blue : Colors.grey,
+              color: value ? Colors.black : Colors.grey,
               size: 24,
             ),
             const SizedBox(height: 4),
             Text(
               title,
               style: TextStyle(
-                color: value ? Colors.blue : Colors.grey.shade700,
+                color: value ? Colors.black : Colors.grey.shade700,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -692,8 +694,10 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
       top: 24,
       right: 24,
       child: GlassContainer(
-        height: 400,
-        width: 300,
+        height: 1000,
+        width: 140,
+        padding: EdgeInsets.only(top: 6),
+
         gradient: LinearGradient(
           colors: [Colors.white.withOpacity(0.40), Colors.white.withOpacity(0.10)],
           begin: Alignment.topLeft,
@@ -705,32 +709,75 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           end: Alignment.bottomRight,
         ),
         borderColor: Colors.white.withOpacity(0.3),
-        blur: 15,
+        blur: 10,
         borderRadius: BorderRadius.circular(20),
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: const Text(
-                '행정구역 선택',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
             Expanded(
               child: ListView.builder(
                 itemCount: DongList.all.length + 1,
                 itemBuilder: (context, index) {
                   if (index == 0) {
-                    return _buildDongSelectionItem(null, '전체 구역');
+                    return _buildDongSelectionItem(null, '전체');
                   }
                   final dong = DongList.all[index - 1];
                   return _buildDongSelectionItem(dong, dong.name);
                 },
               ),
             ),
+            Container(
+              height: 200,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildEnhancedToggle(
+                    title: '지형',
+                    icon: Icons.terrain,
+                    value: _showTerrain,
+                    onChanged: (value) {
+                      setState(() {
+                        _showTerrain = value;
+                      });
+                      _startAutoResetTimer();
+                    },
+                  ),
+                  _buildEnhancedToggle(
+                    title: '번호',
+                    icon: Icons.numbers,
+                    value: _showNumber,
+                    onChanged: (value) {
+                      setState(() {
+                        _showNumber = value;
+                      });
+                      _startAutoResetTimer();
+                    },
+                  ),
+                  _buildEnhancedToggle(
+                    title: '동이름',
+                    icon: Icons.location_city,
+                    value: _showDongName,
+                    onChanged: (value) {
+                      setState(() {
+                        _showDongName = value;
+                      });
+                      _startAutoResetTimer();
+                    },
+                  ),
+                  _buildEnhancedToggle(
+                    title: '구역',
+                    icon: Icons.map,
+                    value: _showDongAreas,
+                    onChanged: (value) {
+                      setState(() {
+                        _showDongAreas = value;
+                      });
+                      _startAutoResetTimer();
+                    },
+                  ),
+                ],
+              ),
+            )
+
           ],
         ),
       ),
@@ -742,38 +789,47 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
       decoration: BoxDecoration(
         color: isSelected ? Colors.blue.withOpacity(0.3) : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: ListTile(
-        leading: dong != null
-            ? Container(
-                width: 24,
-                height: 24,
+      child: InkWell(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+          child: Row(
+            children: [
+              dong != null
+                  ? Container(
+                width: 16,
+                height: 16,
                 decoration: BoxDecoration(
                   color: dong.color,
                   shape: BoxShape.circle,
                 ),
+              ) : const Icon(Icons.select_all, size: 16),
+              Padding(
+                padding: EdgeInsets.only(left: 8),
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
               )
-            : const Icon(Icons.select_all, size: 24),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ],
           ),
         ),
-        trailing: dong != null
-            ? Text(
-                '${dong.merchantList.length}개',
-                style: const TextStyle(fontSize: 14),
-              )
-            : Text(
-                '${DongList.all.fold(0, (sum, d) => sum + d.merchantList.length)}개',
-                style: const TextStyle(fontSize: 14),
-              ),
+        // trailing: dong != null
+        //     ? Text(
+        //         '${dong.merchantList.length}개',
+        //         style: const TextStyle(fontSize: 14),
+        //       )
+        //     : Text(
+        //         '${DongList.all.fold(0, (sum, d) => sum + d.merchantList.length)}개',
+        //         style: const TextStyle(fontSize: 14),
+        //       ),
         onTap: () {
           setState(() {
             _selectedDong = dong;

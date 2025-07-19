@@ -18,45 +18,29 @@ class FloatingActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        // 버튼들을 화면 양쪽에 배치
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 왼쪽 버튼 그룹
-            toolButtons(context),
-            // 오른쪽 버튼 그룹
-            toolButtons(context),
-          ],
-        ),
-      ),
-    );
+    return toolButtons(context);
   }
 
   Widget toolButtons(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // 전체화면 버튼
         FloatingActionButton(
           onPressed: onFullscreen,
           child: Icon(isFullscreen ? Icons.fullscreen_exit : Icons.fullscreen),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 24),
         // 좌우 스왑 버튼
         FloatingActionButton(
           onPressed: onSwap,
           child: const Icon(Icons.swap_horiz),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 24),
         // 상인회 목록 버튼
         FloatingActionButton(
-          onPressed: () => _showMerchantList(context),
+          onPressed: () => _showMerchantListDialog(context),
           child: const Icon(Icons.store),
         ),
       ],

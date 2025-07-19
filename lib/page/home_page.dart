@@ -46,42 +46,47 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('서구 골목경제 119 상황판'),
+        toolbarHeight: 100,
+        title: Text('광주광역시 서구 골목경제 119 상황판', style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold))
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final isTablet = constraints.maxWidth > 600;
           final dashboardFlex = 6;
           final mapFlex = 6;
 
-          final children = [
-            Expanded(flex: dashboardFlex, child: const DashboardWidget()),
-            Expanded(flex: mapFlex, child: MapWidget(
-              onMerchantSelected: (merchant) {
-                print('Selected merchant: ${merchant.id} - ${merchant.name}');
-              },
-            )),
-          ];
-
-          return Center(
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Stack(
-                children: [
-                  Row(
-                    children: _isMapLeft ? children.reversed.toList() : children,
-                  ),
-                  FloatingActionButtons(
+          return Row(
+            children: [
+              Container(
+                width: 80,
+                alignment: Alignment.center,
+                child: FloatingActionButtons(
                     isFullscreen: _isFullscreen,
                     onSwap: _toggleMapPosition,
                     onFullscreen: _toggleFullscreen,
                     onMerchant: (merchant) {
                       print('${merchant.id}  ${merchant.name}');
                     }
-                  ),
-                ],
+                ),
               ),
-            ),
+              Expanded(flex: dashboardFlex, child: const DashboardWidget()),
+              Expanded(flex: mapFlex, child: MapWidget(
+                onMerchantSelected: (merchant) {
+                  print('Selected merchant: ${merchant.id} - ${merchant.name}');
+                },
+              )),
+              Container(
+                width: 80,
+                alignment: Alignment.center,
+                child: FloatingActionButtons(
+                    isFullscreen: _isFullscreen,
+                    onSwap: _toggleMapPosition,
+                    onFullscreen: _toggleFullscreen,
+                    onMerchant: (merchant) {
+                      print('${merchant.id}  ${merchant.name}');
+                    }
+                ),
+              ),
+            ],
           );
         },
       ),
