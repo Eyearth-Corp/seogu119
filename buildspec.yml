@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto8
+    commands:
+      - pwd
+  pre_build:
+    commands:
+      - echo Pre Build started on `date`
+      - git clone https://github.com/flutter/flutter.git -b stable
+      - export PATH="$PATH:`pwd`/flutter/bin"
+      - flutter upgrade
+      - flutter precache
+      - flutter doctor
+  build:
+    commands:
+      - echo Build started on `date`
+      - flutter build web
+      - ls -al ./build/web
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - aws s3 sync ./build/web s3://seogu119.eyearth.net
+      - aws cloudfront create-invalidation --distribution-id E142B7QLTB42CF --paths "/*"

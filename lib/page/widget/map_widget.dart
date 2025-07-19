@@ -9,6 +9,7 @@ import 'dart:async';
 
 // Import the Dong data
 import '../data/dong_list.dart';
+import 'dong_merchant_dialog.dart';
 
 class MapWidget extends StatefulWidget {
   final Function(Merchant)? onMerchantSelected;
@@ -35,7 +36,6 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   bool _showDongName = true;
   bool _showDisableDongAreas = false;
   bool _showDongAreas = false;
-  bool _showDongTags = false;
 
   // State for Dong selection
   Dong? _selectedDong;
@@ -118,7 +118,6 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         _showNumber = true;
         _showDongName = true;
         _showDongAreas = false;
-        _showDongTags = false;
       });
       _zoomToFitEntireMap();
       _startAutoResetTimer();
@@ -265,18 +264,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
 
                           // Dong areas
                           //..._buildDongAreas(),
-                          // Dong name layer
-                          AnimatedOpacity(
-                            opacity: _showDongName ? 1.0 : 0.0,
-                            duration: const Duration(milliseconds: 300),
-                            child: Image.asset(
-                              'assets/map/dong_name.png',
-                              fit: BoxFit.contain,
-                              width: _mapWidth,
-                              height: _mapHeight,
-                              filterQuality: FilterQuality.high,
-                            ),
-                          ),
+                          // Dong name layer replaced by dong tags
                           // Dong tags
                           ..._buildDongTags(),
                           // Merchant numbers
@@ -420,6 +408,16 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     showDialog(
       context: context,
       builder: (context) => _buildMerchantDetailsModal(merchant),
+    );
+  }
+
+  void _showDongMerchantDialog(Dong dong) {
+    showDialog(
+      context: context,
+      builder: (context) => DongMerchantDialog(
+        dongName: dong.name,
+        dongColor: dong.color,
+      ),
     );
   }
 
@@ -593,7 +591,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   }
 
   List<Widget> _buildDongTags() {
-    if (!_showDongTags) return [];
+    if (!_showDongName) return [];
     
     List<Widget> widgets = [];
     
@@ -604,12 +602,25 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         Positioned.fromRect(
           rect: dong.dongTagArea,
           child: AnimatedOpacity(
-            opacity: dong.isShow ? 1.0 : 0.0,
+            opacity: 1.0,
             duration: const Duration(milliseconds: 300),
-            child: Image.asset(
-              dong.dongTagAsset,
-              fit: BoxFit.contain,
-              filterQuality: FilterQuality.high,
+            child: GestureDetector(
+              onTap: () {
+                _showDongMerchantDialog(dong);
+                _startAutoResetTimer();
+              },
+              child: Stack(
+                children: [
+                  // 기존 동 이름 이미지
+                  Image.asset(
+                    dong.dongTagAsset,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                  ),
+                  // 투명한 클릭 가능한 버튼 오버레이
+
+                ],
+              ),
             ),
           ),
         ),
@@ -935,6 +946,8 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           
           if (dong != null) {
             _animateToRect(dong.area);
+            // 동을 선택하면 해당 동별 가맹점 현황 다이얼로그 표시
+            //_showDongMerchantDialog(dong);
           } else {
             // 전체를 선택하면 전체 지도가 보이게 축소한다.
             _zoomToFitEntireMap();
@@ -1044,6 +1057,8 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     
     if (dong != null) {
       _animateToRect(dong.area);
+      // 동을 선택하면 해당 동별 가맹점 현황 다이얼로그 표시
+      _showDongMerchantDialog(dong);
     } else {
       _zoomToFitEntireMap();
     }
