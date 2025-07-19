@@ -1,5 +1,11 @@
 version: 0.2
-
+env:
+  variables:
+    # Flutter 중국 미러 설정
+    PUB_HOSTED_URL: "https://pub.flutter-io.cn"
+    FLUTTER_STORAGE_BASE_URL: "https://storage.flutter-io.cn"
+    # 필요한 경우 Flutter 버전 지정
+    # FLUTTER_VERSION: "3.19.0" # 예시 버전, 프로젝트에 맞는 버전 사용
 phases:
   install:
     runtime-versions:
