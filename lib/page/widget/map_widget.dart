@@ -33,6 +33,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   bool _showTerrain = true;
   bool _showNumber = true;
   bool _showDongName = true;
+  bool _showDisableDongAreas = false;
   bool _showDongAreas = false;
   bool _showDongTags = false;
 
@@ -200,8 +201,39 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                               filterQuality: FilterQuality.high,
                             ),
                           ),
+
+                          // 동 지역별 비활성화 (전체 지역을 회색으로 표시)
+                          // _showDisableDongAreas가 true이고 전체가 선택된 경우에만 표시
+                          AnimatedOpacity(
+                            opacity: _showDisableDongAreas ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 300),
+                            child: Image.asset(
+                              'assets/map/base_gray.png',
+                              fit: BoxFit.contain,
+                              width: _mapWidth,
+                              height: _mapHeight,
+                              filterQuality: FilterQuality.high,
+                            ),
+                          ),
+
+                          // 동 선택 지역 표시 (선택된 동의 지역만 표시)
+                          // _showDongAreas가 true이고 특정 동이 선택된 경우에만 표시
+                          if (_showDongAreas && _selectedDong != null)
+                            AnimatedOpacity(
+                              opacity: 1.0,
+                              duration: const Duration(milliseconds: 300),
+                              child: Image.asset(
+                                _selectedDong!.areaAsset,
+                                fit: BoxFit.contain,
+                                width: _mapWidth,
+                                height: _mapHeight,
+                                filterQuality: FilterQuality.high,
+                              ),
+                            ),
+
+
                           // Dong areas
-                          ..._buildDongAreas(),
+                          //..._buildDongAreas(),
                           // Dong name layer
                           AnimatedOpacity(
                             opacity: _showDongName ? 1.0 : 0.0,
@@ -726,7 +758,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
               ),
             ),
             Container(
-              height: 200,
+              height: 280,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -764,12 +796,34 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                     },
                   ),
                   _buildEnhancedToggle(
-                    title: '구역',
-                    icon: Icons.map,
+                    title: '선택구역',
+                    icon: Icons.crop_free,
                     value: _showDongAreas,
                     onChanged: (value) {
                       setState(() {
                         _showDongAreas = value;
+                      });
+                      _startAutoResetTimer();
+                    },
+                  ),
+                  _buildEnhancedToggle(
+                    title: '비활성화',
+                    icon: Icons.blur_on,
+                    value: _showDisableDongAreas,
+                    onChanged: (value) {
+                      setState(() {
+                        _showDisableDongAreas = value;
+                      });
+                      _startAutoResetTimer();
+                    },
+                  ),
+                  _buildEnhancedToggle(
+                    title: '동태그',
+                    icon: Icons.label,
+                    value: _showDongTags,
+                    onChanged: (value) {
+                      setState(() {
+                        _showDongTags = value;
                       });
                       _startAutoResetTimer();
                     },
@@ -835,6 +889,17 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
             _selectedDong = dong;
             _selectedMerchants.clear();
             _calculateVisibleMerchants();
+            
+            // 자동 상태 관리
+            if (dong == null) {
+              // "전체" 선택 시
+              _showDisableDongAreas = false;
+              _showDongAreas = false;
+            } else {
+              // 특정 동 선택 시
+              _showDisableDongAreas = true;
+              _showDongAreas = true;
+            }
           });
           
           if (dong != null) {
@@ -932,6 +997,17 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
       _selectedDong = dong;
       _selectedMerchants.clear();
       _calculateVisibleMerchants();
+      
+      // 자동 상태 관리
+      if (dong == null) {
+        // "전체" 선택 시
+        _showDisableDongAreas = false;
+        _showDongAreas = false;
+      } else {
+        // 특정 동 선택 시
+        _showDisableDongAreas = true;
+        _showDongAreas = true;
+      }
     });
     
     if (dong != null) {
