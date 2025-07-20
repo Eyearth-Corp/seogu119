@@ -55,7 +55,9 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   
   // Performance optimization
   final Set<int> _visibleMerchants = {};
+  final Set<int> _renderedMerchants = {};
   bool _isLoading = false;
+  Rect? _currentViewport;
 
   @override
   void initState() {
@@ -126,17 +128,60 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
 
   void _calculateVisibleMerchants() {
     _visibleMerchants.clear();
+    _renderedMerchants.clear();
+    
     if (_selectedDong != null) {
       for (var merchant in _selectedDong!.merchantList) {
         _visibleMerchants.add(merchant.id);
+        // Only add to rendered if within viewport
+        if (_isInViewport(merchant.x, merchant.y)) {
+          _renderedMerchants.add(merchant.id);
+        }
       }
     } else {
       for (var dong in DongList.all) {
         for (var merchant in dong.merchantList) {
           _visibleMerchants.add(merchant.id);
+          // Only add to rendered if within viewport
+          if (_isInViewport(merchant.x, merchant.y)) {
+            _renderedMerchants.add(merchant.id);
+          }
         }
       }
     }
+  }
+
+  bool _isInViewport(double x, double y) {
+    if (_currentViewport == null) return true; // Render all if viewport not set
+    
+    // Add padding around viewport for smooth scrolling
+    const padding = 200.0;
+    return _currentViewport!.inflate(padding).contains(Offset(x, y));
+  }
+
+  void _updateViewport() {
+    final context = interactiveViewerKey.currentContext;
+    if (context == null) return;
+
+    final renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final transform = _transformationController.value;
+    final viewport = renderBox.size;
+    
+    // Calculate the current viewport in scene coordinates
+    final sceneTopLeft = transform.getTranslation();
+    final scale = transform.getMaxScaleOnAxis();
+    
+    _currentViewport = Rect.fromLTWH(
+      -sceneTopLeft.x / scale,
+      -sceneTopLeft.y / scale,
+      viewport.width / scale,
+      viewport.height / scale,
+    );
+    
+    // Recalculate visible merchants based on new viewport
+    _calculateVisibleMerchants();
   }
 
   void _zoomToFitEntireMap() {
@@ -201,6 +246,14 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                   maxScale: 3.0,
                   boundaryMargin: const EdgeInsets.all(400),
                   constrained: false,
+                  onInteractionUpdate: (details) {
+                    // Update viewport on pan/zoom
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) {
+                        _updateViewport();
+                      }
+                    });
+                  },
                   child: GestureDetector(
                     onTapUp: _handleTapUp,
                     onDoubleTap: _handleDoubleTap,
@@ -211,53 +264,71 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                       child: Stack(
                         alignment: Alignment.topLeft,
                         children: [
-                          // Base map image
-                          Image.asset(
-                            'assets/map/base.png',
-                            fit: BoxFit.contain,
-                            width: _mapWidth,
-                            height: _mapHeight,
-                            filterQuality: FilterQuality.high,
-                          ),
-                          // Terrain layer
-                          AnimatedOpacity(
-                            opacity: _showTerrain ? 1.0 : 0.0,
-                            duration: const Duration(milliseconds: 300),
+                          // Base map image with caching (WebP)
+                          RepaintBoundary(
                             child: Image.asset(
-                              'assets/map/mount.png',
+                              'assets/map/base.webp',
                               fit: BoxFit.contain,
                               width: _mapWidth,
                               height: _mapHeight,
-                              filterQuality: FilterQuality.high,
+                              filterQuality: FilterQuality.medium,
+                              cacheWidth: (_mapWidth * 0.8).toInt(), // Reduce memory usage
+                              cacheHeight: (_mapHeight * 0.8).toInt(),
                             ),
                           ),
+                          // Terrain layer with lazy loading
+                          if (_showTerrain)
+                            RepaintBoundary(
+                              child: AnimatedOpacity(
+                                opacity: _showTerrain ? 1.0 : 0.0,
+                                duration: const Duration(milliseconds: 300),
+                                child: Image.asset(
+                                  'assets/map/mount.webp',
+                                  fit: BoxFit.contain,
+                                  width: _mapWidth,
+                                  height: _mapHeight,
+                                  filterQuality: FilterQuality.medium,
+                                  cacheWidth: (_mapWidth * 0.8).toInt(),
+                                  cacheHeight: (_mapHeight * 0.8).toInt(),
+                                ),
+                              ),
+                            ),
 
                           // 동 지역별 비활성화 (전체 지역을 회색으로 표시)
                           // _showDisableDongAreas가 true이고 전체가 선택된 경우에만 표시
-                          AnimatedOpacity(
-                            opacity: _showDisableDongAreas ? 1.0 : 0.0,
-                            duration: const Duration(milliseconds: 300),
-                            child: Image.asset(
-                              'assets/map/base_gray.png',
-                              fit: BoxFit.contain,
-                              width: _mapWidth,
-                              height: _mapHeight,
-                              filterQuality: FilterQuality.high,
+                          if (_showDisableDongAreas)
+                            RepaintBoundary(
+                              child: AnimatedOpacity(
+                                opacity: _showDisableDongAreas ? 1.0 : 0.0,
+                                duration: const Duration(milliseconds: 300),
+                                child: Image.asset(
+                                  'assets/map/base_gray.webp',
+                                  fit: BoxFit.contain,
+                                  width: _mapWidth,
+                                  height: _mapHeight,
+                                  filterQuality: FilterQuality.medium,
+                                  cacheWidth: (_mapWidth * 0.8).toInt(),
+                                  cacheHeight: (_mapHeight * 0.8).toInt(),
+                                ),
+                              ),
                             ),
-                          ),
 
                           // 동 선택 지역 표시 (선택된 동의 지역만 표시)
                           // _showDongAreas가 true이고 특정 동이 선택된 경우에만 표시
                           if (_showDongAreas && _selectedDong != null)
-                            AnimatedOpacity(
-                              opacity: 1.0,
-                              duration: const Duration(milliseconds: 300),
-                              child: Image.asset(
-                                _selectedDong!.areaAsset,
-                                fit: BoxFit.contain,
-                                width: _mapWidth,
-                                height: _mapHeight,
-                                filterQuality: FilterQuality.high,
+                            RepaintBoundary(
+                              child: AnimatedOpacity(
+                                opacity: 1.0,
+                                duration: const Duration(milliseconds: 300),
+                                child: Image.asset(
+                                  _selectedDong!.areaAsset,
+                                  fit: BoxFit.contain,
+                                  width: _mapWidth,
+                                  height: _mapHeight,
+                                  filterQuality: FilterQuality.medium,
+                                  cacheWidth: (_mapWidth * 0.8).toInt(),
+                                  cacheHeight: (_mapHeight * 0.8).toInt(),
+                                ),
                               ),
                             ),
 
@@ -477,7 +548,8 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
       if (_selectedDong != null && dong != _selectedDong) continue;
       
       for (var merchant in dong.merchantList) {
-        if (!_visibleMerchants.contains(merchant.id)) continue;
+        // Use rendered merchants set for viewport optimization
+        if (!_renderedMerchants.contains(merchant.id)) continue;
         
         final isSelected = _selectedMerchants.contains(merchant.id);
         final isHighlighted = _isSelectionMode && isSelected;
@@ -486,11 +558,11 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           Positioned(
             left: merchant.x,
             top: merchant.y,
-            child: AnimationConfiguration.staggeredList(
-              position: animationIndex,
-              duration: const Duration(milliseconds: 375),
-              child: SlideAnimation(
-                verticalOffset: 50.0,
+            child: RepaintBoundary(
+              key: ValueKey('merchant_${merchant.id}'),
+              child: AnimationConfiguration.staggeredList(
+                position: animationIndex,
+                duration: const Duration(milliseconds: 200), // Reduced animation time
                 child: FadeInAnimation(
                   child: _buildMerchantMarker(merchant, dong, isHighlighted),
                 ),
@@ -601,25 +673,23 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
       widgets.add(
         Positioned.fromRect(
           rect: dong.dongTagArea,
-          child: AnimatedOpacity(
-            opacity: 1.0,
-            duration: const Duration(milliseconds: 300),
-            child: GestureDetector(
-              onTap: () {
-                _showDongMerchantDialog(dong);
-                _startAutoResetTimer();
-              },
-              child: Stack(
-                children: [
-                  // 기존 동 이름 이미지
-                  Image.asset(
-                    dong.dongTagAsset,
-                    fit: BoxFit.contain,
-                    filterQuality: FilterQuality.high,
-                  ),
-                  // 투명한 클릭 가능한 버튼 오버레이
-
-                ],
+          child: RepaintBoundary(
+            key: ValueKey('dong_tag_${dong.name}'),
+            child: AnimatedOpacity(
+              opacity: 1.0,
+              duration: const Duration(milliseconds: 300),
+              child: GestureDetector(
+                onTap: () {
+                  _showDongMerchantDialog(dong);
+                  _startAutoResetTimer();
+                },
+                child: Image.asset(
+                  dong.dongTagAsset,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.medium,
+                  cacheWidth: dong.dongTagArea.width.toInt(),
+                  cacheHeight: dong.dongTagArea.height.toInt(),
+                ),
               ),
             ),
           ),

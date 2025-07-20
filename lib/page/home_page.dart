@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
-        title: Text('광주광역시 서구 골목경제 119 상황판', style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold))
+        title: const Text('광주광역시 서구 골목경제 119 상황판', style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold))
       ),
       body: Stack(
         children: [
@@ -72,11 +72,16 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   Expanded(flex: dashboardFlex, child: const DashboardWidget()),
-                  Expanded(flex: mapFlex, child: MapWidget(
-                    onMerchantSelected: (merchant) {
-                      print('Selected merchant: ${merchant.id} - ${merchant.name}');
-                    },
-                  )),
+                  Expanded(
+                    flex: mapFlex, 
+                    child: RepaintBoundary(
+                      child: MapWidget(
+                        onMerchantSelected: (merchant) {
+                          print('Selected merchant: ${merchant.id} - ${merchant.name}');
+                        },
+                      ),
+                    ),
+                  ),
                   Container(
                     width: 80,
                     alignment: Alignment.center,
