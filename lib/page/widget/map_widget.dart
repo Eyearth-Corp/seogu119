@@ -11,10 +11,24 @@ import 'dart:async';
 import '../data/dong_list.dart';
 import 'dong_merchant_dialog.dart';
 
+// MapWidget을 외부에서 제어하기 위한 컨트롤러
+class MapWidgetController {
+  void Function(Merchant)? _navigateToMerchant;
+  
+  void _setNavigateFunction(void Function(Merchant) navigateFunc) {
+    _navigateToMerchant = navigateFunc;
+  }
+  
+  void navigateToMerchant(Merchant merchant) {
+    _navigateToMerchant?.call(merchant);
+  }
+}
+
 class MapWidget extends StatefulWidget {
   final Function(Merchant)? onMerchantSelected;
+  final MapWidgetController? controller;
   
-  const MapWidget({super.key, this.onMerchantSelected});
+  const MapWidget({super.key, this.onMerchantSelected, this.controller});
 
   @override
   State<MapWidget> createState() => _MapWidgetState();
@@ -41,6 +55,9 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   Dong? _selectedDong;
   Set<int> _selectedMerchants = {};
   bool _isSelectionMode = false;
+  
+  // State for last selected merchant (for highlighting)
+  Merchant? _lastSelectedMerchant;
 
   // Fixed map size
   final double _mapWidth = 2403;
@@ -84,6 +101,9 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
     
+    // 컨트롤러에 네비게이션 함수 설정
+    widget.controller?._setNavigateFunction(_animateToMerchant);
+    
     _startAutoResetTimer();
     _calculateVisibleMerchants();
     
@@ -116,6 +136,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         _selectedDong = null;
         _selectedMerchants.clear();
         _isSelectionMode = false;
+        _lastSelectedMerchant = null; // 선택된 상인회도 초기화
         _showTerrain = true;
         _showNumber = true;
         _showDongName = true;
@@ -470,6 +491,10 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         }
       });
     } else {
+      // 마커 직접 클릭 시에도 해당 상인회를 하이라이트
+      setState(() {
+        _lastSelectedMerchant = merchant;
+      });
       _showMerchantDetails(merchant);
       widget.onMerchantSelected?.call(merchant);
     }
@@ -530,12 +555,18 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   }
 
   void _animateToMerchant(Merchant merchant) {
+    setState(() {
+      _lastSelectedMerchant = merchant;
+    });
+    
     final rect = Rect.fromCenter(
       center: Offset(merchant.x, merchant.y),
       width: 200,
       height: 200,
     );
     _animateToRect(rect);
+    
+    _startAutoResetTimer(); // 자동 리셋 타이머 재시작
   }
 
   List<Widget> _buildMerchantNumbers() {
@@ -553,6 +584,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         
         final isSelected = _selectedMerchants.contains(merchant.id);
         final isHighlighted = _isSelectionMode && isSelected;
+        final isLastSelected = _lastSelectedMerchant?.id == merchant.id;
         
         widgets.add(
           Positioned(
@@ -564,7 +596,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                 position: animationIndex,
                 duration: const Duration(milliseconds: 200), // Reduced animation time
                 child: FadeInAnimation(
-                  child: _buildMerchantMarker(merchant, dong, isHighlighted),
+                  child: _buildMerchantMarker(merchant, dong, isHighlighted, isLastSelected),
                 ),
               ),
             ),
@@ -577,11 +609,25 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     return widgets;
   }
 
-  Widget _buildMerchantMarker(Merchant merchant, Dong dong, bool isHighlighted) {
+  Widget _buildMerchantMarker(Merchant merchant, Dong dong, bool isHighlighted, bool isLastSelected) {
     return AnimatedBuilder(
       animation: _pulseAnimation!,
       builder: (context, child) {
         final scale = isHighlighted ? _pulseAnimation!.value : 1.0;
+        
+        // 마지막 선택된 상인회는 노란색 배경, 일반 선택 모드에서는 오렌지색 테두리
+        Color backgroundColor = Colors.white;
+        Color borderColor = dong.color;
+        double borderWidth = 3;
+        
+        if (isLastSelected) {
+          backgroundColor = Colors.yellow.shade300;
+          borderColor = Colors.orange;
+          borderWidth = 4;
+        } else if (isHighlighted) {
+          borderColor = Colors.orange;
+          borderWidth = 4;
+        }
         
         return Transform.scale(
           scale: scale,
@@ -589,15 +635,15 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
             width: _touchTargetSize,
             height: _touchTargetSize,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: backgroundColor,
               border: Border.all(
-                color: isHighlighted ? Colors.orange : dong.color,
-                width: isHighlighted ? 4 : 3,
+                color: borderColor,
+                width: borderWidth,
               ),
               borderRadius: BorderRadius.circular(_touchTargetSize / 2),
               boxShadow: [
                 BoxShadow(
-                  color: dong.color.withOpacity(0.3),
+                  color: borderColor.withOpacity(0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -1153,4 +1199,5 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     }
     return merchants;
   }
+
 }

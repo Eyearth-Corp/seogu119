@@ -6,6 +6,7 @@ import 'widget/dashboard_widget.dart';
 import 'widget/floating_action_buttons.dart';
 import 'widget/map_widget.dart';
 import 'widget/admin_access_button.dart';
+import 'data/dong_list.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,6 +18,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isMapLeft = false;
   bool _isFullscreen = false;
+  
+  // MapWidget을 제어하기 위한 컨트롤러
+  final MapWidgetController _mapController = MapWidgetController();
+
+  /// 선택된 상인회로 지도 이동
+  void _navigateToMerchant(Merchant merchant) {
+    _mapController.navigateToMerchant(merchant);
+  }
 
   void _toggleMapPosition() {
     setState(() {
@@ -66,9 +75,7 @@ class _HomePageState extends State<HomePage> {
                         isFullscreen: _isFullscreen,
                         onSwap: _toggleMapPosition,
                         onFullscreen: _toggleFullscreen,
-                        onMerchant: (merchant) {
-                          print('${merchant.id}  ${merchant.name}');
-                        }
+                        onMerchant: _navigateToMerchant
                     ),
                   ),
                   Expanded(flex: dashboardFlex, child: const DashboardWidget()),
@@ -76,6 +83,7 @@ class _HomePageState extends State<HomePage> {
                     flex: mapFlex, 
                     child: RepaintBoundary(
                       child: MapWidget(
+                        controller: _mapController,
                         onMerchantSelected: (merchant) {
                           print('Selected merchant: ${merchant.id} - ${merchant.name}');
                         },
@@ -89,18 +97,13 @@ class _HomePageState extends State<HomePage> {
                         isFullscreen: _isFullscreen,
                         onSwap: _toggleMapPosition,
                         onFullscreen: _toggleFullscreen,
-                        onMerchant: (merchant) {
-                          print('${merchant.id}  ${merchant.name}');
-                        }
+                        onMerchant: _navigateToMerchant
                     ),
                   ),
                 ],
               );
             },
           ),
-          
-          // 관리자 접근 버튼
-          const AdminAccessButton(),
         ],
       ),
     );
