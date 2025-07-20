@@ -64,15 +64,15 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     _transformationController.value = Matrix4.identity();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 80),
     );
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 100),
     )..repeat(reverse: true);
     _fadeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 100),
     );
     
     _pulseAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(

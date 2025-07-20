@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 class AdminService {
   static const String baseUrl = kDebugMode 
       ? 'http://localhost:8000' 
-      : 'https://api.seogu119.eyearth.net';
+      : 'https://seogu119-api.eyearth.net';
   
   static String? _authToken;
   static bool get isLoggedIn => _authToken != null;
