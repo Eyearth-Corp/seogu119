@@ -189,22 +189,10 @@ class DashboardDataManager {
       fileName: 'data_total.json',
     ),
     DataDate(
-      date: '2024-12-05',
-      phase: '1차',
-      displayName: '1차 (24.12.5)',
-      fileName: 'data_20241205.json',
-    ),
-    DataDate(
-      date: '2025-03-31',
-      phase: '2차',
-      displayName: '2차 (25.3.31)',
-      fileName: 'data_20250331.json',
-    ),
-    DataDate(
-      date: '2025-05-01',
-      phase: '3차',
-      displayName: '3차 (25.5.1)',
-      fileName: 'data_20250501.json',
+      date: '2025-06-20',
+      phase: '6차',
+      displayName: '6차 (25.6.20)',
+      fileName: 'data_20250620.json',
     ),
     DataDate(
       date: '2025-05-16',
@@ -213,10 +201,22 @@ class DashboardDataManager {
       fileName: 'data_20250516.json',
     ),
     DataDate(
-      date: '2025-06-20',
-      phase: '6차',
-      displayName: '6차 (25.6.20)',
-      fileName: 'data_20250620.json',
+      date: '2025-05-01',
+      phase: '3차',
+      displayName: '3차 (25.5.1)',
+      fileName: 'data_20250501.json',
+    ),
+    DataDate(
+      date: '2025-03-31',
+      phase: '2차',
+      displayName: '2차 (25.3.31)',
+      fileName: 'data_20250331.json',
+    ),
+    DataDate(
+      date: '2024-12-05',
+      phase: '1차',
+      displayName: '1차 (24.12.5)',
+      fileName: 'data_20241205.json',
     ),
   ];
 

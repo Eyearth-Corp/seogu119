@@ -139,14 +139,14 @@ class MerchantListDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
         child: Container(
           padding: EdgeInsets.symmetric(
-            horizontal: isMobileScreen ? 8.0 : 12.0,
-            vertical: isMobileScreen ? 6.0 : 8.0,
+            horizontal: isMobileScreen ? 8.0 : 18.0,
+            vertical: isMobileScreen ? 6.0 : 16.0,
           ),
           alignment: Alignment.centerLeft,
           child: Text(
             '${merchant.id}. ${merchant.name}',
             style: TextStyle(
-              fontSize: isMobileScreen ? 12.0 : 13.0,
+              fontSize: isMobileScreen ? 12.0 : 18.0,
               fontWeight: FontWeight.w500,
             ),
             overflow: TextOverflow.ellipsis,
