@@ -42,7 +42,7 @@ class DongList {
         ]
     ),
     // 6-8
-    Dong(name: '유촌동', color: Color(0xFFc38753),
+    Dong(name: '유덕동', color: Color(0xFFc38753),
         area: Rect.fromLTWH(630, 314, 454, 276),
         dongTagArea: Rect.fromLTWH(973, 345, 133, 90),
         areaAsset: 'assets/map/dong_유촌.webp',
@@ -144,7 +144,7 @@ class DongList {
         ]
     ),
     // 51
-    Dong(name: '양동', color: Color(0xFFf5aa4e),
+    Dong(name: '양3동', color: Color(0xFFf5aa4e),
         area: Rect.fromLTWH(1685, 244, 260, 136),
         dongTagArea: Rect.fromLTWH(1962, 320, 132, 90),
         areaAsset: 'assets/map/dong_양동.webp',
@@ -154,7 +154,7 @@ class DongList {
         ]
     ),
     // 52-53
-    Dong(name: '마륵동', color: Color(0xFFe6bb39),
+    Dong(name: '서창(마륵)동', color: Color(0xFFe6bb39),
         area: Rect.fromLTWH(393, 1187, 586, 345),
         dongTagArea: Rect.fromLTWH(724, 1325, 132, 90),
         areaAsset: 'assets/map/dong_마륵.webp',
@@ -305,7 +305,7 @@ class DongList {
         ]
     ),
     // 118-119
-    Dong(name: '매월동', color: Color(0xFFe7bc3a),
+    Dong(name: '서창(매월)동', color: Color(0xFFe7bc3a),
         area: Rect.fromLTWH(1009, 1880, 458, 433),
         dongTagArea: Rect.fromLTWH(1167, 2062, 133, 90),
         areaAsset: 'assets/map/dong_매월.webp',
