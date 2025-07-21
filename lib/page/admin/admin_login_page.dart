@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../data/admin_service.dart';
 import 'admin_dashboard_page.dart';
 
@@ -104,7 +103,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 
                 Text(
                   '서구 골목 관리자',
-                  style: GoogleFonts.notoSansKr(
+                  style: TextStyle(
+                    fontFamily: 'NotoSans',
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFF2D3748),
@@ -114,7 +114,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 
                 Text(
                   '관리자 계정으로 로그인하세요',
-                  style: GoogleFonts.notoSansKr(
+                  style: TextStyle(
+                    fontFamily: 'NotoSans',
                     fontSize: 14,
                     color: const Color(0xFF718096),
                   ),
@@ -188,7 +189,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                     ),
                     child: Text(
                       _errorMessage!,
-                      style: GoogleFonts.notoSansKr(
+                      style: TextStyle(
+                    fontFamily: 'NotoSans',
                         color: Colors.red,
                         fontSize: 12,
                       ),
@@ -221,7 +223,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                           )
                         : Text(
                             '로그인',
-                            style: GoogleFonts.notoSansKr(
+                            style: TextStyle(
+                    fontFamily: 'NotoSans',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -237,7 +240,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   },
                   child: Text(
                     '홈으로 돌아가기',
-                    style: GoogleFonts.notoSansKr(
+                    style: TextStyle(
+                    fontFamily: 'NotoSans',
                       color: const Color(0xFF718096),
                       fontSize: 14,
                     ),

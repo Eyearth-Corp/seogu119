@@ -19,12 +19,8 @@ dependencies:
   fl_chart: ^1.0.0
   fluttertoast: ^8.2.6
   hawk_fab_menu: ^1.2.0
-  animations: ^2.0.11
   glass_kit: ^4.0.1
-  shimmer: ^3.0.0
-  flutter_staggered_animations: ^1.1.1
   cached_network_image: ^3.3.1
-  google_fonts: ^6.2.1
   speech_balloon: ^0.0.3
 
 dev_dependencies:
@@ -36,9 +32,18 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+
+
   assets:
     - assets/images/
-    - assets/temp/
-    - assets/svg/
     - assets/map/
     - assets/excel/
+    
+  fonts:
+    - family: NotoSans
+      fonts:
+        - asset: fonts/NotoSans-Regular.otf
+          weight: 400
+        - asset: fonts/NotoSans-Bold.otf
+          weight: 700

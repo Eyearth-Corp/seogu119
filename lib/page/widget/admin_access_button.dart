@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AdminAccessButton extends StatelessWidget {
   const AdminAccessButton({super.key});
@@ -34,7 +33,7 @@ class AdminAccessButton extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     '관리자',
-                    style: GoogleFonts.notoSansKr(
+                    style: TextStyle(fontFamily: 'NotoSans',
                       color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,

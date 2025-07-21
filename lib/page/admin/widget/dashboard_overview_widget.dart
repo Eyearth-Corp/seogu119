@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../data/dashboard_data.dart';
 
@@ -96,7 +95,7 @@ class _DashboardOverviewWidgetState extends State<DashboardOverviewWidget> {
         children: [
           Text(
             '데이터 기준일:',
-            style: GoogleFonts.notoSansKr(
+            style: TextStyle(fontFamily: 'NotoSans',
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -109,7 +108,7 @@ class _DashboardOverviewWidgetState extends State<DashboardOverviewWidget> {
                 value: date.date,
                 child: Text(
                   date.displayName,
-                  style: GoogleFonts.notoSansKr(),
+                  style: TextStyle(fontFamily: 'NotoSans'),
                 ),
               );
             }).toList(),
@@ -205,7 +204,7 @@ class _DashboardOverviewWidgetState extends State<DashboardOverviewWidget> {
           const SizedBox(height: 16),
           Text(
             value,
-            style: GoogleFonts.notoSansKr(
+            style: TextStyle(fontFamily: 'NotoSans',
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF1F2937),
@@ -214,7 +213,7 @@ class _DashboardOverviewWidgetState extends State<DashboardOverviewWidget> {
           const SizedBox(height: 4),
           Text(
             title,
-            style: GoogleFonts.notoSansKr(
+            style: TextStyle(fontFamily: 'NotoSans',
               fontSize: 14,
               color: const Color(0xFF6B7280),
             ),
@@ -243,7 +242,7 @@ class _DashboardOverviewWidgetState extends State<DashboardOverviewWidget> {
         children: [
           Text(
             '업종별 분포',
-            style: GoogleFonts.notoSansKr(
+            style: TextStyle(fontFamily: 'NotoSans',
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -270,7 +269,7 @@ class _DashboardOverviewWidgetState extends State<DashboardOverviewWidget> {
                     value: entry.value.toDouble(),
                     title: '${entry.value}',
                     radius: 60,
-                    titleStyle: GoogleFonts.notoSansKr(
+                    titleStyle: TextStyle(fontFamily: 'NotoSans',
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -304,7 +303,7 @@ class _DashboardOverviewWidgetState extends State<DashboardOverviewWidget> {
         children: [
           Text(
             '완료 현황',
-            style: GoogleFonts.notoSansKr(
+            style: TextStyle(fontFamily: 'NotoSans',
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -320,7 +319,7 @@ class _DashboardOverviewWidgetState extends State<DashboardOverviewWidget> {
                     value: _dashboardData!.summary.completionRate,
                     title: '완료\n${_dashboardData!.summary.completionRate.toStringAsFixed(1)}%',
                     radius: 60,
-                    titleStyle: GoogleFonts.notoSansKr(
+                    titleStyle: TextStyle(fontFamily: 'NotoSans',
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -331,7 +330,7 @@ class _DashboardOverviewWidgetState extends State<DashboardOverviewWidget> {
                     value: 100 - _dashboardData!.summary.completionRate,
                     title: '미완료\n${(100 - _dashboardData!.summary.completionRate).toStringAsFixed(1)}%',
                     radius: 60,
-                    titleStyle: GoogleFonts.notoSansKr(
+                    titleStyle: TextStyle(fontFamily: 'NotoSans',
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.black54,
@@ -365,7 +364,7 @@ class _DashboardOverviewWidgetState extends State<DashboardOverviewWidget> {
         children: [
           Text(
             '지역별 상세 현황',
-            style: GoogleFonts.notoSansKr(
+            style: TextStyle(fontFamily: 'NotoSans',
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -396,19 +395,19 @@ class _DashboardOverviewWidgetState extends State<DashboardOverviewWidget> {
                 ),
                 title: Text(
                   area.name,
-                  style: GoogleFonts.notoSansKr(
+                  style: TextStyle(fontFamily: 'NotoSans',
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 subtitle: Text(
                   area.category,
-                  style: GoogleFonts.notoSansKr(
+                  style: TextStyle(fontFamily: 'NotoSans',
                     color: Colors.grey.shade600,
                   ),
                 ),
                 trailing: Text(
                   '${area.stores}개',
-                  style: GoogleFonts.notoSansKr(
+                  style: TextStyle(fontFamily: 'NotoSans',
                     fontWeight: FontWeight.bold,
                     color: Colors.deepPurple,
                   ),

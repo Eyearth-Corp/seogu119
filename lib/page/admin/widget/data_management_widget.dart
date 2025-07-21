@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../data/admin_service.dart';
 import '../../data/dashboard_data.dart';
 
@@ -101,7 +100,7 @@ class _DataManagementWidgetState extends State<DataManagementWidget> {
       children: [
         Text(
           '데이터 관리',
-          style: GoogleFonts.notoSansKr(
+          style: TextStyle(fontFamily: 'NotoSans',
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -111,7 +110,7 @@ class _DataManagementWidgetState extends State<DataManagementWidget> {
         OutlinedButton.icon(
           onPressed: _refreshData,
           icon: const Icon(Icons.refresh),
-          label: Text('새로고침', style: GoogleFonts.notoSansKr()),
+          label: Text('새로고침', style: TextStyle(fontFamily: 'NotoSans',)),
         ),
         const SizedBox(width: 12),
         
@@ -123,7 +122,7 @@ class _DataManagementWidgetState extends State<DataManagementWidget> {
             );
           },
           icon: const Icon(Icons.download),
-          label: Text('데이터 내보내기', style: GoogleFonts.notoSansKr()),
+          label: Text('데이터 내보내기', style: TextStyle(fontFamily: 'NotoSans',)),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
@@ -231,7 +230,7 @@ class _DataManagementWidgetState extends State<DataManagementWidget> {
           const SizedBox(height: 16),
           Text(
             value,
-            style: GoogleFonts.notoSansKr(
+            style: TextStyle(fontFamily: 'NotoSans',
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF1F2937),
@@ -240,7 +239,7 @@ class _DataManagementWidgetState extends State<DataManagementWidget> {
           const SizedBox(height: 4),
           Text(
             title,
-            style: GoogleFonts.notoSansKr(
+            style: TextStyle(fontFamily: 'NotoSans',
               fontSize: 14,
               color: const Color(0xFF6B7280),
             ),
@@ -270,7 +269,7 @@ class _DataManagementWidgetState extends State<DataManagementWidget> {
             padding: const EdgeInsets.all(20),
             child: Text(
               '데이터 세트 목록',
-              style: GoogleFonts.notoSansKr(
+              style: TextStyle(fontFamily: 'NotoSans',
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -287,7 +286,7 @@ class _DataManagementWidgetState extends State<DataManagementWidget> {
                     const SizedBox(height: 16),
                     Text(
                       '데이터가 없습니다.',
-                      style: GoogleFonts.notoSansKr(
+                      style: TextStyle(fontFamily: 'NotoSans',
                         fontSize: 16,
                         color: Colors.grey.shade600,
                       ),
@@ -318,7 +317,7 @@ class _DataManagementWidgetState extends State<DataManagementWidget> {
                     child: Center(
                       child: Text(
                         dateInfo['phase'] ?? '',
-                        style: GoogleFonts.notoSansKr(
+                        style: TextStyle(fontFamily: 'NotoSans',
                           fontWeight: FontWeight.bold,
                           color: Colors.deepPurple,
                           fontSize: 12,
@@ -328,21 +327,21 @@ class _DataManagementWidgetState extends State<DataManagementWidget> {
                   ),
                   title: Text(
                     '${dateInfo['phase']} - ${dateInfo['date']}',
-                    style: GoogleFonts.notoSansKr(
+                    style: TextStyle(fontFamily: 'NotoSans',
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   subtitle: statistics != null
                       ? Text(
                           '가맹점 ${statistics['total_merchants']}개 | 영업중 ${statistics['operating_merchants']}개 | 매출 ${(statistics['total_revenue'] / 10000).toStringAsFixed(0)}억원',
-                          style: GoogleFonts.notoSansKr(
+                          style: TextStyle(fontFamily: 'NotoSans',
                             color: Colors.grey.shade600,
                             fontSize: 12,
                           ),
                         )
                       : Text(
                           '통계 정보 없음',
-                          style: GoogleFonts.notoSansKr(
+                          style: TextStyle(fontFamily: 'NotoSans',
                             color: Colors.grey.shade400,
                             fontSize: 12,
                           ),
@@ -358,7 +357,7 @@ class _DataManagementWidgetState extends State<DataManagementWidget> {
                         ),
                         child: Text(
                           _getStatusText(dateInfo['date']),
-                          style: GoogleFonts.notoSansKr(
+                          style: TextStyle(fontFamily: 'NotoSans',
                             fontSize: 12,
                             color: _getStatusColor(dateInfo['date']),
                             fontWeight: FontWeight.w500,
@@ -436,7 +435,7 @@ class DateDetailDialog extends StatelessWidget {
           children: [
             Text(
               '${dateInfo['phase']} 데이터 상세 정보',
-              style: GoogleFonts.notoSansKr(
+              style: TextStyle(fontFamily: 'NotoSans',
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -453,7 +452,7 @@ class DateDetailDialog extends StatelessWidget {
               
               Text(
                 '통계 정보',
-                style: GoogleFonts.notoSansKr(
+                style: TextStyle(fontFamily: 'NotoSans',
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -473,7 +472,7 @@ class DateDetailDialog extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   '업종별 분포',
-                  style: GoogleFonts.notoSansKr(
+                  style: TextStyle(fontFamily: 'NotoSans',
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -493,7 +492,7 @@ class DateDetailDialog extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('닫기', style: GoogleFonts.notoSansKr()),
+                  child: Text('닫기', style: TextStyle(fontFamily: 'NotoSans',)),
                 ),
               ],
             ),
@@ -513,7 +512,7 @@ class DateDetailDialog extends StatelessWidget {
             width: 120,
             child: Text(
               label,
-              style: GoogleFonts.notoSansKr(
+              style: TextStyle(fontFamily: 'NotoSans',
                 color: Colors.grey.shade600,
               ),
             ),
@@ -521,7 +520,7 @@ class DateDetailDialog extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.notoSansKr(
+              style: TextStyle(fontFamily: 'NotoSans',
                 fontWeight: FontWeight.w500,
               ),
             ),

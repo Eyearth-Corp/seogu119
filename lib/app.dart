@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:seogu119/page/home_page.dart';
 import 'package:seogu119/page/admin/admin_login_page.dart';
 import 'package:seogu119/page/admin/admin_dashboard_page.dart';
@@ -16,7 +15,7 @@ class App extends StatelessWidget {
       title: '서구 골목',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        fontFamily: GoogleFonts.notoSansKr().fontFamily,
+        fontFamily: 'NotoSans',
         scaffoldBackgroundColor: Colors.white,
       ),
       initialRoute: '/',

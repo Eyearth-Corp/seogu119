@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../data/admin_service.dart';
 import 'admin_login_page.dart';
 import 'widget/admin_sidebar.dart';
@@ -31,25 +30,29 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       builder: (context) => AlertDialog(
         title: Text(
           '로그아웃',
-          style: GoogleFonts.notoSansKr(),
+          style: TextStyle(
+                        fontFamily: 'NotoSans',),
         ),
         content: Text(
           '정말 로그아웃하시겠습니까?',
-          style: GoogleFonts.notoSansKr(),
+          style: TextStyle(
+                        fontFamily: 'NotoSans',),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               '취소',
-              style: GoogleFonts.notoSansKr(color: Colors.grey),
+              style: TextStyle(
+                        fontFamily: 'NotoSans',color: Colors.grey),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
               '로그아웃',
-              style: GoogleFonts.notoSansKr(color: Colors.red),
+              style: TextStyle(
+                        fontFamily: 'NotoSans',color: Colors.red),
             ),
           ),
         ],
@@ -133,7 +136,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     children: [
                       Text(
                         _getCurrentPageTitle(),
-                        style: GoogleFonts.notoSansKr(
+                        style: TextStyle(
+                        fontFamily: 'NotoSans',
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF1F2937),
@@ -163,7 +167,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                             const SizedBox(width: 8),
                             Text(
                               'Admin',
-                              style: GoogleFonts.notoSansKr(
+                              style: TextStyle(
+                        fontFamily: 'NotoSans',
                                 fontWeight: FontWeight.w500,
                                 color: const Color(0xFF374151),
                               ),

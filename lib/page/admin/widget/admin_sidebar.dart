@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../admin_dashboard_page.dart';
 
 class AdminSidebar extends StatelessWidget {
@@ -57,7 +56,8 @@ class AdminSidebar extends StatelessWidget {
                   Expanded(
                     child: Text(
                       '서구 골목 관리자',
-                      style: GoogleFonts.notoSansKr(
+                      style: TextStyle(
+                          fontFamily: 'NotoSans',
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -155,7 +155,8 @@ class AdminSidebar extends StatelessWidget {
                   Expanded(
                     child: Text(
                       title,
-                      style: GoogleFonts.notoSansKr(
+                      style: TextStyle(
+                          fontFamily: 'NotoSans',
                         color: isSelected ? Colors.white : Colors.grey.shade400,
                         fontSize: 14,
                         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -196,7 +197,8 @@ class AdminSidebar extends StatelessWidget {
                 const SizedBox(width: 12),
                 Text(
                   '로그아웃',
-                  style: GoogleFonts.notoSansKr(
+                  style: TextStyle(
+                          fontFamily: 'NotoSans',
                     color: Colors.red.shade300,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

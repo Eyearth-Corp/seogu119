@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../data/admin_service.dart';
 import '../../data/dashboard_data.dart';
 
@@ -99,19 +98,19 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('가맹점 삭제', style: GoogleFonts.notoSansKr()),
+        title: Text('가맹점 삭제', style: TextStyle(fontFamily: 'NotoSans')),
         content: Text(
           '$merchantName을(를) 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
-          style: GoogleFonts.notoSansKr(),
+          style: TextStyle(fontFamily: 'NotoSans'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('취소', style: GoogleFonts.notoSansKr()),
+            child: Text('취소', style: TextStyle(fontFamily: 'NotoSans')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('삭제', style: GoogleFonts.notoSansKr(color: Colors.red)),
+            child: Text('삭제', style: TextStyle(fontFamily: 'NotoSans',color: Colors.red)),
           ),
         ],
       ),
@@ -184,7 +183,7 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
         children: [
           Text(
             '필터',
-            style: GoogleFonts.notoSansKr(
+            style: TextStyle(fontFamily: 'NotoSans',
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
@@ -203,7 +202,7 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
                   items: availableDates.map((date) {
                     return DropdownMenuItem(
                       value: date.date,
-                      child: Text(date.displayName, style: GoogleFonts.notoSansKr()),
+                      child: Text(date.displayName, style: TextStyle(fontFamily: 'NotoSans')),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -230,7 +229,7 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
                     const DropdownMenuItem(value: null, child: Text('전체')),
                     ..._dongNames.map((dong) => DropdownMenuItem(
                       value: dong,
-                      child: Text(dong, style: GoogleFonts.notoSansKr()),
+                      child: Text(dong, style: TextStyle(fontFamily: 'NotoSans')),
                     )),
                   ],
                   onChanged: (value) {
@@ -255,7 +254,7 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
                     const DropdownMenuItem(value: null, child: Text('전체')),
                     ..._categories.map((category) => DropdownMenuItem(
                       value: category,
-                      child: Text(category, style: GoogleFonts.notoSansKr()),
+                      child: Text(category, style: TextStyle(fontFamily: 'NotoSans')),
                     )),
                   ],
                   onChanged: (value) {
@@ -280,7 +279,7 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
                     const DropdownMenuItem(value: null, child: Text('전체')),
                     ..._statuses.map((status) => DropdownMenuItem(
                       value: status,
-                      child: Text(status, style: GoogleFonts.notoSansKr()),
+                      child: Text(status, style: TextStyle(fontFamily: 'NotoSans')),
                     )),
                   ],
                   onChanged: (value) {
@@ -305,7 +304,7 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
         ElevatedButton.icon(
           onPressed: () => _showMerchantDialog(),
           icon: const Icon(Icons.add),
-          label: Text('가맹점 추가', style: GoogleFonts.notoSansKr()),
+          label: Text('가맹점 추가', style: TextStyle(fontFamily: 'NotoSans')),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
@@ -316,7 +315,7 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
         OutlinedButton.icon(
           onPressed: _resetFilters,
           icon: const Icon(Icons.refresh),
-          label: Text('필터 초기화', style: GoogleFonts.notoSansKr()),
+          label: Text('필터 초기화', style: TextStyle(fontFamily: 'NotoSans')),
         ),
         
         const Spacer(),
@@ -324,7 +323,7 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
         if (_pagination != null)
           Text(
             '총 ${_pagination!['total_items']}개 중 ${(_currentPage - 1) * _limit + 1}-${(_currentPage - 1) * _limit + _merchants.length}개',
-            style: GoogleFonts.notoSansKr(color: Colors.grey.shade600),
+            style: TextStyle(fontFamily: 'NotoSans',color: Colors.grey.shade600),
           ),
       ],
     );
@@ -340,7 +339,7 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
             const SizedBox(height: 16),
             Text(
               '가맹점 데이터가 없습니다.',
-              style: GoogleFonts.notoSansKr(
+              style: TextStyle(fontFamily: 'NotoSans',
                 fontSize: 16,
                 color: Colors.grey.shade600,
               ),
@@ -367,28 +366,28 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
           columnSpacing: 16,
           columns: [
             DataColumn(
-              label: Text('가맹점명', style: GoogleFonts.notoSansKr(fontWeight: FontWeight.bold)),
+              label: Text('가맹점명', style: TextStyle(fontFamily: 'NotoSans',fontWeight: FontWeight.bold)),
             ),
             DataColumn(
-              label: Text('동', style: GoogleFonts.notoSansKr(fontWeight: FontWeight.bold)),
+              label: Text('동', style: TextStyle(fontFamily: 'NotoSans',fontWeight: FontWeight.bold)),
             ),
             DataColumn(
-              label: Text('카테고리', style: GoogleFonts.notoSansKr(fontWeight: FontWeight.bold)),
+              label: Text('카테고리', style: TextStyle(fontFamily: 'NotoSans',fontWeight: FontWeight.bold)),
             ),
             DataColumn(
-              label: Text('상태', style: GoogleFonts.notoSansKr(fontWeight: FontWeight.bold)),
+              label: Text('상태', style: TextStyle(fontFamily: 'NotoSans',fontWeight: FontWeight.bold)),
             ),
             DataColumn(
-              label: Text('직원 수', style: GoogleFonts.notoSansKr(fontWeight: FontWeight.bold)),
+              label: Text('직원 수', style: TextStyle(fontFamily: 'NotoSans',fontWeight: FontWeight.bold)),
             ),
             DataColumn(
-              label: Text('월 매출', style: GoogleFonts.notoSansKr(fontWeight: FontWeight.bold)),
+              label: Text('월 매출', style: TextStyle(fontFamily: 'NotoSans',fontWeight: FontWeight.bold)),
             ),
             DataColumn(
-              label: Text('온누리', style: GoogleFonts.notoSansKr(fontWeight: FontWeight.bold)),
+              label: Text('온누리', style: TextStyle(fontFamily: 'NotoSans',fontWeight: FontWeight.bold)),
             ),
             DataColumn(
-              label: Text('작업', style: GoogleFonts.notoSansKr(fontWeight: FontWeight.bold)),
+              label: Text('작업', style: TextStyle(fontFamily: 'NotoSans',fontWeight: FontWeight.bold)),
             ),
           ],
           rows: _merchants.map((merchant) {
@@ -396,19 +395,19 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
               DataCell(
                 Text(
                   merchant['name'] ?? '',
-                  style: GoogleFonts.notoSansKr(),
+                  style: TextStyle(fontFamily: 'NotoSans'),
                 ),
               ),
               DataCell(
                 Text(
                   merchant['dong_name'] ?? '',
-                  style: GoogleFonts.notoSansKr(),
+                  style: TextStyle(fontFamily: 'NotoSans'),
                 ),
               ),
               DataCell(
                 Text(
                   merchant['category'] ?? '',
-                  style: GoogleFonts.notoSansKr(),
+                  style: TextStyle(fontFamily: 'NotoSans'),
                 ),
               ),
               DataCell(
@@ -420,7 +419,7 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
                   ),
                   child: Text(
                     merchant['status'] ?? '',
-                    style: GoogleFonts.notoSansKr(
+                    style: TextStyle(fontFamily: 'NotoSans',
                       fontSize: 12,
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
@@ -431,13 +430,13 @@ class _MerchantManagementWidgetState extends State<MerchantManagementWidget> {
               DataCell(
                 Text(
                   '${merchant['employee_count']}명',
-                  style: GoogleFonts.notoSansKr(),
+                  style: TextStyle(fontFamily: 'NotoSans'),
                 ),
               ),
               DataCell(
                 Text(
                   '${merchant['monthly_revenue']?.toStringAsFixed(0)}만원',
-                  style: GoogleFonts.notoSansKr(),
+                  style: TextStyle(fontFamily: 'NotoSans'),
                 ),
               ),
               DataCell(
@@ -692,7 +691,7 @@ class _MerchantFormDialogState extends State<MerchantFormDialog> {
               children: [
                 Text(
                   widget.merchant == null ? '가맹점 추가' : '가맹점 수정',
-                  style: GoogleFonts.notoSansKr(
+                  style: TextStyle(fontFamily: 'NotoSans',
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -710,7 +709,7 @@ class _MerchantFormDialogState extends State<MerchantFormDialog> {
                         ),
                         items: _dongNames.map((dong) => DropdownMenuItem(
                           value: dong,
-                          child: Text(dong, style: GoogleFonts.notoSansKr()),
+                          child: Text(dong, style: TextStyle(fontFamily: 'NotoSans')),
                         )).toList(),
                         onChanged: (value) => setState(() => _selectedDong = value!),
                       ),
@@ -725,7 +724,7 @@ class _MerchantFormDialogState extends State<MerchantFormDialog> {
                         ),
                         items: _categories.map((category) => DropdownMenuItem(
                           value: category,
-                          child: Text(category, style: GoogleFonts.notoSansKr()),
+                          child: Text(category, style: TextStyle(fontFamily: 'NotoSans')),
                         )).toList(),
                         onChanged: (value) => setState(() => _selectedCategory = value!),
                       ),
@@ -755,7 +754,7 @@ class _MerchantFormDialogState extends State<MerchantFormDialog> {
                         ),
                         items: _statuses.map((status) => DropdownMenuItem(
                           value: status,
-                          child: Text(status, style: GoogleFonts.notoSansKr()),
+                          child: Text(status, style: TextStyle(fontFamily: 'NotoSans')),
                         )).toList(),
                         onChanged: (value) => setState(() => _selectedStatus = value!),
                       ),
@@ -770,7 +769,7 @@ class _MerchantFormDialogState extends State<MerchantFormDialog> {
                         ),
                         items: _scales.map((scale) => DropdownMenuItem(
                           value: scale,
-                          child: Text(scale, style: GoogleFonts.notoSansKr()),
+                          child: Text(scale, style: TextStyle(fontFamily: 'NotoSans')),
                         )).toList(),
                         onChanged: (value) => setState(() => _selectedScale = value!),
                       ),
@@ -848,7 +847,7 @@ class _MerchantFormDialogState extends State<MerchantFormDialog> {
                 const SizedBox(height: 16),
                 
                 CheckboxListTile(
-                  title: Text('온누리상품권 가맹점', style: GoogleFonts.notoSansKr()),
+                  title: Text('온누리상품권 가맹점', style: TextStyle(fontFamily: 'NotoSans')),
                   value: _hasOnNuriCard,
                   onChanged: (value) => setState(() => _hasOnNuriCard = value ?? false),
                   controlAffinity: ListTileControlAffinity.leading,
@@ -860,7 +859,7 @@ class _MerchantFormDialogState extends State<MerchantFormDialog> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text('취소', style: GoogleFonts.notoSansKr()),
+                      child: Text('취소', style: TextStyle(fontFamily: 'NotoSans')),
                     ),
                     const SizedBox(width: 12),
                     ElevatedButton(
@@ -875,7 +874,7 @@ class _MerchantFormDialogState extends State<MerchantFormDialog> {
                               height: 16,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : Text('저장', style: GoogleFonts.notoSansKr()),
+                          : Text('저장', style: TextStyle(fontFamily: 'NotoSans')),
                     ),
                   ],
                 ),

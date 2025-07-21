@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:animations/animations.dart';
 import 'package:glass_kit/glass_kit.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:speech_balloon/speech_balloon.dart';
 import 'dart:math';
 import 'dart:async';
@@ -36,14 +33,8 @@ class MapWidget extends StatefulWidget {
   State<MapWidget> createState() => _MapWidgetState();
 }
 
-class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
+class _MapWidgetState extends State<MapWidget> {
   final TransformationController _transformationController = TransformationController();
-  late AnimationController _animationController;
-  late AnimationController _pulseController;
-  late AnimationController _fadeController;
-  Animation<Matrix4>? _matrixAnimation;
-  Animation<double>? _pulseAnimation;
-  Animation<double>? _fadeAnimation;
   Timer? _autoResetTimer;
 
   // State for layer visibility
@@ -83,28 +74,9 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     super.initState();
     
     _transformationController.value = Matrix4.identity();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 80),
-    );
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-    )..repeat(reverse: true);
-    _fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-    );
-    
-    _pulseAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
-    );
     
     // 컨트롤러에 네비게이션 함수 설정
-    widget.controller?._setNavigateFunction(_animateToMerchant);
+    widget.controller?._setNavigateFunction(_jumpToMerchant);
     
     _startAutoResetTimer();
     _calculateVisibleMerchants();
@@ -118,9 +90,6 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   @override
   void dispose() {
     _transformationController.dispose();
-    _animationController.dispose();
-    _pulseController.dispose();
-    _fadeController.dispose();
     _autoResetTimer?.cancel();
     super.dispose();
   }
@@ -232,6 +201,21 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     _transformationController.value = matrix;
   }
 
+  void _jumpToMerchant(Merchant merchant) {
+    setState(() {
+      _lastSelectedMerchant = merchant;
+    });
+    
+    final rect = Rect.fromCenter(
+      center: Offset(merchant.x, merchant.y),
+      width: 200,
+      height: 200,
+    );
+    _jumpToRect(rect);
+    
+    _startAutoResetTimer();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -302,9 +286,8 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                           // Terrain layer with lazy loading
                           if (_showTerrain)
                             RepaintBoundary(
-                              child: AnimatedOpacity(
+                              child: Opacity(
                                 opacity: _showTerrain ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 300),
                                 child: Image.asset(
                                   'assets/map/mount.webp',
                                   fit: BoxFit.contain,
@@ -321,9 +304,8 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                           // _showDisableDongAreas가 true이고 전체가 선택된 경우에만 표시
                           if (_showDisableDongAreas)
                             RepaintBoundary(
-                              child: AnimatedOpacity(
+                              child: Opacity(
                                 opacity: _showDisableDongAreas ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 300),
                                 child: Image.asset(
                                   'assets/map/base_gray.webp',
                                   fit: BoxFit.contain,
@@ -340,9 +322,8 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                           // _showDongAreas가 true이고 특정 동이 선택된 경우에만 표시
                           if (_showDongAreas && _selectedDong != null)
                             RepaintBoundary(
-                              child: AnimatedOpacity(
+                              child: Opacity(
                                 opacity: 1.0,
-                                duration: const Duration(milliseconds: 300),
                                 child: Image.asset(
                                   _selectedDong!.areaAsset,
                                   fit: BoxFit.contain,
@@ -392,7 +373,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     );
   }
 
-  void _animateToRect(Rect rect) {
+  void _jumpToRect(Rect rect) {
     final context = interactiveViewerKey.currentContext;
     if (context == null) return;
 
@@ -407,21 +388,8 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
       ..translate(dx, dy)
       ..scale(scale);
 
-    _matrixAnimation = Matrix4Tween(
-      begin: _transformationController.value,
-      end: endMatrix,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOutCubic,
-    ));
-
-    _animationController.addListener(() {
-      if (_matrixAnimation != null) {
-        _transformationController.value = _matrixAnimation!.value;
-      }
-    });
-
-    _animationController.forward(from: 0);
+    // Directly set the transformation without animation
+    _transformationController.value = endMatrix;
   }
 
   void _handleTapUp(TapUpDetails details) {
@@ -548,7 +516,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         ElevatedButton(
           onPressed: () {
             Navigator.of(context).pop();
-            _animateToMerchant(merchant);
+            _jumpToMerchant(merchant);
           },
           child: const Text('위치로 이동', style: TextStyle(fontSize: 20)),
         ),
@@ -556,26 +524,11 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     );
   }
 
-  void _animateToMerchant(Merchant merchant) {
-    setState(() {
-      _lastSelectedMerchant = merchant;
-    });
-    
-    final rect = Rect.fromCenter(
-      center: Offset(merchant.x, merchant.y),
-      width: 200,
-      height: 200,
-    );
-    _animateToRect(rect);
-    
-    _startAutoResetTimer(); // 자동 리셋 타이머 재시작
-  }
 
   List<Widget> _buildMerchantNumbers() {
     if (!_showNumber) return [];
 
     List<Widget> widgets = [];
-    int animationIndex = 0;
 
     for (var dong in DongList.all) {
       if (_selectedDong != null && dong != _selectedDong) continue;
@@ -594,17 +547,10 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
             top: merchant.y,
             child: RepaintBoundary(
               key: ValueKey('merchant_${merchant.id}'),
-              child: AnimationConfiguration.staggeredList(
-                position: animationIndex,
-                duration: const Duration(milliseconds: 200), // Reduced animation time
-                child: FadeInAnimation(
-                  child: _buildMerchantMarker(merchant, dong, isHighlighted, isLastSelected),
-                ),
-              ),
+              child: _buildMerchantMarker(merchant, dong, isHighlighted, isLastSelected),
             ),
           ),
         );
-        animationIndex++;
       }
     }
     
@@ -612,10 +558,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   }
 
   Widget _buildMerchantMarker(Merchant merchant, Dong dong, bool isHighlighted, bool isLastSelected) {
-    return AnimatedBuilder(
-      animation: _pulseAnimation!,
-      builder: (context, child) {
-        final scale = isHighlighted ? _pulseAnimation!.value : 1.0;
+    final scale = isHighlighted ? 1.1 : 1.0;
         
         // 마지막 선택된 상인회는 노란색 배경, 일반 선택 모드에서는 오렌지색 테두리
         Color backgroundColor = Colors.white;
@@ -674,8 +617,6 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
             ),
           ),
         );
-      },
-    );
   }
 
   List<Widget> _buildDongAreas() {
@@ -689,9 +630,8 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
       widgets.add(
         Positioned.fromRect(
           rect: dong.area,
-          child: AnimatedOpacity(
+          child: Opacity(
             opacity: dong.isShow ? 0.3 : 0.0,
-            duration: const Duration(milliseconds: 300),
             child: Container(
               decoration: BoxDecoration(
                 color: dong.color,
@@ -723,9 +663,8 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           rect: dong.dongTagArea,
           child: RepaintBoundary(
             key: ValueKey('dong_tag_${dong.name}'),
-            child: AnimatedOpacity(
+            child: Opacity(
               opacity: 1.0,
-              duration: const Duration(milliseconds: 300),
               child: GestureDetector(
                 onTap: () {
                   //_showDongMerchantDialog(dong);
@@ -746,11 +685,11 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                     width: dong.dongTagArea.width,
                     height: 52,
                     borderRadius: 12,
+                    borderWidth: 8,
                     nipLocation: NipLocation.bottom,
                     nipHeight: 18,
                     color: Colors.white,
                     borderColor: dong.color,
-                    borderWidth: 4,
                     child: Center(
                       child: Text(
                         dong.name,
@@ -879,9 +818,8 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   }) {
     return GestureDetector(
       onTap: () => onChanged(!value),
-      child: AnimatedContainer(
+      child: Container(
         width: double.infinity,
-        duration: const Duration(milliseconds: 200),
         margin: EdgeInsets.symmetric(horizontal: 8),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
@@ -1035,8 +973,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   Widget _buildDongSelectionItem(Dong? dong, String title) {
     final isSelected = _selectedDong == dong;
     
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
       decoration: BoxDecoration(
         color: isSelected ? Colors.blue.withOpacity(0.3) : Colors.transparent,
@@ -1069,15 +1006,6 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
             ],
           ),
         ),
-        // trailing: dong != null
-        //     ? Text(
-        //         '${dong.merchantList.length}개',
-        //         style: const TextStyle(fontSize: 14),
-        //       )
-        //     : Text(
-        //         '${DongList.all.fold(0, (sum, d) => sum + d.merchantList.length)}개',
-        //         style: const TextStyle(fontSize: 14),
-        //       ),
         onTap: () {
           setState(() {
             _selectedDong = dong;
@@ -1101,7 +1029,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           _calculateVisibleMerchants();
           
           if (dong != null) {
-            _animateToRect(dong.area);
+            _jumpToRect(dong.area);
             // 동을 선택하면 해당 동별 가맹점 현황 다이얼로그 표시
             //_showDongMerchantDialog(dong);
           } else {
@@ -1116,52 +1044,46 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   }
 
   Widget _buildTouchFeedback() {
-    return AnimatedBuilder(
-      animation: _fadeAnimation!,
-      builder: (context, child) {
-        return Positioned(
-          top: 24,
-          left: 24,
-          child: AnimatedOpacity(
-            opacity: _isSelectionMode ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 300),
-            child: GlassContainer(
-              height: 60,
-              width: 200,
-              gradient: LinearGradient(
-                colors: [Colors.orange.withOpacity(0.40), Colors.orange.withOpacity(0.10)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderGradient: LinearGradient(
-                colors: [Colors.orange.withOpacity(0.60), Colors.orange.withOpacity(0.10)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderColor: Colors.orange.withOpacity(0.3),
-              blur: 15,
-              borderRadius: BorderRadius.circular(16),
-              child: const Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.touch_app, color: Colors.orange, size: 24),
-                    SizedBox(width: 8),
-                    Text(
-                      '선택 모드',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange,
-                      ),
-                    ),
-                  ],
+    return Positioned(
+      top: 24,
+      left: 24,
+      child: Opacity(
+        opacity: _isSelectionMode ? 1.0 : 0.0,
+        child: GlassContainer(
+          height: 60,
+          width: 200,
+          gradient: LinearGradient(
+            colors: [Colors.orange.withOpacity(0.40), Colors.orange.withOpacity(0.10)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderGradient: LinearGradient(
+            colors: [Colors.orange.withOpacity(0.60), Colors.orange.withOpacity(0.10)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderColor: Colors.orange.withOpacity(0.3),
+          blur: 15,
+          borderRadius: BorderRadius.circular(16),
+          child: const Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.touch_app, color: Colors.orange, size: 24),
+                SizedBox(width: 8),
+                Text(
+                  '선택 모드',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -1212,7 +1134,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     });
     
     if (dong != null) {
-      _animateToRect(dong.area);
+      _jumpToRect(dong.area);
       // 동을 선택하면 해당 동별 가맹점 현황 다이얼로그 표시
       //_showDongMerchantDialog(dong);
     } else {
