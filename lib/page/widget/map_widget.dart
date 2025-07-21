@@ -4,6 +4,7 @@ import 'package:animations/animations.dart';
 import 'package:glass_kit/glass_kit.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:speech_balloon/speech_balloon.dart';
 import 'dart:math';
 import 'dart:async';
 
@@ -730,13 +731,47 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                   //_showDongMerchantDialog(dong);
                   _startAutoResetTimer();
                 },
-                child: Image.asset(
-                  dong.dongTagAsset,
-                  fit: BoxFit.contain,
-                  filterQuality: FilterQuality.medium,
-                  cacheWidth: dong.dongTagArea.width.toInt(),
-                  cacheHeight: dong.dongTagArea.height.toInt(),
+                child: Container(
+                  width: dong.dongTagArea.width,
+                  height: 52,
+                  alignment: Alignment.topLeft,
+                  // decoration: BoxDecoration(
+                  //   color: Colors.white,
+                  //   border: Border.all(
+                  //     color: Colors.red,
+                  //     width: 2
+                  //   ),
+                  // ),
+                  child: SpeechBalloon(
+                    width: dong.dongTagArea.width,
+                    height: 52,
+                    borderRadius: 12,
+                    nipLocation: NipLocation.bottom,
+                    nipHeight: 18,
+                    color: Colors.white,
+                    borderColor: dong.color,
+                    borderWidth: 4,
+                    child: Center(
+                      child: Text(
+                        dong.name,
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
                 ),
+                // child: Image.asset(
+                //   dong.dongTagAsset,
+                //   fit: BoxFit.contain,
+                //   filterQuality: FilterQuality.medium,
+                //   cacheWidth: dong.dongTagArea.width.toInt(),
+                //   cacheHeight: dong.dongTagArea.height.toInt(),
+                // ),
               ),
             ),
           ),

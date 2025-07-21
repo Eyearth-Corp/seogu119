@@ -156,7 +156,7 @@ class DongList {
     // 52-53
     Dong(name: '서창(마륵)동', color: Color(0xFFe6bb39),
         area: Rect.fromLTWH(393, 1187, 586, 345),
-        dongTagArea: Rect.fromLTWH(724, 1325, 132, 90),
+        dongTagArea: Rect.fromLTWH(724, 1325, 152, 90),
         areaAsset: 'assets/map/dong_마륵.webp',
         dongTagAsset: 'assets/map/tag_마륵.webp',
         merchantList : [
@@ -307,7 +307,7 @@ class DongList {
     // 118-119
     Dong(name: '서창(매월)동', color: Color(0xFFe7bc3a),
         area: Rect.fromLTWH(1009, 1880, 458, 433),
-        dongTagArea: Rect.fromLTWH(1167, 2062, 133, 90),
+        dongTagArea: Rect.fromLTWH(1167, 2062, 152, 90),
         areaAsset: 'assets/map/dong_매월.webp',
         dongTagAsset: 'assets/map/tag_매월.webp',
         merchantList : [
