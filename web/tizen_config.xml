@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" 
+        xmlns:tizen="http://tizen.org/ns/widgets"
+        id="http://seogu119.dashboard" 
+        version="1.0.0">
+    
+    <tizen:app-widget id="seogu119.dashboard" primary="true" max-instance="1">
+        <tizen:widget-label>서구 골목경제 119</tizen:widget-label>
+        <tizen:widget-content src="index.html">
+            <tizen:widget-size preview="preview.png">4x4</tizen:widget-size>
+        </tizen:widget-content>
+    </tizen:app-widget>
+    
+    <name xml:lang="ko">서구 골목경제 119 상황판</name>
+    <name xml:lang="en">Seogu Alley Economy 119 Dashboard</name>
+    
+    <description xml:lang="ko">광주광역시 서구 골목경제 현황 및 상인회 통계 대시보드</description>
+    <description xml:lang="en">Gwangju Seogu District Alley Economy Statistics Dashboard</description>
+    
+    <author href="https://seogu.gwangju.kr" email="webmaster@seogu.gwangju.kr">광주광역시 서구청</author>
+    
+    <content src="index.html"/>
+    <icon src="favicon-96x96.png"/>
+    
+    <tizen:application id="seogu119.dashboard" package="seogu119" required_version="4.0"/>
+    
+    <feature name="http://tizen.org/feature/web.service"/>
+    <feature name="http://tizen.org/feature/network.internet"/>
+    
+    <tizen:privilege name="http://tizen.org/privilege/internet"/>
+    <tizen:privilege name="http://tizen.org/privilege/widget.viewer"/>
+    
+    <tizen:setting screen-orientation="landscape" 
+                   context-menu="enable" 
+                   background-support="disable"
+                   encryption="disable"
+                   install-location="auto"/>
+    
+    <preference name="tizen-app-version" value="1.0.0"/>
+    <preference name="tizen-app-description" value="서구 골목경제 대시보드"/>
+</widget>
