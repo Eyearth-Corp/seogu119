@@ -4,9 +4,10 @@ import 'package:flutter/services.dart';
 import 'dart:html' as html;
 import 'widget/floating_action_buttons.dart';
 import 'widget/map_widget.dart';
-import 'widget/admin_access_button.dart';
+import 'widget/dashboard/main_dashboard.dart';
+import 'widget/dashboard/dong_dashboard.dart';
 import 'data/dong_list.dart';
-import 'package:fl_chart/fl_chart.dart';
+import '../core/colors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,6 +19,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isMapLeft = false;
   bool _isFullscreen = false;
+  Dong? _selectedDong; // 선택된 동
   
   // MapWidget을 제어하기 위한 컨트롤러
   final MapWidgetController _mapController = MapWidgetController();
@@ -52,741 +54,24 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  /// 선택된 동 변경 콜백
+  void _onDongSelected(Dong? dong) {
+    setState(() {
+      _selectedDong = dong;
+    });
+  }
+
   /// 대시보드 공간 - 8개 섹션으로 구성
   Widget _buildDashboardSpace() {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        border: Border(
-          right: BorderSide(
-            color: Colors.grey.shade300,
-            width: 1,
-          ),
-        ),
-      ),
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            // 상단 메트릭 카드들
-            _buildTopMetrics(),
-            const SizedBox(height: 20),
-            // 하단 주요 성과
-            _buildWeeklyAchievements(),
-            const SizedBox(height: 20),
-            _buildOnNuriTrendChart(),
-            const SizedBox(height: 20),
-            _buildDongMembershipStatus(),
-            const SizedBox(height: 20),
-            _buildComplaintKeywords(),
-            const SizedBox(height: 20),
-            _buildComplaintPerformance(),
-            const SizedBox(height: 20),
-            _buildComplaintCases(),
-            const SizedBox(height: 20),
-            _buildOtherOrganizationTrends(),
-            const SizedBox(height: 20),
-
-          ],
-        ),
-      ),
-    );
-  }
-
-  // 1. 상단 메트릭 카드들 - 전체 가맹점, 이번주 신규, 가맹률
-  Widget _buildTopMetrics() {
-    return Row(
-      children: [
-        Expanded(child: _buildMetricCard('🏪 전체 가맹점', '11,426', '개', const Color(0xFF3B82F6))),
-        const SizedBox(width: 16),
-        Expanded(child: _buildMetricCard('✨ 이번주 신규', '47', '개', const Color(0xFF10B981))),
-        const SizedBox(width: 16),
-        Expanded(child: _buildMetricCard('📊 가맹률', '85.2', '%', const Color(0xFFEAB308))),
-      ],
-    );
-  }
-
-  Widget _buildMetricCard(String title, String value, String unit, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 19,
-              color: Color(0xFF64748B),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 2),
-                child: Text(
-                  unit,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF64748B),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 2. 온누리 가맹점 추이
-  Widget _buildOnNuriTrendChart() {
-    return Container(
-      height: 200,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '📈 온누리 가맹점 추이',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(
-                  show: true,
-                  drawHorizontalLine: true,
-                  horizontalInterval: 10,
-                  getDrawingHorizontalLine: (value) => FlLine(
-                    color: const Color(0xFFE2E8F0),
-                    strokeWidth: 1,
-                  ),
-                  drawVerticalLine: false,
-                ),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 35,
-                      getTitlesWidget: (value, meta) => Text(
-                        '${value.toInt()}%',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-                      ),
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 25,
-                      getTitlesWidget: (value, meta) {
-                        return const Text('');
-                      },
-                    ),
-                  ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                ),
-                borderData: FlBorderData(show: false),
-                minX: 0,
-                maxX: 5,
-                minY: 70,
-                maxY: 90,
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: const [
-                      FlSpot(0, 75),
-                      FlSpot(1, 78),
-                      FlSpot(2, 82),
-                      FlSpot(3, 80),
-                      FlSpot(4, 85),
-                      FlSpot(5, 87),
-                    ],
-                    isCurved: true,
-                    color: const Color(0xFF3B82F6),
-                    barWidth: 3,
-                    isStrokeCapRound: true,
-                    dotData: FlDotData(
-                      show: true,
-                      getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
-                        radius: 4,
-                        color: const Color(0xFF3B82F6),
-                        strokeWidth: 2,
-                        strokeColor: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 3. 동별 가맹률 현황
-  Widget _buildDongMembershipStatus() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '🗺️ 동별 가맹률 현황',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildDongStatusItem('동천동', 92.1, const Color(0xFF10B981)),
-          _buildDongStatusItem('유촌동', 88.3, const Color(0xFF3B82F6)),
-          _buildDongStatusItem('청아동', 85.7, const Color(0xFFEAB308)),
-          _buildDongStatusItem('화정동', 82.4, const Color(0xFFEF4444)),
-          _buildDongStatusItem('기타', 79.2, const Color(0xFF64748B)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDongStatusItem(String dongName, double percentage, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                width: 100,
-                child: Text(
-                  dongName,
-                  style: const TextStyle(
-                    fontSize: 19,
-                    color: Color(0xFF64748B),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Container(
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  child: FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: percentage / 100.0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: color,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                width: 80,
-                alignment: Alignment.centerRight,
-                child: Text(
-                  '${percentage.toStringAsFixed(1)}%',
-                  style: const TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E293B),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 4. 민원 TOP 3 키워드
-  Widget _buildComplaintKeywords() {
-    return Container(
-      height: 140,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '🔥 민원 TOP 3 키워드',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: Row(
-              children: [
-                _buildKeywordItem('1', '주차 문제', 34, const Color(0xFFEF4444)),
-                _buildKeywordItem('2', '소음 방해', 28, const Color(0xFFEAB308)),
-                _buildKeywordItem('3', '청소 문제', 19, const Color(0xFF3B82F6)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKeywordItem(String rank, String keyword, int count, Color color) {
-    return Expanded(
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    rank,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 8),
-              Text(
-                keyword,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFF1E293B),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '$count건',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF64748B),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 5. 민원 해결 사례
-  Widget _buildComplaintCases() {
-    return Container(
-      height: 170,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '✅ 민원 해결 사례',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCaseItem('동천동 주차장 확장', '해결'),
-                _buildCaseItem('유촌동 소음방해 개선', '진행중'),
-                _buildCaseItem('청아동 청소 개선', '해결'),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCaseItem(String title, String status) {
-    final isCompleted = status == '해결';
-    return Expanded(
-      child: Row(
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: isCompleted ? const Color(0xFF10B981) : const Color(0xFFEAB308),
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 19,
-                color: Color(0xFF1E293B),
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: isCompleted 
-                  ? const Color(0xFF10B981).withOpacity(0.1)
-                  : const Color(0xFFEAB308).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              status,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: isCompleted ? const Color(0xFF10B981) : const Color(0xFFEAB308),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 6. 민원처리 실적
-  Widget _buildComplaintPerformance() {
-    return Container(
-      height: 170,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '📋 민원처리 실적',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
-                      '처리됨',
-                      style: TextStyle(
-                        fontSize: 19,
-                        color: Color(0xFF64748B),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      '187건',
-                      style: TextStyle(
-                        fontSize: 23,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF10B981),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 40,
-                color: const Color(0xFFE2E8F0),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
-                      '처리율',
-                      style: TextStyle(
-                        fontSize: 19,
-                        color: Color(0xFF64748B),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      '94.2%',
-                      style: TextStyle(
-                        fontSize: 23,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF3B82F6),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 7. 타 기관·지자체 주요 동향
-  Widget _buildOtherOrganizationTrends() {
-    return Container(
-      height: 140,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '🌐 타 기관·지자체 주요 동향',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTrendItem('부산 동구 골목상권 활성화 사업'),
-                _buildTrendItem('대구 중구 전통시장 디지털화'),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTrendItem(String title) {
-    return Expanded(
-      child: Row(
-        children: [
-          Container(
-            width: 4,
-            height: 4,
-            decoration: BoxDecoration(
-              color: const Color(0xFF64748B),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 19,
-                color: Color(0xFF1E293B),
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 8. 금주 주요 성과
-  Widget _buildWeeklyAchievements() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '🎯 금주 주요 성과',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildAchievementCard('신규 가맹점', '47개', const Color(0xFF10B981)),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildAchievementCard('민원 해결', '23건', const Color(0xFF3B82F6)),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildAchievementCard('지원 예산', '2.3억', const Color(0xFFEAB308)),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAchievementCard(String title, String value, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 19,
-              color: Color(0xFF64748B),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
+    if (_selectedDong != null) {
+      return DongDashboard(
+        dong: _selectedDong!,
+        onBackPressed: () => _onDongSelected(null),
+        onMerchantSelected: _navigateToMerchant,
+      );
+    }
+    
+    return const MainDashboard();
   }
 
   @override
@@ -794,7 +79,27 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
-        title: const Text('광주광역시 서구 골목경제 119 상황판', style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold))
+        backgroundColor: SeoguColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo.png',
+              height: 60,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 16),
+            const Text(
+              '광주광역시 서구 골목경제 119 상황판',
+              style: TextStyle(
+                fontSize: 34,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
       body: Stack(
         children: [
@@ -819,13 +124,12 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Expanded(
                     flex: 7,
-                    child: RepaintBoundary(
-                      child: MapWidget(
-                        controller: _mapController,
-                        onMerchantSelected: (merchant) {
-                          print('Selected merchant: ${merchant.id} - ${merchant.name}');
-                        },
-                      ),
+                    child: MapWidget(
+                      controller: _mapController,
+                      onMerchantSelected: (merchant) {
+                        print('Selected merchant: ${merchant.id} - ${merchant.name}');
+                      },
+                      onDongSelected: _onDongSelected,
                     ),
                   ),
                   Container(

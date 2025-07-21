@@ -26,9 +26,10 @@ class MapWidgetController {
 
 class MapWidget extends StatefulWidget {
   final Function(Merchant)? onMerchantSelected;
+  final Function(Dong?)? onDongSelected;
   final MapWidgetController? controller;
   
-  const MapWidget({super.key, this.onMerchantSelected, this.controller});
+  const MapWidget({super.key, this.onMerchantSelected, this.onDongSelected, this.controller});
 
   @override
   State<MapWidget> createState() => _MapWidgetState();
@@ -264,7 +265,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                   key: interactiveViewerKey,
                   transformationController: _transformationController,
                   minScale: 0.1,
-                  maxScale: 3.0,
+                  maxScale: 2.0,
                   boundaryMargin: const EdgeInsets.all(400),
                   constrained: false,
                   onInteractionUpdate: (details) {
@@ -507,15 +508,15 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     );
   }
 
-  void _showDongMerchantDialog(Dong dong) {
-    showDialog(
-      context: context,
-      builder: (context) => DongMerchantDialog(
-        dongName: dong.name,
-        dongColor: dong.color,
-      ),
-    );
-  }
+  // void _showDongMerchantDialog(Dong dong) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => DongMerchantDialog(
+  //       dongName: dong.name,
+  //       dongColor: dong.color,
+  //     ),
+  //   );
+  // }
 
   Widget _buildMerchantDetailsModal(Merchant merchant) {
     return AlertDialog(
@@ -726,7 +727,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
               duration: const Duration(milliseconds: 300),
               child: GestureDetector(
                 onTap: () {
-                  _showDongMerchantDialog(dong);
+                  //_showDongMerchantDialog(dong);
                   _startAutoResetTimer();
                 },
                 child: Image.asset(
@@ -1046,7 +1047,6 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           setState(() {
             _selectedDong = dong;
             _selectedMerchants.clear();
-            _calculateVisibleMerchants();
             
             // 자동 상태 관리
             if (dong == null) {
@@ -1059,6 +1059,11 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
               _showDongAreas = true;
             }
           });
+          
+          // 대시보드에 동 선택 전달
+          widget.onDongSelected?.call(dong);
+          
+          _calculateVisibleMerchants();
           
           if (dong != null) {
             _animateToRect(dong.area);
@@ -1174,7 +1179,7 @@ class _MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     if (dong != null) {
       _animateToRect(dong.area);
       // 동을 선택하면 해당 동별 가맹점 현황 다이얼로그 표시
-      _showDongMerchantDialog(dong);
+      //_showDongMerchantDialog(dong);
     } else {
       _zoomToFitEntireMap();
     }
