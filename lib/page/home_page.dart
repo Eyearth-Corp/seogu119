@@ -79,25 +79,33 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
-        backgroundColor: SeoguColors.primary,
+        backgroundColor: Colors.white,
         foregroundColor: Colors.white,
         elevation: 0,
         title: Row(
           children: [
+            SizedBox(width: 128),
             Image.asset(
-              'assets/images/logo.png',
+              'assets/images/logo_seogu.png',
               height: 60,
               fit: BoxFit.contain,
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 20),
+            Image.asset(
+              'assets/images/logo_slogan.png',
+              height: 48,
+              fit: BoxFit.contain,
+            ),
+            Spacer(),
             const Text(
               '광주광역시 서구 골목경제 119 상황판',
               style: TextStyle(
                 fontSize: 34,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: SeoguColors.primary,
               ),
             ),
+            SizedBox(width: 128)
           ],
         ),
       ),

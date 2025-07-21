@@ -1,35 +1,45 @@
 {
-    "name": "seogu119",
-    "short_name": "seogu119",
+    "name": "광주광역시 서구 골목경제 119 상황판",
+    "short_name": "서구 골목경제 119",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#1E3A8A",
+    "theme_color": "#1E3A8A",
+    "description": "광주광역시 서구 골목경제 현황 및 상인회 통계 대시보드",
+    "orientation": "landscape-primary",
     "prefer_related_applications": false,
+    "categories": ["government", "productivity", "utilities"],
+    "lang": "ko",
+    "scope": "/",
     "icons": [
+        {
+            "src": "favicon-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png"
+        },
+        {
+            "src": "web-app-manifest-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "web-app-manifest-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
         {
             "src": "icons/Icon-192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
             "src": "icons/Icon-512.png",
             "sizes": "512x512",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/Icon-maskable-192.png",
-            "sizes": "192x192",
             "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "icons/Icon-maskable-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
+            "purpose": "any"
         }
     ]
 }

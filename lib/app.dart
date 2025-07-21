@@ -11,17 +11,13 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    print(width);
-    print(height);
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: '서구 골목',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: GoogleFonts.notoSansKr().fontFamily,
+        scaffoldBackgroundColor: Colors.white,
       ),
       initialRoute: '/',
       routes: {
