@@ -65,27 +65,28 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             // 상단 메트릭 카드들
             _buildTopMetrics(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             // 하단 주요 성과
             _buildWeeklyAchievements(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             _buildOnNuriTrendChart(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             _buildDongMembershipStatus(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             _buildComplaintKeywords(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             _buildComplaintPerformance(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             _buildComplaintCases(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             _buildOtherOrganizationTrends(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
           ],
         ),
@@ -97,11 +98,11 @@ class _HomePageState extends State<HomePage> {
   Widget _buildTopMetrics() {
     return Row(
       children: [
-        Expanded(child: _buildMetricCard('전체 가맹점', '11,426', '개', const Color(0xFF3B82F6))),
-        const SizedBox(width: 12),
-        Expanded(child: _buildMetricCard('이번주 신규', '47', '개', const Color(0xFF10B981))),
-        const SizedBox(width: 12),
-        Expanded(child: _buildMetricCard('가맹률', '85.2', '%', const Color(0xFFEAB308))),
+        Expanded(child: _buildMetricCard('🏪 전체 가맹점', '11,426', '개', const Color(0xFF3B82F6))),
+        const SizedBox(width: 16),
+        Expanded(child: _buildMetricCard('✨ 이번주 신규', '47', '개', const Color(0xFF10B981))),
+        const SizedBox(width: 16),
+        Expanded(child: _buildMetricCard('📊 가맹률', '85.2', '%', const Color(0xFFEAB308))),
       ],
     );
   }
@@ -126,30 +127,30 @@ class _HomePageState extends State<HomePage> {
           Text(
             title,
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 19,
               color: Color(0xFF64748B),
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: color,
                 ),
               ),
-              const SizedBox(width: 2),
+              const SizedBox(width: 4),
               Padding(
                 padding: const EdgeInsets.only(bottom: 2),
                 child: Text(
                   unit,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     color: Color(0xFF64748B),
                     fontWeight: FontWeight.w500,
                   ),
@@ -165,7 +166,7 @@ class _HomePageState extends State<HomePage> {
   // 2. 온누리 가맹점 추이
   Widget _buildOnNuriTrendChart() {
     return Container(
-      height: 180,
+      height: 200,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -182,14 +183,14 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '온누리 가맹점 추이',
+            '📈 온누리 가맹점 추이',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1E293B),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Expanded(
             child: LineChart(
               LineChartData(
@@ -210,7 +211,7 @@ class _HomePageState extends State<HomePage> {
                       reservedSize: 35,
                       getTitlesWidget: (value, meta) => Text(
                         '${value.toInt()}%',
-                        style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+                        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                       ),
                     ),
                   ),
@@ -219,13 +220,6 @@ class _HomePageState extends State<HomePage> {
                       showTitles: true,
                       reservedSize: 25,
                       getTitlesWidget: (value, meta) {
-                        const labels = ['1월', '2월', '3월', '4월', '5월', '6월'];
-                        if (value.toInt() >= 0 && value.toInt() < labels.length) {
-                          return Text(
-                            labels[value.toInt()],
-                            style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
-                          );
-                        }
                         return const Text('');
                       },
                     ),
@@ -274,7 +268,6 @@ class _HomePageState extends State<HomePage> {
   // 3. 동별 가맹률 현황
   Widget _buildDongMembershipStatus() {
     return Container(
-      height: 180,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -291,25 +284,19 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '동별 가맹률 현황',
+            '🗺️ 동별 가맹률 현황',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1E293B),
             ),
           ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: ListView(
-              children: [
-                _buildDongStatusItem('동천동', 92.1, const Color(0xFF10B981)),
-                _buildDongStatusItem('유촌동', 88.3, const Color(0xFF3B82F6)),
-                _buildDongStatusItem('청아동', 85.7, const Color(0xFFEAB308)),
-                _buildDongStatusItem('화정동', 82.4, const Color(0xFFEF4444)),
-                _buildDongStatusItem('기타', 79.2, const Color(0xFF64748B)),
-              ],
-            ),
-          ),
+          const SizedBox(height: 16),
+          _buildDongStatusItem('동천동', 92.1, const Color(0xFF10B981)),
+          _buildDongStatusItem('유촌동', 88.3, const Color(0xFF3B82F6)),
+          _buildDongStatusItem('청아동', 85.7, const Color(0xFFEAB308)),
+          _buildDongStatusItem('화정동', 82.4, const Color(0xFFEF4444)),
+          _buildDongStatusItem('기타', 79.2, const Color(0xFF64748B)),
         ],
       ),
     );
@@ -317,34 +304,63 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildDongStatusItem(String dongName, double percentage, Color color) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Column(
         children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              dongName,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF64748B),
+          Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(4),
+                ),
               ),
-            ),
-          ),
-          Text(
-            '${percentage.toStringAsFixed(1)}%',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1E293B),
-            ),
+              const SizedBox(width: 10),
+              Container(
+                width: 100,
+                child: Text(
+                  dongName,
+                  style: const TextStyle(
+                    fontSize: 19,
+                    color: Color(0xFF64748B),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: percentage / 100.0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                width: 80,
+                alignment: Alignment.centerRight,
+                child: Text(
+                  '${percentage.toStringAsFixed(1)}%',
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E293B),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -354,7 +370,7 @@ class _HomePageState extends State<HomePage> {
   // 4. 민원 TOP 3 키워드
   Widget _buildComplaintKeywords() {
     return Container(
-      height: 150,
+      height: 140,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -371,14 +387,14 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '민원 TOP 3 키워드',
+            '🔥 민원 TOP 3 키워드',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1E293B),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Expanded(
             child: Row(
               children: [
@@ -397,37 +413,43 @@ class _HomePageState extends State<HomePage> {
     return Expanded(
       child: Column(
         children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(
-                rank,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    rank,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
-            ),
+              SizedBox(width: 8),
+              Text(
+                keyword,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF1E293B),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            keyword,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF1E293B),
-            ),
-          ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             '$count건',
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 19,
               fontWeight: FontWeight.w600,
               color: Color(0xFF64748B),
             ),
@@ -440,7 +462,7 @@ class _HomePageState extends State<HomePage> {
   // 5. 민원 해결 사례
   Widget _buildComplaintCases() {
     return Container(
-      height: 150,
+      height: 170,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -457,14 +479,14 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '민원 해결 사례',
+            '✅ 민원 해결 사례',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1E293B),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,12 +515,12 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(4),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               title,
               style: const TextStyle(
-                fontSize: 12,
+                fontSize: 19,
                 color: Color(0xFF1E293B),
               ),
               maxLines: 1,
@@ -516,7 +538,7 @@ class _HomePageState extends State<HomePage> {
             child: Text(
               status,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: isCompleted ? const Color(0xFF10B981) : const Color(0xFFEAB308),
               ),
@@ -530,7 +552,7 @@ class _HomePageState extends State<HomePage> {
   // 6. 민원처리 실적
   Widget _buildComplaintPerformance() {
     return Container(
-      height: 150,
+      height: 170,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -547,14 +569,14 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '민원처리 실적',
+            '📋 민원처리 실적',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1E293B),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
@@ -564,24 +586,17 @@ class _HomePageState extends State<HomePage> {
                     const Text(
                       '처리됨',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 19,
                         color: Color(0xFF64748B),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     const Text(
-                      '187',
+                      '187건',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 23,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF10B981),
-                      ),
-                    ),
-                    const Text(
-                      '건',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF64748B),
                       ),
                     ),
                   ],
@@ -599,24 +614,17 @@ class _HomePageState extends State<HomePage> {
                     const Text(
                       '처리율',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 19,
                         color: Color(0xFF64748B),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     const Text(
-                      '94.2',
+                      '94.2%',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 23,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF3B82F6),
-                      ),
-                    ),
-                    const Text(
-                      '%',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF64748B),
                       ),
                     ),
                   ],
@@ -632,7 +640,7 @@ class _HomePageState extends State<HomePage> {
   // 7. 타 기관·지자체 주요 동향
   Widget _buildOtherOrganizationTrends() {
     return Container(
-      height: 120,
+      height: 140,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -649,14 +657,14 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '타 기관·지자체 주요 동향',
+            '🌐 타 기관·지자체 주요 동향',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1E293B),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -683,12 +691,12 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               title,
               style: const TextStyle(
-                fontSize: 12,
+                fontSize: 19,
                 color: Color(0xFF1E293B),
               ),
               maxLines: 1,
@@ -719,24 +727,24 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '금주 주요 성과',
+            '🎯 금주 주요 성과',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1E293B),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: _buildAchievementCard('신규 가맹점', '47개', const Color(0xFF10B981)),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
                 child: _buildAchievementCard('민원 해결', '23건', const Color(0xFF3B82F6)),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
                 child: _buildAchievementCard('지원 예산', '2.3억', const Color(0xFFEAB308)),
               ),
@@ -763,15 +771,15 @@ class _HomePageState extends State<HomePage> {
           Text(
             title,
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 19,
               color: Color(0xFF64748B),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             value,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: color,
             ),
