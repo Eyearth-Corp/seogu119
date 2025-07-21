@@ -400,8 +400,6 @@ class _MapWidgetState extends State<MapWidget> {
     final tappedMerchant = _findMerchantAtPosition(position);
     if (tappedMerchant != null) {
       _handleMerchantTap(tappedMerchant);
-    } else {
-      _copyPositionToClipboard(position);
     }
   }
 
@@ -1085,34 +1083,6 @@ class _MapWidgetState extends State<MapWidget> {
         ),
       ),
     );
-  }
-
-  void _copyPositionToClipboard(Offset position) {
-    final int x = position.dx.clamp(0, _mapWidth).round();
-    final int y = position.dy.clamp(0, _mapHeight).round();
-
-    final String textToCopy = 'X: $x, Y: $y';
-    Clipboard.setData(ClipboardData(text: textToCopy)).then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.copy, color: Colors.white),
-              const SizedBox(width: 8),
-              Text(
-                '좌표 복사됨: $textToCopy',
-                style: const TextStyle(fontSize: 18),
-              ),
-            ],
-          ),
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      );
-    });
   }
 
   void selectDong(Dong? dong) {
