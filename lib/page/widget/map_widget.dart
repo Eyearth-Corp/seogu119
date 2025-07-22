@@ -26,8 +26,9 @@ class MapWidget extends StatefulWidget {
   final Function(Merchant)? onMerchantSelected;
   final Function(Dong?)? onDongSelected;
   final MapWidgetController? controller;
+  final bool isMapLeft;
   
-  const MapWidget({super.key, this.onMerchantSelected, this.onDongSelected, this.controller});
+  const MapWidget({super.key, this.onMerchantSelected, this.onDongSelected, this.controller, this.isMapLeft = false});
 
   @override
   State<MapWidget> createState() => _MapWidgetState();
@@ -854,7 +855,9 @@ class _MapWidgetState extends State<MapWidget> {
   Widget _buildDongSelectionPanel() {
     return Positioned(
       top: 24,
-      right: 24,
+      left: widget.isMapLeft ? 24 : null,
+      right: widget.isMapLeft ? null : 24,
+
       child: GlassContainer(
         height: 1000,
         width: 140,

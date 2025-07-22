@@ -30,29 +30,31 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       builder: (context) => AlertDialog(
         title: Text(
           '로그아웃',
-          style: TextStyle(
-                        fontFamily: 'NotoSans',),
+          style: const TextStyle(
+                        fontFamily: 'NotoSans'),
         ),
         content: Text(
           '정말 로그아웃하시겠습니까?',
-          style: TextStyle(
-                        fontFamily: 'NotoSans',),
+          style: const TextStyle(
+                        fontFamily: 'NotoSans'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               '취소',
-              style: TextStyle(
-                        fontFamily: 'NotoSans',color: Colors.grey),
+              style: const TextStyle(
+                        fontFamily: 'NotoSans',
+                        color: Colors.grey),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
               '로그아웃',
-              style: TextStyle(
-                        fontFamily: 'NotoSans',color: Colors.red),
+              style: const TextStyle(
+                        fontFamily: 'NotoSans',
+                        color: Colors.red),
             ),
           ),
         ],
@@ -136,11 +138,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     children: [
                       Text(
                         _getCurrentPageTitle(),
-                        style: TextStyle(
-                        fontFamily: 'NotoSans',
+                        style: const TextStyle(
+                          fontFamily: 'NotoSans',
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1F2937),
+                          color: Color(0xFF1F2937),
                         ),
                       ),
                       const Spacer(),
@@ -167,10 +169,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                             const SizedBox(width: 8),
                             Text(
                               'Admin',
-                              style: TextStyle(
-                        fontFamily: 'NotoSans',
+                              style: const TextStyle(
+                                fontFamily: 'NotoSans',
                                 fontWeight: FontWeight.w500,
-                                color: const Color(0xFF374151),
+                                color: Color(0xFF374151),
                               ),
                             ),
                           ],

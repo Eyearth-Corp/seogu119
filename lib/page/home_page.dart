@@ -23,6 +23,22 @@ class _HomePageState extends State<HomePage> {
   
   // MapWidget을 제어하기 위한 컨트롤러
   final MapWidgetController _mapController = MapWidgetController();
+  
+  // MapWidget 인스턴스를 유지하기 위한 키
+  final GlobalKey _mapWidgetKey = GlobalKey();
+  
+  /// MapWidget을 일관된 키로 생성하여 상태 유지
+  Widget _buildMapWidget() {
+    return MapWidget(
+      key: _mapWidgetKey,
+      controller: _mapController,
+      onMerchantSelected: (merchant) {
+        print('Selected merchant: ${merchant.id} - ${merchant.name}');
+      },
+      onDongSelected: _onDongSelected,
+      isMapLeft: _isMapLeft,
+    );
+  }
 
   /// 선택된 상인회로 지도 이동
   void _navigateToMerchant(Merchant merchant) {
@@ -80,23 +96,23 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         toolbarHeight: 100,
         backgroundColor: Colors.white,
-        foregroundColor: Colors.white,
+        foregroundColor: SeoguColors.primary,
         elevation: 0,
         title: Row(
           children: [
-            SizedBox(width: 128),
+            const SizedBox(width: 128),
             Image.asset(
               'assets/images/logo_seogu.png',
               height: 60,
               fit: BoxFit.contain,
             ),
-            SizedBox(width: 20),
+            const SizedBox(width: 20),
             Image.asset(
               'assets/images/logo_slogan.png',
               height: 48,
               fit: BoxFit.contain,
             ),
-            Spacer(),
+            const Spacer(),
             const Text(
               '광주광역시 서구 골목경제 119 상황판',
               style: TextStyle(
@@ -105,13 +121,14 @@ class _HomePageState extends State<HomePage> {
                 color: SeoguColors.primary,
               ),
             ),
-            SizedBox(width: 128)
+            const SizedBox(width: 128)
           ],
         ),
       ),
-      body: Stack(
-        children: [
-          LayoutBuilder(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            LayoutBuilder(
             builder: (context, constraints) {
               return Row(
                 children: [
@@ -120,31 +137,48 @@ class _HomePageState extends State<HomePage> {
                     alignment: Alignment.center,
                     child: FloatingActionButtons(
                         isFullscreen: _isFullscreen,
+                        isMapLeft: _isMapLeft,
                         onSwap: _toggleMapPosition,
                         onFullscreen: _toggleFullscreen,
                         onMerchant: _navigateToMerchant
                     ),
                   ),
-                  // Left Dashboard Space (50%)
+                  // 동적 레이아웃: _isMapLeft에 따라 지도와 대시보드 위치 변경
                   Expanded(
-                    flex: 5,
-                    child: _buildDashboardSpace(),
-                  ),
-                  Expanded(
-                    flex: 7,
-                    child: MapWidget(
-                      controller: _mapController,
-                      onMerchantSelected: (merchant) {
-                        print('Selected merchant: ${merchant.id} - ${merchant.name}');
-                      },
-                      onDongSelected: _onDongSelected,
-                    ),
+                    child: _isMapLeft
+                        ? Row(
+                            children: [
+                              // 지도가 왼쪽일 때
+                              Expanded(
+                                flex: 7,
+                                child: _buildMapWidget(),
+                              ),
+                              Expanded(
+                                flex: 5,
+                                child: _buildDashboardSpace(),
+                              ),
+                            ],
+                          )
+                        : Row(
+                            children: [
+                              // 대시보드가 왼쪽일 때 (기본)
+                              Expanded(
+                                flex: 5,
+                                child: _buildDashboardSpace(),
+                              ),
+                              Expanded(
+                                flex: 7,
+                                child: _buildMapWidget(),
+                              ),
+                            ],
+                          ),
                   ),
                   Container(
                     width: 80,
                     alignment: Alignment.center,
                     child: FloatingActionButtons(
                         isFullscreen: _isFullscreen,
+                        isMapLeft: _isMapLeft,
                         onSwap: _toggleMapPosition,
                         onFullscreen: _toggleFullscreen,
                         onMerchant: _navigateToMerchant
@@ -155,6 +189,7 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ],
+        ),
       ),
     );
   }

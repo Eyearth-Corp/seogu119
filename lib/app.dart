@@ -20,14 +20,7 @@ class App extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => FittedBox(
-          fit: BoxFit.contain,
-          child: SizedBox(
-            width: 2560,
-            height: 1440,
-            child: HomePage()
-          ),
-        ),
+        '/': (context) => const HomePage(),
         '/admin': (context) => const AdminLoginPage(),
       },
       onGenerateRoute: (settings) {

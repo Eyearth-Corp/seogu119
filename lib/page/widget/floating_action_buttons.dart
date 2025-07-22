@@ -4,6 +4,7 @@ import 'package:seogu119/page/widget/merchant_list_dialog.dart';
 
 class FloatingActionButtons extends StatelessWidget {
   final bool isFullscreen;
+  final bool isMapLeft; // 지도 위치 상태 추가
   final VoidCallback onSwap;
   final VoidCallback onFullscreen;
   final ValueChanged<Merchant>? onMerchant; // 상인회 선택 시 호출될 콜백
@@ -11,6 +12,7 @@ class FloatingActionButtons extends StatelessWidget {
   const FloatingActionButtons({
     super.key,
     required this.isFullscreen,
+    required this.isMapLeft, // 새 매개변수 추가
     required this.onSwap,
     required this.onFullscreen,
     this.onMerchant, // 생성자에 콜백 추가
@@ -32,10 +34,17 @@ class FloatingActionButtons extends StatelessWidget {
           child: Icon(isFullscreen ? Icons.fullscreen_exit : Icons.fullscreen),
         ),
         const SizedBox(height: 24),
-        // 좌우 스왑 버튼
-        FloatingActionButton(
-          onPressed: onSwap,
-          child: const Icon(Icons.swap_horiz),
+        // 좌우 스왑 버튼 (현재 상태 표시)
+        Tooltip(
+          message: isMapLeft ? '지도가 왼쪽에 있습니다\n클릭하면 대시보드가 왼쪽으로 이동' : '대시보드가 왼쪽에 있습니다\n클릭하면 지도가 왼쪽으로 이동',
+          child: FloatingActionButton(
+            onPressed: onSwap,
+            backgroundColor: isMapLeft ? Colors.blue[600] : Colors.grey[600],
+            child: Icon(
+              isMapLeft ? Icons.map : Icons.dashboard,
+              color: Colors.white,
+            ),
+          ),
         ),
         const SizedBox(height: 24),
         // 상인회 목록 버튼
