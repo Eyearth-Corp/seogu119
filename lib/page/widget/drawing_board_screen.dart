@@ -27,7 +27,7 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
   Uint8List? _backgroundImage;
   final List<DrawnLine> _lines = <DrawnLine>[];
   final List<DrawnLine> _undoLines = <DrawnLine>[];
-  Color _selectedColor = Colors.red;
+  Color _selectedColor = SeoguColors.primary;
   double _strokeWidth = 3.0;
   bool _isLoading = true;
   bool _showBackground = true;
@@ -172,9 +172,12 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
             // 배경 이미지 (캡처된 화면)
             if (_backgroundImage != null && _showBackground)
               Positioned.fill(
-                child: Image.memory(
-                  _backgroundImage!,
-                  fit: BoxFit.contain,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 80, right: 80, top: 100),
+                  child: Image.memory(
+                    _backgroundImage!,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
           
@@ -402,18 +405,18 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
 
   List<Widget> _buildColorPalette() {
     final colors = [
-      Colors.red,
-      Colors.blue,
-      Colors.green,
-      Colors.yellow,
-      Colors.purple,
-      Colors.orange,
+      SeoguColors.highlight,      // 서구 레드 (중요한 표시용)
+      SeoguColors.primary,        // 서구 메인 블루 (공식 색상)
+      SeoguColors.secondary,      // 서구 그린 (긍정적 표시용)
+      const Color(0xFFFF9800),    // 주황색 (경고/주의용)
+      const Color(0xFF9C27B0),    // 보라색 (특별 표시용)
       Colors.pink,
-      Colors.white,
-      Colors.black,
-      SeoguColors.primary,
-      SeoguColors.secondary,
+      Colors.yellow,
+      Colors.white,              // 화이트 (지우기/수정용)
+      Colors.black,              // 블랙 (기본 그리기용)
       SeoguColors.accent,
+      const Color(0xFF795548),   // 갈색 (자연스러운 표시용)
+      const Color(0xFF607D8B),   // 블루그레이 (중성 표시용)
     ];
 
     return colors.map((color) {
