@@ -22,6 +22,8 @@ dependencies:
   glass_kit: ^4.0.1
   cached_network_image: ^3.3.1
   speech_balloon: ^0.0.3
+  flutter_drawing_board: ^0.9.8
+  screenshot: ^3.0.0
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/rendering.dart';
 import 'dart:html' as html;
 import 'widget/floating_action_buttons.dart';
 import 'widget/map_widget.dart';
@@ -24,19 +25,28 @@ class _HomePageState extends State<HomePage> {
   // MapWidget을 제어하기 위한 컨트롤러
   final MapWidgetController _mapController = MapWidgetController();
   
+  // 스크린샷 캡처를 위한 GlobalKey
+  final GlobalKey _mapRepaintBoundaryKey = GlobalKey();
+  
   // MapWidget 인스턴스를 유지하기 위한 키
   final GlobalKey _mapWidgetKey = GlobalKey();
   
+  // 메인 콘텐츠 캡처를 위한 키
+  final GlobalKey _mainContentKey = GlobalKey();
+  
   /// MapWidget을 일관된 키로 생성하여 상태 유지
   Widget _buildMapWidget() {
-    return MapWidget(
-      key: _mapWidgetKey,
-      controller: _mapController,
-      onMerchantSelected: (merchant) {
-        print('Selected merchant: ${merchant.id} - ${merchant.name}');
-      },
-      onDongSelected: _onDongSelected,
-      isMapLeft: _isMapLeft,
+    return RepaintBoundary(
+      key: _mapRepaintBoundaryKey,
+      child: MapWidget(
+        key: _mapWidgetKey,
+        controller: _mapController,
+        onMerchantSelected: (merchant) {
+          print('Selected merchant: ${merchant.id} - ${merchant.name}');
+        },
+        onDongSelected: _onDongSelected,
+        isMapLeft: _isMapLeft,
+      ),
     );
   }
 
@@ -44,6 +54,8 @@ class _HomePageState extends State<HomePage> {
   void _navigateToMerchant(Merchant merchant) {
     _mapController.navigateToMerchant(merchant);
   }
+  
+
 
   void _toggleMapPosition() {
     setState(() {
@@ -81,13 +93,14 @@ class _HomePageState extends State<HomePage> {
   Widget _buildDashboardSpace() {
     if (_selectedDong != null) {
       return DongDashboard(
+        key: ValueKey('dong_dashboard_${_selectedDong!.name}'),
         dong: _selectedDong!,
         onBackPressed: () => _onDongSelected(null),
         onMerchantSelected: _navigateToMerchant,
       );
     }
     
-    return const MainDashboard();
+    return const MainDashboard(key: ValueKey('main_dashboard'));
   }
 
   @override
@@ -136,52 +149,60 @@ class _HomePageState extends State<HomePage> {
                     width: 80,
                     alignment: Alignment.center,
                     child: FloatingActionButtons(
+                        key: const ValueKey('floating_buttons_left'),
                         isFullscreen: _isFullscreen,
                         isMapLeft: _isMapLeft,
                         onSwap: _toggleMapPosition,
                         onFullscreen: _toggleFullscreen,
-                        onMerchant: _navigateToMerchant
+                        onMerchant: _navigateToMerchant,
+                        heroTagSuffix: '_left',
                     ),
                   ),
                   // 동적 레이아웃: _isMapLeft에 따라 지도와 대시보드 위치 변경
                   Expanded(
-                    child: _isMapLeft
-                        ? Row(
-                            children: [
-                              // 지도가 왼쪽일 때
-                              Expanded(
-                                flex: 7,
-                                child: _buildMapWidget(),
-                              ),
-                              Expanded(
-                                flex: 5,
-                                child: _buildDashboardSpace(),
-                              ),
-                            ],
-                          )
-                        : Row(
-                            children: [
-                              // 대시보드가 왼쪽일 때 (기본)
-                              Expanded(
-                                flex: 5,
-                                child: _buildDashboardSpace(),
-                              ),
-                              Expanded(
-                                flex: 7,
-                                child: _buildMapWidget(),
-                              ),
-                            ],
-                          ),
+                    child: RepaintBoundary(
+                      key: _mainContentKey,
+                      child: _isMapLeft
+                          ? Row(
+                              children: [
+                                // 지도가 왼쪽일 때
+                                Expanded(
+                                  flex: 7,
+                                  child: _buildMapWidget(),
+                                ),
+                                Expanded(
+                                  flex: 5,
+                                  child: _buildDashboardSpace(),
+                                ),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                // 대시보드가 왼쪽일 때 (기본)
+                                Expanded(
+                                  flex: 5,
+                                  child: _buildDashboardSpace(),
+                                ),
+                                Expanded(
+                                  flex: 7,
+                                  child: _buildMapWidget(),
+                                ),
+                              ],
+                            ),
+                    ),
                   ),
                   Container(
                     width: 80,
                     alignment: Alignment.center,
                     child: FloatingActionButtons(
+                        key: const ValueKey('floating_buttons_right'),
                         isFullscreen: _isFullscreen,
                         isMapLeft: _isMapLeft,
                         onSwap: _toggleMapPosition,
                         onFullscreen: _toggleFullscreen,
-                        onMerchant: _navigateToMerchant
+                        onMerchant: _navigateToMerchant,
+                        heroTagSuffix: '_right',
+                        mainContentKey: _mainContentKey,
                     ),
                   ),
                 ],

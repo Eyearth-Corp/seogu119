@@ -44,6 +44,7 @@ class _MapWidgetState extends State<MapWidget> {
   bool _showDongName = true;
   bool _showDisableDongAreas = false;
   bool _showDongAreas = false;
+  bool _showCapturedBackground = false;
 
   // State for Dong selection
   Dong? _selectedDong;
@@ -62,7 +63,7 @@ class _MapWidgetState extends State<MapWidget> {
   static const double _fontSize = 16.0;
   static const Duration _autoResetDuration = Duration(minutes: 5);
 
-  final GlobalKey interactiveViewerKey = GlobalKey();
+  final GlobalKey interactiveViewerKey = GlobalKey(debugLabel: 'map_interactive_viewer');
   
   // Performance optimization
   final Set<int> _visibleMerchants = {};
@@ -284,6 +285,26 @@ class _MapWidgetState extends State<MapWidget> {
                               cacheHeight: (_mapHeight * 0.8).toInt(),
                             ),
                           ),
+                          // Captured background layer
+                          if (_showCapturedBackground)
+                            RepaintBoundary(
+                              child: Opacity(
+                                opacity: _showCapturedBackground ? 0.7 : 0.0,
+                                child: Image.asset(
+                                  'assets/map/captured_background.webp', // 캡처한 배경 이미지 파일
+                                  fit: BoxFit.contain,
+                                  width: _mapWidth,
+                                  height: _mapHeight,
+                                  filterQuality: FilterQuality.medium,
+                                  cacheWidth: (_mapWidth * 0.8).toInt(),
+                                  cacheHeight: (_mapHeight * 0.8).toInt(),
+                                  errorBuilder: (context, error, stackTrace) {
+                                    // 파일이 없을 경우 빈 컨테이너 반환
+                                    return Container();
+                                  },
+                                ),
+                              ),
+                            ),
                           // Terrain layer with lazy loading
                           if (_showTerrain)
                             RepaintBoundary(
@@ -795,6 +816,19 @@ class _MapWidgetState extends State<MapWidget> {
                       onChanged: (value) {
                         setState(() {
                           _showDongAreas = value;
+                        });
+                        _startAutoResetTimer();
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildEnhancedToggle(
+                      title: '캡처배경',
+                      icon: Icons.wallpaper,
+                      value: _showCapturedBackground,
+                      onChanged: (value) {
+                        setState(() {
+                          _showCapturedBackground = value;
                         });
                         _startAutoResetTimer();
                       },
