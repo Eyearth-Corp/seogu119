@@ -28,7 +28,7 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
   final List<DrawnLine> _lines = <DrawnLine>[];
   final List<DrawnLine> _undoLines = <DrawnLine>[];
   Color _selectedColor = SeoguColors.primary;
-  double _strokeWidth = 3.0;
+  double _strokeWidth = 4.0;
   bool _isLoading = true;
   bool _showBackground = true;
 
@@ -199,173 +199,130 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
               ),
             ),
           ),
-          
-          // 상단 툴바
+
+          // 좌측 패널
           Positioned(
-            top: 40,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
-              ),
-              child: Row(
-                children: [
-                  // 닫기 버튼
-                  _buildToolButton(
-                    Icons.close,
-                    '닫기',
-                    Colors.red,
-                    () => Navigator.of(context).pop(),
-                  ),
-                  
-                  const SizedBox(width: 16),
-                  
-                  // 실행 취소
-                  _buildToolButton(
-                    Icons.undo,
-                    '실행 취소',
-                    Colors.white,
-                    _canUndo() ? _undo : null,
-                  ),
-                  
-                  // 다시 실행
-                  _buildToolButton(
-                    Icons.redo,
-                    '다시 실행',
-                    Colors.white,
-                    _canRedo() ? _redo : null,
-                  ),
-                  
-                  const SizedBox(width: 16),
-                  
-                  // 배경 토글
-                  _buildToolButton(
-                    _showBackground ? Icons.image : Icons.image_outlined,
-                    '배경 ${_showBackground ? '숨기기' : '보이기'}',
-                    Colors.blue,
-                    () {
-                      setState(() {
-                        _showBackground = !_showBackground;
-                      });
-                    },
-                  ),
-                  
-                  const SizedBox(width: 16),
-                  
-                  // 전체 지우기
-                  _buildToolButton(
-                    Icons.clear_all,
-                    '전체 지우기',
-                    Colors.orange,
-                    _lines.isNotEmpty ? _clearAll : null,
-                  ),
-                  
-                  const Spacer(),
-                  
-                  // 저장 버튼
-                  _buildToolButton(
-                    Icons.save,
-                    '저장',
-                    Colors.green,
-                    () => _saveDrawing(),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          
-          // 좌측 색상 팔레트
-          Positioned(
-            left: 20,
+            left: 0,
             top: 120,
-            child: Container(
-              width: 60,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '색상',
-                    style: TextStyle(
-                      fontFamily: 'NotoSans',
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ..._buildColorPalette(),
-                ],
-              ),
-            ),
+            bottom: 0,
+            child: _buildTool(),
+          ),
+
+          // 우축 패널
+          Positioned(
+            right: 0,
+            top: 120,
+            bottom: 0,
+            child: _buildTool(),
           ),
           
-          // 우측 선 굵기 조절
-          Positioned(
-            right: 20,
-            top: 120,
-            child: Container(
-              width: 80,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '선 굵기',
-                    style: TextStyle(
-                      fontFamily: 'NotoSans',
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${_strokeWidth.toInt()}px',
-                    style: TextStyle(
-                      fontFamily: 'NotoSans',
-                      fontSize: 10,
-                      color: Colors.white70,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  RotatedBox(
-                    quarterTurns: -1,
-                    child: Slider(
-                      value: _strokeWidth,
-                      min: 1.0,
-                      max: 20.0,
-                      divisions: 19,
-                      activeColor: SeoguColors.primary,
-                      inactiveColor: Colors.white30,
-                      onChanged: (value) {
-                        setState(() {
-                          _strokeWidth = value;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+
         ],
       ),
     ),
+    );
+  }
+
+  Widget _buildTool() {
+    return Container(
+      alignment: Alignment.center,
+      child: Container(
+        width: 80,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 실행 취소
+            _buildToolButton(
+              Icons.undo,
+              '실행 취소',
+              Colors.white,
+              _canUndo() ? _undo : null,
+            ),
+
+            // 다시 실행
+            _buildToolButton(
+              Icons.redo,
+              '다시 실행',
+              Colors.white,
+              _canRedo() ? _redo : null,
+            ),
+
+            const SizedBox(height: 16),
+
+            // 배경 토글
+            _buildToolButton(
+              _showBackground ? Icons.image : Icons.image_outlined,
+              '배경 ${_showBackground ? '숨기기' : '보이기'}',
+              Colors.blue,
+                  () {
+                setState(() {
+                  _showBackground = !_showBackground;
+                });
+              },
+            ),
+            Text('배경 ${_showBackground ? '숨기기' : '보이기'}',
+              style: TextStyle(
+                fontFamily: 'NotoSans',
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // 전체 지우기
+            _buildToolButton(
+              Icons.clear_all,
+              '전체 지우기',
+              Colors.orange,
+              _lines.isNotEmpty ? _clearAll : null,
+            ),
+            Text('전체 지우기',
+              style: TextStyle(
+                fontFamily: 'NotoSans',
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+
+            const SizedBox(height: 32),
+            Text(
+              '색상',
+              style: TextStyle(
+                fontFamily: 'NotoSans',
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 12),
+            ..._buildColorPalette(),
+            const SizedBox(height: 24),
+            Text(
+              '굵기',
+              style: TextStyle(
+                fontFamily: 'NotoSans',
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ..._buildStrokeWidth(),
+            const SizedBox(height: 32),
+            // 닫기 버튼
+            _buildToolButton(
+              Icons.close,
+              '닫기',
+              Colors.red,
+                  () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -383,8 +340,8 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(8),
           child: Container(
-            width: 40,
-            height: 40,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
@@ -408,15 +365,9 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
       SeoguColors.highlight,      // 서구 레드 (중요한 표시용)
       SeoguColors.primary,        // 서구 메인 블루 (공식 색상)
       SeoguColors.secondary,      // 서구 그린 (긍정적 표시용)
-      const Color(0xFFFF9800),    // 주황색 (경고/주의용)
-      const Color(0xFF9C27B0),    // 보라색 (특별 표시용)
-      Colors.pink,
       Colors.yellow,
       Colors.white,              // 화이트 (지우기/수정용)
       Colors.black,              // 블랙 (기본 그리기용)
-      SeoguColors.accent,
-      const Color(0xFF795548),   // 갈색 (자연스러운 표시용)
-      const Color(0xFF607D8B),   // 블루그레이 (중성 표시용)
     ];
 
     return colors.map((color) {
@@ -452,6 +403,35 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
         ),
       );
     }).toList();
+  }
+
+
+  List<Widget> _buildStrokeWidth() {
+    final strokeWidths = [4.0, 8.0, 12.0];
+    return strokeWidths.map((strokeWidth) {
+      final isSelected = _strokeWidth == strokeWidth;
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              _strokeWidth = strokeWidth;
+            });
+          },
+          child: Container(
+            width: 32,
+            height: 32,
+            alignment: Alignment.center,
+            child: Container(
+              color: isSelected?Colors.yellow:Colors.white,
+              width: 32,
+              height: strokeWidth,
+            ),
+          ),
+        ),
+      );
+    }).toList();
+
   }
 
   void _startNewLine(Offset point) {
@@ -558,6 +538,9 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
       final ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
       final Uint8List pngBytes = byteData!.buffer.asUint8List();
+      //임시 다운로드
+
+
 
       // 클립보드에 복사 (웹에서만 동작)
       // 모바일에서는 갤러리에 저장하는 기능 필요
