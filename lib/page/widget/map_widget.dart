@@ -64,10 +64,7 @@ class _MapWidgetState extends State<MapWidget> {
   static const Duration _autoResetDuration = Duration(minutes: 5);
 
   final GlobalKey interactiveViewerKey = GlobalKey(debugLabel: 'map_interactive_viewer');
-  
-  // Performance optimization
-  final Set<int> _visibleMerchants = {};
-  final Set<int> _renderedMerchants = {};
+
   bool _isLoading = false;
   Rect? _currentViewport;
 
@@ -81,7 +78,6 @@ class _MapWidgetState extends State<MapWidget> {
     widget.controller?._setNavigateFunction(_jumpToMerchant);
     
     _startAutoResetTimer();
-    _calculateVisibleMerchants();
     
     // 시작시 전체 지도가 보이게 축소
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -120,39 +116,6 @@ class _MapWidgetState extends State<MapWidget> {
     }
   }
 
-  void _calculateVisibleMerchants() {
-    _visibleMerchants.clear();
-    _renderedMerchants.clear();
-    
-    if (_selectedDong != null) {
-      for (var merchant in _selectedDong!.merchantList) {
-        _visibleMerchants.add(merchant.id);
-        // Only add to rendered if within viewport
-        if (_isInViewport(merchant.x, merchant.y)) {
-          _renderedMerchants.add(merchant.id);
-        }
-      }
-    } else {
-      for (var dong in DongList.all) {
-        for (var merchant in dong.merchantList) {
-          _visibleMerchants.add(merchant.id);
-          // Only add to rendered if within viewport
-          if (_isInViewport(merchant.x, merchant.y)) {
-            _renderedMerchants.add(merchant.id);
-          }
-        }
-      }
-    }
-  }
-
-  bool _isInViewport(double x, double y) {
-    if (_currentViewport == null) return true; // Render all if viewport not set
-    
-    // Add padding around viewport for smooth scrolling
-    const padding = 200.0;
-    return _currentViewport!.inflate(padding).contains(Offset(x, y));
-  }
-
   void _updateViewport() {
     final context = interactiveViewerKey.currentContext;
     if (context == null) return;
@@ -173,9 +136,6 @@ class _MapWidgetState extends State<MapWidget> {
       viewport.width / scale,
       viewport.height / scale,
     );
-    
-    // Recalculate visible merchants based on new viewport
-    _calculateVisibleMerchants();
   }
 
   void _zoomToFitEntireMap() {
@@ -408,9 +368,6 @@ class _MapWidgetState extends State<MapWidget> {
       if (_selectedDong != null && dong != _selectedDong) continue;
       
       for (var merchant in dong.merchantList) {
-        // Use rendered merchants set for viewport optimization
-        if (!_renderedMerchants.contains(merchant.id)) continue;
-        
         final isSelected = _selectedMerchants.contains(merchant.id);
         final isHighlighted = _isSelectionMode && isSelected;
         final isLastSelected = _lastSelectedMerchant?.id == merchant.id;
@@ -699,8 +656,6 @@ class _MapWidgetState extends State<MapWidget> {
 
     // 대시보드에 동 선택 전달
     widget.onDongSelected?.call(dong);
-
-    _calculateVisibleMerchants();
 
     if (dong != null) {
       _jumpToRect(dong.area);
