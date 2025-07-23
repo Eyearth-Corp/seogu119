@@ -390,10 +390,10 @@ class DongDashboard extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
+              crossAxisCount: 3,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
-              childAspectRatio: 2.5,
+              childAspectRatio: 3.2,
             ),
             itemCount: dong.merchantList.length,
             itemBuilder: (context, index) {
@@ -421,7 +421,7 @@ class DongDashboard extends StatelessWidget {
           ),
         ),
         child: Text(
-          '${merchant.id}\n${merchant.name}',
+          '${merchant.id}.\n${merchant.name}',
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,

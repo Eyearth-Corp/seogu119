@@ -890,7 +890,7 @@ class _MapWidgetState extends State<MapWidget> {
       right: widget.isMapLeft ? null : 24,
 
       child: GlassContainer(
-        height: 1000,
+        height: 832,
         width: 140,
         padding: EdgeInsets.only(top: 6),
 
@@ -921,81 +921,6 @@ class _MapWidgetState extends State<MapWidget> {
                 },
               ),
             ),
-            Container(
-              height: 160,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildEnhancedToggle(
-                    title: '지형',
-                    icon: Icons.terrain,
-                    value: _showTerrain,
-                    onChanged: (value) {
-                      setState(() {
-                        _showTerrain = value;
-                      });
-                      _startAutoResetTimer();
-                    },
-                  ),
-                  _buildEnhancedToggle(
-                    title: '번호',
-                    icon: Icons.numbers,
-                    value: _showNumber,
-                    onChanged: (value) {
-                      setState(() {
-                        _showNumber = value;
-                      });
-                      _startAutoResetTimer();
-                    },
-                  ),
-                  _buildEnhancedToggle(
-                    title: '동이름',
-                    icon: Icons.location_city,
-                    value: _showDongName,
-                    onChanged: (value) {
-                      setState(() {
-                        _showDongName = value;
-                      });
-                      _startAutoResetTimer();
-                    },
-                  ),
-                  // _buildEnhancedToggle(
-                  //   title: '선택구역',
-                  //   icon: Icons.crop_free,
-                  //   value: _showDongAreas,
-                  //   onChanged: (value) {
-                  //     setState(() {
-                  //       _showDongAreas = value;
-                  //     });
-                  //     _startAutoResetTimer();
-                  //   },
-                  // ),
-                  // _buildEnhancedToggle(
-                  //   title: '비활성화',
-                  //   icon: Icons.blur_on,
-                  //   value: _showDisableDongAreas,
-                  //   onChanged: (value) {
-                  //     setState(() {
-                  //       _showDisableDongAreas = value;
-                  //     });
-                  //     _startAutoResetTimer();
-                  //   },
-                  // ),
-                  // _buildEnhancedToggle(
-                  //   title: '동태그',
-                  //   icon: Icons.label,
-                  //   value: _showDongTags,
-                  //   onChanged: (value) {
-                  //     setState(() {
-                  //       _showDongTags = value;
-                  //     });
-                  //     _startAutoResetTimer();
-                  //   },
-                  // ),
-                ],
-              ),
-            )
-
           ],
         ),
       ),
