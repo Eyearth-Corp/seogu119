@@ -54,6 +54,9 @@ class _MapWidgetState extends State<MapWidget> {
   // State for last selected merchant (for highlighting)
   Merchant? _lastSelectedMerchant;
 
+  // Loading state
+  bool _isLoading = false;
+
   // Fixed map size
   final double _mapWidth = 2403;
   final double _mapHeight = 2900;
@@ -65,8 +68,6 @@ class _MapWidgetState extends State<MapWidget> {
 
   final GlobalKey interactiveViewerKey = GlobalKey(debugLabel: 'map_interactive_viewer');
 
-  bool _isLoading = false;
-  Rect? _currentViewport;
 
   @override
   void initState() {
@@ -90,6 +91,11 @@ class _MapWidgetState extends State<MapWidget> {
     _transformationController.dispose();
     _autoResetTimer?.cancel();
     super.dispose();
+  }
+
+  void _updateViewport() {
+    // Update viewport calculation for optimized rendering
+    // This method can be implemented if viewport optimization is needed
   }
 
   void _startAutoResetTimer() {
@@ -116,28 +122,9 @@ class _MapWidgetState extends State<MapWidget> {
     }
   }
 
-  void _updateViewport() {
-    final context = interactiveViewerKey.currentContext;
-    if (context == null) return;
 
-    final renderBox = context.findRenderObject() as RenderBox?;
-    if (renderBox == null) return;
-
-    final transform = _transformationController.value;
-    final viewport = renderBox.size;
-    
-    // Calculate the current viewport in scene coordinates
-    final sceneTopLeft = transform.getTranslation();
-    final scale = transform.getMaxScaleOnAxis();
-    
-    _currentViewport = Rect.fromLTWH(
-      -sceneTopLeft.x / scale,
-      -sceneTopLeft.y / scale,
-      viewport.width / scale,
-      viewport.height / scale,
-    );
-  }
-
+  /// 전체 지도가 화면에 맞도록 줌과 위치를 초기화합니다.
+  /// InteractiveViewer의 크기에 맞춰 지도 전체가 보이도록 자동 조절합니다.
   void _zoomToFitEntireMap() {
     final context = interactiveViewerKey.currentContext;
     if (context == null) return;
@@ -163,6 +150,9 @@ class _MapWidgetState extends State<MapWidget> {
     _transformationController.value = matrix;
   }
 
+  /// 특정 상인회로 즉시 이동합니다.
+  /// [_merchant]: 이동할 목표 상인회 객체
+  /// 해당 상인회가 속한 동을 선택하고 마지막 선택된 상인회로 설정합니다.
   void _jumpToMerchant(Merchant _merchant) {
     for (var dong in DongList.all) {
       for (var merchant in dong.merchantList) {
@@ -330,8 +320,6 @@ class _MapWidgetState extends State<MapWidget> {
             ),
           ),
         ),
-        // Enhanced legend
-        //_buildEnhancedLegend(),
         // Dong selection panel
         _buildDongSelectionPanel(),
         // Touch feedback overlay
@@ -340,6 +328,9 @@ class _MapWidgetState extends State<MapWidget> {
     );
   }
 
+  /// 지정된 사각형 영역으로 즉시 점프하여 화면에 맞춥니다.
+  /// [rect]: 이동할 목표 사각형 영역
+  /// 적절한 스케일과 위치를 계산하여 해당 영역이 화면 중앙에 오도록 조정합니다.
   void _jumpToRect(Rect rect) {
     final context = interactiveViewerKey.currentContext;
     if (context == null) return;
@@ -359,6 +350,11 @@ class _MapWidgetState extends State<MapWidget> {
     _transformationController.value = endMatrix;
   }
 
+  /// 지도 위에 상인회 번호 마커들을 생성합니다.
+  /// 현재 선택된 동과 설정에 따라 표시할 상인회들을 필터링하고,
+  /// 각 상인회의 위치에 번호와 선택 상태를 표시하는 위젯을 생성합니다.
+  /// 
+  /// Returns: 상인회 마커 위젯들의 리스트
   List<Widget> _buildMerchantNumbers() {
     if (!_showNumber) return [];
 
@@ -637,6 +633,16 @@ class _MapWidgetState extends State<MapWidget> {
     );
   }
 
+  /// 동(구역)을 선택하거나 전체 보기로 전환합니다.
+  /// [dong]: 선택할 동 객체. null이면 전체 보기로 전환됩니다.
+  /// 
+  /// 주요 기능:
+  /// - 선택된 동 상태 업데이트
+  /// - 상인회 선택 상태 초기화
+  /// - 레이어 가시성 조정 (동 영역, 비활성화 영역)
+  /// - 대시보드에 선택 상태 알림
+  /// - 해당 동 영역으로 지도 이동 또는 전체 지도 보기
+  /// - 자동 리셋 타이머 재시작
   void selectDong(Dong? dong) {
     setState(() {
       _selectedDong = dong;
@@ -660,7 +666,6 @@ class _MapWidgetState extends State<MapWidget> {
     if (dong != null) {
       _jumpToRect(dong.area);
       // 동을 선택하면 해당 동별 가맹점 현황 다이얼로그 표시
-      //_showDongMerchantDialog(dong);
     } else {
       // 전체를 선택하면 전체 지도가 보이게 축소한다.
       _zoomToFitEntireMap();
@@ -669,22 +674,5 @@ class _MapWidgetState extends State<MapWidget> {
     _startAutoResetTimer();
   }
 
-  void toggleSelectionMode() {
-    setState(() {
-      _isSelectionMode = !_isSelectionMode;
-    });
-  }
-
-  List<Merchant> getSelectedMerchants() {
-    List<Merchant> merchants = [];
-    for (var dong in DongList.all) {
-      for (var merchant in dong.merchantList) {
-        if (_selectedMerchants.contains(merchant.id)) {
-          merchants.add(merchant);
-        }
-      }
-    }
-    return merchants;
-  }
 
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../data/dong_list.dart';
 import '../../../core/colors.dart';
 
 class MainDashboard extends StatelessWidget {
@@ -60,7 +59,9 @@ class MainDashboard extends StatelessWidget {
     );
   }
 
-  // 1. 상단 메트릭 카드들 - 전체 가맹점, 이번주 신규, 가맹률
+  /// 상단 메트릭 카드들을 생성합니다.
+  /// 전체 가맹점 수, 이번주 신규 가맹점, 가맹률을 표시하며
+  /// 각각 서구 브랜드 컬러를 사용합니다.
   Widget _buildTopMetrics() {
     return Row(
       children: [
@@ -73,6 +74,11 @@ class MainDashboard extends StatelessWidget {
     );
   }
 
+  /// 개별 메트릭 카드를 생성합니다.
+  /// [title]: 카드 제목 (예: '전체 가맹점')  
+  /// [value]: 수치 값 (예: '11,426')
+  /// [unit]: 단위 (예: '개', '%')
+  /// [color]: 강조색 (주로 서구 브랜드 컬러)
   Widget _buildMetricCard(String title, String value, String unit, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -257,7 +263,7 @@ class MainDashboard extends StatelessWidget {
               color: SeoguColors.textPrimary,
             ),
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           _buildDongStatusItem('동천동', 92.1, SeoguColors.secondary),
           _buildDongStatusItem('유촌동', 88.3, SeoguColors.primary),
           _buildDongStatusItem('치평동', 85.7, SeoguColors.accent),
@@ -426,6 +432,9 @@ class MainDashboard extends StatelessWidget {
   }
 
   // 5. 민원 해결 사례
+  /// 민원 해결 사례 섹션을 생성합니다.
+  /// 터치 가능한 사례 목록을 표시하며, 각 항목을 터치하면 상세 정보 다이얼로그가 표시됩니다.
+  /// [context]: 다이얼로그 표시를 위한 BuildContext
   Widget _buildComplaintCases(BuildContext context) {
     return Container(
       height: 170,
@@ -518,6 +527,11 @@ class MainDashboard extends StatelessWidget {
     );
   }
 
+  /// 민원 사례 상세 정보 다이얼로그를 표시합니다.
+  /// [context]: 다이얼로그를 표시할 BuildContext
+  /// [title]: 민원 사례 제목
+  /// [status]: 처리 상태 ('해결' 또는 '진행중')
+  /// [detail]: 상세 설명 내용
   void _showComplaintDetailDialog(BuildContext context, String title, String status, String detail) {
     final isCompleted = status == '해결';
     
@@ -632,6 +646,10 @@ class MainDashboard extends StatelessWidget {
     );
   }
 
+  /// 타 기관 동향 상세 정보 다이얼로그를 표시합니다.
+  /// [context]: 다이얼로그를 표시할 BuildContext
+  /// [title]: 동향 제목
+  /// [detail]: 상세 설명 내용
   void _showTrendDetailDialog(BuildContext context, String title, String detail) {
     showDialog(
       context: context,

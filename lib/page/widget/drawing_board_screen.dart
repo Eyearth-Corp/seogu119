@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:screenshot/screenshot.dart';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import '../../core/colors.dart';
 
 class DrawingBoardScreen extends StatefulWidget {
   final Widget? backgroundWidget;
@@ -27,7 +26,7 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
   Uint8List? _backgroundImage;
   final List<DrawnLine> _lines = <DrawnLine>[];
   final List<DrawnLine> _undoLines = <DrawnLine>[];
-  Color _selectedColor = Colors.red;
+  Color _selectedColor = const Color(0xFF1E3A8A); // 서구 메인 블루
   double _strokeWidth = 4.0;
   bool _isLoading = true;
   bool _showBackground = true;
@@ -44,6 +43,13 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
     super.dispose();
   }
 
+  /// 배경 위젯 또는 화면을 캡처하여 드로잉 배경으로 사용합니다.
+  /// 
+  /// 다음 순서로 캡처를 시도합니다:
+  /// 1. captureKey가 제공된 경우: RenderRepaintBoundary에서 직접 캡처
+  /// 2. backgroundWidget이 RepaintBoundary인 경우: 해당 위젯에서 캡처  
+  /// 3. screenshot 패키지를 사용하여 위젯 캡처
+  /// 4. 모든 방법 실패 시: 빈 배경으로 진행
   Future<void> _captureBackground() async {
     try {
       // captureKey가 제공된 경우 (실제 화면 캡처)
@@ -367,14 +373,25 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
     );
   }
 
+  /// 드로잉용 색상 팔레트를 생성합니다.
+  /// 서구의 공식 브랜드 컬러를 포함한 다양한 색상을 제공하며,
+  /// 현재 선택된 색상에는 체크 표시와 테두리를 추가합니다.
+  /// 
+  /// Returns: 색상 선택 버튼들의 위젯 리스트
   List<Widget> _buildColorPalette() {
     final colors = [
-      Colors.red,
-      Colors.blue,
-      Colors.green,
+      const Color(0xFFEF4444),       // 서구 레드 (중요한 표시용)
+      const Color(0xFF1E3A8A),       // 서구 메인 블루 (공식 색상)
+      const Color(0xFF16A34A),       // 서구 그린 (긍정적 표시용)
+      const Color(0xFFFF9800),       // 주황색 (경고/주의용)
+      const Color(0xFF9C27B0),       // 보라색 (특별 표시용)
+      Colors.pink,
       Colors.yellow,
-      Colors.white,
-      Colors.black,
+      Colors.white,                  // 화이트 (지우기/수정용)
+      Colors.black,                  // 블랙 (기본 그리기용)
+      const Color(0xFF0891B2),       // 서구 틸
+      const Color(0xFF795548),       // 갈색 (자연스러운 표시용)
+      const Color(0xFF607D8B),       // 블루그레이 (중성 표시용)
     ];
 
     return colors.map((color) {
@@ -441,6 +458,9 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
 
   }
 
+  /// 새로운 선 그리기를 시작합니다.
+  /// [point]: 시작 지점의 좌표
+  /// 현재 선택된 색상과 굵기로 새로운 DrawnLine을 생성하고 redo 히스토리를 초기화합니다.
   void _startNewLine(Offset point) {
     setState(() {
       _lines.add(DrawnLine([point], _selectedColor, _strokeWidth));
@@ -448,6 +468,8 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
     });
   }
 
+  /// 현재 그리고 있는 선에 새로운 점을 추가합니다.
+  /// [point]: 추가할 점의 좌표
   void _addPointToLine(Offset point) {
     setState(() {
       if (_lines.isNotEmpty) {
@@ -456,14 +478,19 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
     });
   }
 
+  /// 현재 선 그리기를 완료합니다.
+  /// 필요시 추가 처리 로직을 구현할 수 있습니다.
   void _finishCurrentLine() {
-    // 현재 선 그리기 완료
+    // 현재 선 그리기 완료 - 추가 처리 로직 구현 가능
   }
 
+  /// 실행 취소가 가능한지 확인합니다.
   bool _canUndo() => _lines.isNotEmpty;
 
+  /// 다시 실행이 가능한지 확인합니다.
   bool _canRedo() => _undoLines.isNotEmpty;
 
+  /// 마지막 그린 선을 실행 취소합니다.
   void _undo() {
     if (_canUndo()) {
       setState(() {
@@ -472,6 +499,7 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
     }
   }
 
+  /// 실행 취소된 선을 다시 그립니다.
   void _redo() {
     if (_canRedo()) {
       setState(() {
@@ -537,6 +565,8 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
   }
 }
 
+/// 그린 선을 나타내는 데이터 클래스입니다.
+/// 선의 점들, 색상, 굵기 정보를 포함합니다.
 class DrawnLine {
   final List<Offset> points;
   final Color color;
@@ -545,6 +575,7 @@ class DrawnLine {
   DrawnLine(this.points, this.color, this.strokeWidth);
 }
 
+/// 캔버스에 선들을 그리는 커스텀 페인터입니다.
 class DrawingPainter extends CustomPainter {
   final List<DrawnLine> lines;
 
@@ -571,5 +602,10 @@ class DrawingPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant DrawingPainter oldDelegate) {
+    // 선의 개수가 다르거나 마지막 선이 변경된 경우에만 다시 그리기
+    return lines.length != oldDelegate.lines.length ||
+           (lines.isNotEmpty && oldDelegate.lines.isNotEmpty && 
+            lines.last.points.length != oldDelegate.lines.last.points.length);
+  }
 }
