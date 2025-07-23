@@ -43,17 +43,10 @@ class FloatingActionButtons extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         // 좌우 스왑 버튼 (현재 상태 표시)
-        Tooltip(
-          message: isMapLeft ? '지도가 왼쪽에 있습니다\n클릭하면 대시보드가 왼쪽으로 이동' : '대시보드가 왼쪽에 있습니다\n클릭하면 지도가 왼쪽으로 이동',
-          child: FloatingActionButton(
-            heroTag: "swap_btn$suffix",
-            onPressed: onSwap,
-            backgroundColor: isMapLeft ? Colors.blue[600] : Colors.grey[600],
-            child: Icon(
-              isMapLeft ? Icons.map : Icons.dashboard,
-              color: Colors.white,
-            ),
-          ),
+        FloatingActionButton(
+          heroTag: "swap_btn$suffix",
+          onPressed: onSwap,
+          child: Icon(Icons.swap_horiz),
         ),
         const SizedBox(height: 24),
         // 상인회 목록 버튼
@@ -67,8 +60,7 @@ class FloatingActionButtons extends StatelessWidget {
         FloatingActionButton(
           heroTag: "drawing_btn$suffix",
           onPressed: () => _showDrawingBoard(context),
-          backgroundColor: Colors.green[600],
-          child: const Icon(Icons.brush, color: Colors.white),
+          child: const Icon(Icons.brush),
         ),
       ],
     );
