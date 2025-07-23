@@ -260,111 +260,99 @@ class _MapWidgetState extends State<MapWidget> {
                       }
                     });
                   },
-                  child: GestureDetector(
-                    onTapUp: _handleTapUp,
-                    onDoubleTap: _handleDoubleTap,
-                    onLongPress: _handleLongPress,
-                    child: SizedBox(
-                      width: _mapWidth,
-                      height: _mapHeight,
-                      child: Stack(
-                        alignment: Alignment.topLeft,
-                        children: [
-                          // Base map image with caching (WebP)
+                  child: SizedBox(
+                    width: _mapWidth,
+                    height: _mapHeight,
+                    child: Stack(
+                      alignment: Alignment.topLeft,
+                      children: [
+                        // Base map image with caching (WebP)
+                        RepaintBoundary(
+                          child: Image.asset(
+                            'assets/map/base.webp',
+                            fit: BoxFit.contain,
+                            width: _mapWidth,
+                            height: _mapHeight,
+                            filterQuality: FilterQuality.medium,
+                            cacheWidth: (_mapWidth * 0.8).toInt(), // Reduce memory usage
+                            cacheHeight: (_mapHeight * 0.8).toInt(),
+                          ),
+                        ),
+                        // Captured background layer
+                        if (_showCapturedBackground)
                           RepaintBoundary(
-                            child: Image.asset(
-                              'assets/map/base.webp',
-                              fit: BoxFit.contain,
-                              width: _mapWidth,
-                              height: _mapHeight,
-                              filterQuality: FilterQuality.medium,
-                              cacheWidth: (_mapWidth * 0.8).toInt(), // Reduce memory usage
-                              cacheHeight: (_mapHeight * 0.8).toInt(),
+                            child: Opacity(
+                              opacity: _showCapturedBackground ? 0.7 : 0.0,
+                              child: Image.asset(
+                                'assets/map/captured_background.webp', // 캡처한 배경 이미지 파일
+                                fit: BoxFit.contain,
+                                width: _mapWidth,
+                                height: _mapHeight,
+                                filterQuality: FilterQuality.medium,
+                                cacheWidth: (_mapWidth * 0.8).toInt(),
+                                cacheHeight: (_mapHeight * 0.8).toInt(),
+                                errorBuilder: (context, error, stackTrace) {
+                                  // 파일이 없을 경우 빈 컨테이너 반환
+                                  return Container();
+                                },
+                              ),
                             ),
                           ),
-                          // Captured background layer
-                          if (_showCapturedBackground)
-                            RepaintBoundary(
-                              child: Opacity(
-                                opacity: _showCapturedBackground ? 0.7 : 0.0,
-                                child: Image.asset(
-                                  'assets/map/captured_background.webp', // 캡처한 배경 이미지 파일
-                                  fit: BoxFit.contain,
-                                  width: _mapWidth,
-                                  height: _mapHeight,
-                                  filterQuality: FilterQuality.medium,
-                                  cacheWidth: (_mapWidth * 0.8).toInt(),
-                                  cacheHeight: (_mapHeight * 0.8).toInt(),
-                                  errorBuilder: (context, error, stackTrace) {
-                                    // 파일이 없을 경우 빈 컨테이너 반환
-                                    return Container();
-                                  },
-                                ),
+                        // Terrain layer with lazy loading
+                        if (_showTerrain)
+                          RepaintBoundary(
+                            child: Opacity(
+                              opacity: _showTerrain ? 1.0 : 0.0,
+                              child: Image.asset(
+                                'assets/map/mount.webp',
+                                fit: BoxFit.contain,
+                                width: _mapWidth,
+                                height: _mapHeight,
+                                filterQuality: FilterQuality.medium,
+                                cacheWidth: (_mapWidth * 0.8).toInt(),
+                                cacheHeight: (_mapHeight * 0.8).toInt(),
                               ),
                             ),
-                          // Terrain layer with lazy loading
-                          if (_showTerrain)
-                            RepaintBoundary(
-                              child: Opacity(
-                                opacity: _showTerrain ? 1.0 : 0.0,
-                                child: Image.asset(
-                                  'assets/map/mount.webp',
-                                  fit: BoxFit.contain,
-                                  width: _mapWidth,
-                                  height: _mapHeight,
-                                  filterQuality: FilterQuality.medium,
-                                  cacheWidth: (_mapWidth * 0.8).toInt(),
-                                  cacheHeight: (_mapHeight * 0.8).toInt(),
-                                ),
+                          ),
+
+                        // 동 지역별 비활성화 (전체 지역을 회색으로 표시)
+                        // _showDisableDongAreas가 true이고 전체가 선택된 경우에만 표시
+                        if (_showDisableDongAreas)
+                          RepaintBoundary(
+                            child: Opacity(
+                              opacity: _showDisableDongAreas ? 1.0 : 0.0,
+                              child: Image.asset(
+                                'assets/map/base_gray.webp',
+                                fit: BoxFit.contain,
+                                width: _mapWidth,
+                                height: _mapHeight,
+                                filterQuality: FilterQuality.medium,
+                                cacheWidth: (_mapWidth * 0.8).toInt(),
+                                cacheHeight: (_mapHeight * 0.8).toInt(),
                               ),
                             ),
+                          ),
 
-                          // 동 지역별 비활성화 (전체 지역을 회색으로 표시)
-                          // _showDisableDongAreas가 true이고 전체가 선택된 경우에만 표시
-                          if (_showDisableDongAreas)
-                            RepaintBoundary(
-                              child: Opacity(
-                                opacity: _showDisableDongAreas ? 1.0 : 0.0,
-                                child: Image.asset(
-                                  'assets/map/base_gray.webp',
-                                  fit: BoxFit.contain,
-                                  width: _mapWidth,
-                                  height: _mapHeight,
-                                  filterQuality: FilterQuality.medium,
-                                  cacheWidth: (_mapWidth * 0.8).toInt(),
-                                  cacheHeight: (_mapHeight * 0.8).toInt(),
-                                ),
+                        // 동 선택 지역 표시 (선택된 동의 지역만 표시)
+                        // _showDongAreas가 true이고 특정 동이 선택된 경우에만 표시
+                        if (_showDongAreas && _selectedDong != null)
+                          RepaintBoundary(
+                            child: Opacity(
+                              opacity: 1.0,
+                              child: Image.asset(
+                                _selectedDong!.areaAsset,
+                                fit: BoxFit.contain,
+                                width: _mapWidth,
+                                height: _mapHeight,
+                                filterQuality: FilterQuality.medium,
+                                cacheWidth: (_mapWidth * 0.8).toInt(),
+                                cacheHeight: (_mapHeight * 0.8).toInt(),
                               ),
                             ),
-
-                          // 동 선택 지역 표시 (선택된 동의 지역만 표시)
-                          // _showDongAreas가 true이고 특정 동이 선택된 경우에만 표시
-                          if (_showDongAreas && _selectedDong != null)
-                            RepaintBoundary(
-                              child: Opacity(
-                                opacity: 1.0,
-                                child: Image.asset(
-                                  _selectedDong!.areaAsset,
-                                  fit: BoxFit.contain,
-                                  width: _mapWidth,
-                                  height: _mapHeight,
-                                  filterQuality: FilterQuality.medium,
-                                  cacheWidth: (_mapWidth * 0.8).toInt(),
-                                  cacheHeight: (_mapHeight * 0.8).toInt(),
-                                ),
-                              ),
-                            ),
-
-
-                          // Dong areas
-                          //..._buildDongAreas(),
-                          // Dong name layer replaced by dong tags
-                          // Dong tags
-                          ..._buildDongTags(),
-                          // Merchant numbers
-                          ..._buildMerchantNumbers(),
-                        ],
-                      ),
+                          ),
+                        ..._buildDongTags(),
+                        ..._buildMerchantNumbers(),
+                      ],
                     ),
                   ),
                 ),
@@ -410,137 +398,6 @@ class _MapWidgetState extends State<MapWidget> {
     // Directly set the transformation without animation
     _transformationController.value = endMatrix;
   }
-
-  void _handleTapUp(TapUpDetails details) {
-    _startAutoResetTimer();
-    final position = _transformationController.toScene(details.localPosition);
-    
-    // Check if tapping on a merchant
-    final tappedMerchant = _findMerchantAtPosition(position);
-    if (tappedMerchant != null) {
-      _handleMerchantTap(tappedMerchant);
-    }
-  }
-
-  void _handleDoubleTap() {
-    _startAutoResetTimer();
-    // Reset zoom to fit entire map
-    _zoomToFitEntireMap();
-  }
-
-  void _handleLongPress() {
-    _startAutoResetTimer();
-    setState(() {
-      _isSelectionMode = !_isSelectionMode;
-    });
-    
-    HapticFeedback.mediumImpact();
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          _isSelectionMode ? '선택 모드 활성화' : '선택 모드 비활성화',
-          style: const TextStyle(fontSize: 18),
-        ),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  Merchant? _findMerchantAtPosition(Offset position) {
-    const touchRadius = _touchTargetSize / 2;
-    
-    for (var dong in DongList.all) {
-      if (_selectedDong != null && dong != _selectedDong) continue;
-      
-      for (var merchant in dong.merchantList) {
-        final distance = sqrt(
-          pow(merchant.x - position.dx, 2) + pow(merchant.y - position.dy, 2)
-        );
-        if (distance <= touchRadius) {
-          return merchant;
-        }
-      }
-    }
-    return null;
-  }
-
-  void _handleMerchantTap(Merchant merchant) {
-    HapticFeedback.lightImpact();
-    
-    if (_isSelectionMode) {
-      setState(() {
-        if (_selectedMerchants.contains(merchant.id)) {
-          _selectedMerchants.remove(merchant.id);
-        } else {
-          _selectedMerchants.add(merchant.id);
-        }
-      });
-    } else {
-      // 마커 직접 클릭 시에도 해당 상인회를 하이라이트
-      setState(() {
-        _lastSelectedMerchant = merchant;
-      });
-      _showMerchantDetails(merchant);
-      widget.onMerchantSelected?.call(merchant);
-    }
-  }
-
-  void _showMerchantDetails(Merchant merchant) {
-    showDialog(
-      context: context,
-      builder: (context) => _buildMerchantDetailsModal(merchant),
-    );
-  }
-
-  // void _showDongMerchantDialog(Dong dong) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => DongMerchantDialog(
-  //       dongName: dong.name,
-  //       dongColor: dong.color,
-  //     ),
-  //   );
-  // }
-
-  Widget _buildMerchantDetailsModal(Merchant merchant) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
-      title: Text(
-        merchant.name,
-        style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('상인회 ID: ${merchant.id}', style: const TextStyle(fontSize: 20)),
-          const SizedBox(height: 12),
-          Text('위치: (${merchant.x.toInt()}, ${merchant.y.toInt()})', 
-               style: const TextStyle(fontSize: 18)),
-          const SizedBox(height: 20),
-          // Add more merchant details here
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('닫기', style: TextStyle(fontSize: 20)),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            //_jumpToMerchant(merchant);
-          },
-          child: const Text('위치로 이동', style: TextStyle(fontSize: 20)),
-        ),
-      ],
-    );
-  }
-
 
   List<Widget> _buildMerchantNumbers() {
     if (!_showNumber) return [];
@@ -636,37 +493,6 @@ class _MapWidgetState extends State<MapWidget> {
         );
   }
 
-  List<Widget> _buildDongAreas() {
-    if (!_showDongAreas) return [];
-    
-    List<Widget> widgets = [];
-    
-    for (var dong in DongList.all) {
-      if (_selectedDong != null && dong != _selectedDong) continue;
-      
-      widgets.add(
-        Positioned.fromRect(
-          rect: dong.area,
-          child: Opacity(
-            opacity: dong.isShow ? 0.3 : 0.0,
-            child: Container(
-              decoration: BoxDecoration(
-                color: dong.color,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: dong.color.withOpacity(0.8),
-                  width: 2,
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-    
-    return widgets;
-  }
-
   List<Widget> _buildDongTags() {
     if (!_showDongName) return [];
     
@@ -684,20 +510,12 @@ class _MapWidgetState extends State<MapWidget> {
               opacity: 1.0,
               child: GestureDetector(
                 onTap: () {
-                  //_showDongMerchantDialog(dong);
-                  _startAutoResetTimer();
+                  selectDong(dong);
                 },
                 child: Container(
                   width: dong.dongTagArea.width,
                   height: 52,
                   alignment: Alignment.topLeft,
-                  // decoration: BoxDecoration(
-                  //   color: Colors.white,
-                  //   border: Border.all(
-                  //     color: Colors.red,
-                  //     width: 2
-                  //   ),
-                  // ),
                   child: SpeechBalloon(
                     width: dong.dongTagArea.width,
                     height: 52,
@@ -721,13 +539,6 @@ class _MapWidgetState extends State<MapWidget> {
                     ),
                   ),
                 ),
-                // child: Image.asset(
-                //   dong.dongTagAsset,
-                //   fit: BoxFit.contain,
-                //   filterQuality: FilterQuality.medium,
-                //   cacheWidth: dong.dongTagArea.width.toInt(),
-                //   cacheHeight: dong.dongTagArea.height.toInt(),
-                // ),
               ),
             ),
           ),
@@ -736,151 +547,6 @@ class _MapWidgetState extends State<MapWidget> {
     }
     
     return widgets;
-  }
-
-  Widget _buildEnhancedLegend() {
-    return Positioned(
-      bottom: 24,
-      left: 24,
-      right: 24,
-      child: GlassContainer(
-        height: 110,
-        width: double.infinity,
-        gradient: LinearGradient(
-          colors: [Colors.white.withOpacity(0.40), Colors.white.withOpacity(0.10)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderGradient: LinearGradient(
-          colors: [Colors.white.withOpacity(0.60), Colors.white.withOpacity(0.10)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderColor: Colors.white.withOpacity(0.3),
-        blur: 15,
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: _buildEnhancedToggle(
-                      title: '지형',
-                      icon: Icons.terrain,
-                      value: _showTerrain,
-                      onChanged: (value) {
-                        setState(() {
-                          _showTerrain = value;
-                        });
-                        _startAutoResetTimer();
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: _buildEnhancedToggle(
-                      title: '번호',
-                      icon: Icons.numbers,
-                      value: _showNumber,
-                      onChanged: (value) {
-                        setState(() {
-                          _showNumber = value;
-                        });
-                        _startAutoResetTimer();
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: _buildEnhancedToggle(
-                      title: '동이름',
-                      icon: Icons.location_city,
-                      value: _showDongName,
-                      onChanged: (value) {
-                        setState(() {
-                          _showDongName = value;
-                        });
-                        _startAutoResetTimer();
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: _buildEnhancedToggle(
-                      title: '구역',
-                      icon: Icons.map,
-                      value: _showDongAreas,
-                      onChanged: (value) {
-                        setState(() {
-                          _showDongAreas = value;
-                        });
-                        _startAutoResetTimer();
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: _buildEnhancedToggle(
-                      title: '캡처배경',
-                      icon: Icons.wallpaper,
-                      value: _showCapturedBackground,
-                      onChanged: (value) {
-                        setState(() {
-                          _showCapturedBackground = value;
-                        });
-                        _startAutoResetTimer();
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEnhancedToggle({
-    required String title,
-    required IconData icon,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return GestureDetector(
-      onTap: () => onChanged(!value),
-      child: Container(
-        width: double.infinity,
-        margin: EdgeInsets.symmetric(horizontal: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: value ? Colors.black.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: value ? Colors.black : Colors.grey.withOpacity(0.3),
-            width: 2,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: value ? Colors.black : Colors.grey,
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: TextStyle(
-                color: value ? Colors.black : Colors.grey.shade700,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   Widget _buildDongSelectionPanel() {
