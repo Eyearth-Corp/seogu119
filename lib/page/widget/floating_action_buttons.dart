@@ -67,13 +67,6 @@ class FloatingActionButtons extends StatelessWidget {
   }
 
 
-  void _showMerchantList(BuildContext context) {
-
-
-  }
-
-
-
   /// 상인회 목록을 보여주는 다이얼로그를 표시하고, 선택된 상인회 정보를 부모 위젯으로 전달합니다.
   void _showMerchantListDialog(BuildContext context) async {
     // 다이얼로그를 호출하고 반환값을 받습니다.
