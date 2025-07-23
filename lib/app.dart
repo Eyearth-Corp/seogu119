@@ -4,6 +4,7 @@ import 'package:seogu119/page/admin/admin_login_page.dart';
 import 'package:seogu119/page/admin/admin_dashboard_page.dart';
 import 'package:seogu119/page/admin/admin_guard.dart' hide AdminDashboardPage;
 import 'package:seogu119/page/data/admin_service.dart';
+import 'core/fonts.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -15,7 +16,8 @@ class App extends StatelessWidget {
       title: '서구 골목',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        fontFamily: 'NotoSans',
+        fontFamily: SeoguFonts.primaryFont,
+        fontFamilyFallback: SeoguFonts.fontFallbacks,
         scaffoldBackgroundColor: Colors.white,
       ),
       initialRoute: '/',

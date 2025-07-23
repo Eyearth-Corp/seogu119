@@ -38,6 +38,12 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
     _captureBackground();
   }
 
+  @override
+  void dispose() {
+    _backgroundImage = null; // 메모리 해제
+    super.dispose();
+  }
+
   Future<void> _captureBackground() async {
     try {
       // captureKey가 제공된 경우 (실제 화면 캡처)
@@ -130,13 +136,14 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
       });
       
     } catch (e) {
-      print('스크린샷 촬영 실패: $e');
       setState(() {
         _backgroundImage = null;
         _isLoading = false;
       });
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -527,43 +534,6 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
         );
       },
     );
-  }
-
-  void _saveDrawing() async {
-    try {
-      // 전체 화면 캡처 (배경 + 그림)
-      final RenderRepaintBoundary boundary =
-          _repaintBoundaryKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      final ui.Image image = await boundary.toImage(pixelRatio: 2.0);
-      final ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
-      final Uint8List pngBytes = byteData!.buffer.asUint8List();
-      //임시 다운로드
-
-
-
-      // 클립보드에 복사 (웹에서만 동작)
-      // 모바일에서는 갤러리에 저장하는 기능 필요
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '그림이 저장되었습니다',
-            style: TextStyle(fontFamily: 'NotoSans'),
-          ),
-          backgroundColor: SeoguColors.success,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '저장 실패: $e',
-            style: TextStyle(fontFamily: 'NotoSans'),
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
   }
 }
 

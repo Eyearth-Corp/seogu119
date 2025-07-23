@@ -423,7 +423,7 @@ class DongDashboard extends StatelessWidget {
         child: Text(
           '${merchant.id}\n${merchant.name}',
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.w500,
             color: SeoguColors.textPrimary,
           ),

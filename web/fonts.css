@@ -1,0 +1,58 @@
+/* 서구 골목경제 119 웹 폰트 설정 */
+/* 한글 문자 지원을 위한 웹 폰트 폴백 */
+
+/* Google Fonts Noto Sans Korean 임포트 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+
+/* 기본 폰트 스타일 */
+html, body {
+  font-family: 'NotoSans', 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', 
+               'Helvetica Neue', 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+}
+
+/* 한글 문자를 위한 특별한 폰트 클래스 */
+.korean-text {
+  font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', 
+               'NotoSans', 'Helvetica Neue', 'Segoe UI', sans-serif;
+}
+
+/* Flutter 웹에서 사용할 폰트 폴백 */
+flt-text {
+  font-family: 'NotoSans', 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', 
+               'Helvetica Neue', 'Segoe UI', 'Roboto', 'Arial', sans-serif !important;
+}
+
+/* 특정 문자에 대한 폰트 지정 */
+@font-face {
+  font-family: 'SeoguFont';
+  src: url('../fonts/NotoSans-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  unicode-range: U+0000-007F; /* Basic Latin */
+}
+
+@font-face {
+  font-family: 'SeoguFont';
+  src: url('../fonts/NotoSans-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  unicode-range: U+0000-007F; /* Basic Latin */
+}
+
+/* 한글 문자에 대한 Google Fonts 폴백 */
+@font-face {
+  font-family: 'SeoguFont';
+  src: url('https://fonts.gstatic.com/s/notosanskr/v36/PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNUWV2FN-IO_VvptBdWb6EyQDo.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  unicode-range: U+AC00-D7AF; /* Hangul Syllables */
+}
+
+/* Flutter 앱에서 한글 문자 렌더링 지원 */
+body {
+  -webkit-font-feature-settings: "kern" 1;
+  -moz-font-feature-settings: "kern" 1;
+  -o-font-feature-settings: "kern" 1;
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
+}
