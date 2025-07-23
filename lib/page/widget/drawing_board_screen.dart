@@ -27,7 +27,7 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
   Uint8List? _backgroundImage;
   final List<DrawnLine> _lines = <DrawnLine>[];
   final List<DrawnLine> _undoLines = <DrawnLine>[];
-  Color _selectedColor = SeoguColors.primary;
+  Color _selectedColor = Colors.red;
   double _strokeWidth = 4.0;
   bool _isLoading = true;
   bool _showBackground = true;
@@ -369,12 +369,12 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
 
   List<Widget> _buildColorPalette() {
     final colors = [
-      SeoguColors.highlight,      // 서구 레드 (중요한 표시용)
-      SeoguColors.primary,        // 서구 메인 블루 (공식 색상)
-      SeoguColors.secondary,      // 서구 그린 (긍정적 표시용)
+      Colors.red,
+      Colors.blue,
+      Colors.green,
       Colors.yellow,
-      Colors.white,              // 화이트 (지우기/수정용)
-      Colors.black,              // 블랙 (기본 그리기용)
+      Colors.white,
+      Colors.black,
     ];
 
     return colors.map((color) {
