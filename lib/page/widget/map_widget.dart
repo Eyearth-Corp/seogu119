@@ -12,11 +12,11 @@ import 'dong_merchant_dialog.dart';
 // MapWidget을 외부에서 제어하기 위한 컨트롤러
 class MapWidgetController {
   void Function(Merchant)? _navigateToMerchant;
-  
+
   void _setNavigateFunction(void Function(Merchant) navigateFunc) {
     _navigateToMerchant = navigateFunc;
   }
-  
+
   void navigateToMerchant(Merchant merchant) {
     _navigateToMerchant?.call(merchant);
   }
@@ -203,19 +203,16 @@ class _MapWidgetState extends State<MapWidget> {
     _transformationController.value = matrix;
   }
 
-  void _jumpToMerchant(Merchant merchant) {
-    setState(() {
-      _lastSelectedMerchant = merchant;
-    });
-    
-    final rect = Rect.fromCenter(
-      center: Offset(merchant.x, merchant.y),
-      width: 200,
-      height: 200,
-    );
-    _jumpToRect(rect);
-    
-    _startAutoResetTimer();
+  void _jumpToMerchant(Merchant _merchant) {
+    for (var dong in DongList.all) {
+      for (var merchant in dong.merchantList) {
+        if (merchant.id == _merchant.id) {
+          selectDong(dong);
+          _lastSelectedMerchant = merchant;
+          break;
+        }
+      }
+    }
   }
 
   @override
@@ -536,7 +533,7 @@ class _MapWidgetState extends State<MapWidget> {
         ElevatedButton(
           onPressed: () {
             Navigator.of(context).pop();
-            _jumpToMerchant(merchant);
+            //_jumpToMerchant(merchant);
           },
           child: const Text('위치로 이동', style: TextStyle(fontSize: 20)),
         ),
@@ -1042,37 +1039,7 @@ class _MapWidgetState extends State<MapWidget> {
           ),
         ),
         onTap: () {
-          setState(() {
-            _selectedDong = dong;
-            _selectedMerchants.clear();
-            
-            // 자동 상태 관리
-            if (dong == null) {
-              // "전체" 선택 시
-              _showDisableDongAreas = false;
-              _showDongAreas = false;
-            } else {
-              // 특정 동 선택 시
-              _showDisableDongAreas = true;
-              _showDongAreas = true;
-            }
-          });
-          
-          // 대시보드에 동 선택 전달
-          widget.onDongSelected?.call(dong);
-          
-          _calculateVisibleMerchants();
-          
-          if (dong != null) {
-            _jumpToRect(dong.area);
-            // 동을 선택하면 해당 동별 가맹점 현황 다이얼로그 표시
-            //_showDongMerchantDialog(dong);
-          } else {
-            // 전체를 선택하면 전체 지도가 보이게 축소한다.
-            _zoomToFitEntireMap();
-          }
-          
-          _startAutoResetTimer();
+          selectDong(dong);
         },
       ),
     );
@@ -1126,8 +1093,7 @@ class _MapWidgetState extends State<MapWidget> {
     setState(() {
       _selectedDong = dong;
       _selectedMerchants.clear();
-      _calculateVisibleMerchants();
-      
+
       // 자동 상태 관리
       if (dong == null) {
         // "전체" 선택 시
@@ -1139,15 +1105,21 @@ class _MapWidgetState extends State<MapWidget> {
         _showDongAreas = true;
       }
     });
-    
+
+    // 대시보드에 동 선택 전달
+    widget.onDongSelected?.call(dong);
+
+    _calculateVisibleMerchants();
+
     if (dong != null) {
       _jumpToRect(dong.area);
       // 동을 선택하면 해당 동별 가맹점 현황 다이얼로그 표시
       //_showDongMerchantDialog(dong);
     } else {
+      // 전체를 선택하면 전체 지도가 보이게 축소한다.
       _zoomToFitEntireMap();
     }
-    
+
     _startAutoResetTimer();
   }
 

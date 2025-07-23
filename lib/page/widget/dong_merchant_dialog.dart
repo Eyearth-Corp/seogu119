@@ -18,10 +18,6 @@ class DongMerchantDialog extends StatefulWidget {
 
 class _DongMerchantDialogState extends State<DongMerchantDialog>
     with TickerProviderStateMixin {
-  late AnimationController _slideController;
-  late AnimationController _fadeController;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _fadeAnimation;
   
   DongMerchantStatus? _merchantData;
   int _selectedTabIndex = 0;
@@ -39,42 +35,14 @@ class _DongMerchantDialogState extends State<DongMerchantDialog>
   void initState() {
     super.initState();
     
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.elasticOut,
-    ));
-
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
 
     _merchantData = DongMerchantDataManager.getDongData(widget.dongName);
-    
-    _slideController.forward();
-    _fadeController.forward();
+
   }
 
   @override
   void dispose() {
-    _slideController.dispose();
-    _fadeController.dispose();
     super.dispose();
   }
 
@@ -88,34 +56,28 @@ class _DongMerchantDialogState extends State<DongMerchantDialog>
         horizontal: screenSize.width * 0.25,
         vertical: screenSize.height * 0.15,
       ),
-      child: SlideTransition(
-        position: _slideAnimation,
-        child: Container(
-          width: screenSize.width * 0.5,
-          height: screenSize.height * 0.75,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 40,
-                offset: const Offset(0, 20),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              _buildHeader(),
-              _buildTabBar(),
-              Expanded(
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: _buildContent(),
-                ),
-              ),
-            ],
-          ),
+      child: Container(
+        width: screenSize.width * 0.5,
+        height: screenSize.height * 0.75,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 40,
+              offset: const Offset(0, 20),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            _buildHeader(),
+            _buildTabBar(),
+            Expanded(
+              child: _buildContent(),
+            ),
+          ],
         ),
       ),
     );

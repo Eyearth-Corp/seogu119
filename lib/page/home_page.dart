@@ -52,6 +52,8 @@ class _HomePageState extends State<HomePage> {
 
   /// 선택된 상인회로 지도 이동
   void _navigateToMerchant(Merchant merchant) {
+
+
     _mapController.navigateToMerchant(merchant);
   }
   
