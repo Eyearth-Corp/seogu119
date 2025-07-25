@@ -93,8 +93,8 @@ class DongList {
         merchantList : [
           Merchant(id: 28, name: "계수마을상인회", x: 786, y: 582),
           Merchant(id: 29, name: "상무1동아파트상인회1", x: 884, y: 573),
-          Merchant(id: 29, name: "상무1동아파트상인회2", x: 1024, y: 533),
-          Merchant(id: 29, name: "상무1동아파트상인회3", x: 1086, y: 690),
+          Merchant(id: 119, name: "상무1동아파트상인회2", x: 1024, y: 533),
+          Merchant(id: 120, name: "상무1동아파트상인회3", x: 1086, y: 690),
           Merchant(id: 30, name: "상암마을상인회", x: 974, y: 577),
           Merchant(id: 31, name: "상무오월로상인회", x: 908, y: 645),
           Merchant(id: 32, name: "518먹자골목상인회", x: 932, y: 693),

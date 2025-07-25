@@ -512,7 +512,11 @@ class AdminService {
       print('📤 요청 데이터: $data');
       
       // API 요구사항에 맞는 형식으로 데이터 구조화
-      final requestBody = _formatDashboardData(data);
+      final formattedData = _formatDashboardData(data);
+      final requestBody = {
+        'data_date': date,
+        'data_json': formattedData,
+      };
       
       final response = await http.put(
         Uri.parse(url),

@@ -217,65 +217,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     return numericFields.any((field) => key.contains(field));
   }
 
-  /// PUT API 미리보기 다이얼로그
-  Future<void> _showApiPreviewDialog() async {
-    final jsonData = _editedData;
-    
-    showDialog(
+  /// 저장 확인 다이얼로그
+  Future<void> _showSaveConfirmDialog() async {
+    final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('PUT API 미리보기'),
-        content: Container(
-          width: double.maxFinite,
-          constraints: const BoxConstraints(maxHeight: 400),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Endpoint:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text('PUT /api/main-dashboard/$_selectedDate'),
-              const SizedBox(height: 16),
-              const Text(
-                'Request Body:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: SingleChildScrollView(
-                    child: Text(
-                      _formatJson(jsonData),
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        title: const Text('데이터 저장'),
+        content: const Text('변경사항을 저장하시겠습니까?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context, false),
             child: const Text('취소'),
           ),
           ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await _saveData();
-            },
-            child: const Text('전송'),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('저장'),
             style: ElevatedButton.styleFrom(
               backgroundColor: SeoguColors.primary,
             ),
@@ -283,6 +239,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         ],
       ),
     );
+
+    if (result == true) {
+      await _saveData();
+    }
   }
 
   /// JSON 포맷팅
@@ -293,14 +253,15 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   /// 데이터 저장
   Future<void> _saveData() async {
-    if (_selectedDate == null) return;
+    // 날짜를 '2025-07-25'로 고정
+    const fixedDate = '2025-07-25';
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final success = await AdminService.updateMainDashboard(_selectedDate!, _editedData);
+      final success = await AdminService.updateMainDashboard(fixedDate, _editedData);
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -311,7 +272,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         );
         
         if (success) {
-          await _loadDashboardData(_selectedDate!);
+          await _loadDashboardData(_selectedDate ?? fixedDate);
         }
       }
     } catch (e) {
@@ -1068,9 +1029,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       bottom: 20,
                       right: 20,
                       child: ElevatedButton.icon(
-                        onPressed: _showApiPreviewDialog,
-                        icon: const Icon(Icons.preview),
-                        label: const Text('PUT API 미리보기'),
+                        onPressed: _showSaveConfirmDialog,
+                        icon: const Icon(Icons.save),
+                        label: const Text('저장하기'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: SeoguColors.primary,
                           foregroundColor: Colors.white,

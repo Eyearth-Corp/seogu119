@@ -14,7 +14,6 @@ class MainDashboard extends StatefulWidget {
 class _MainDashboardState extends State<MainDashboard> {
   MainDashboardData? _dashboardData;
   bool _isLoading = true;
-  bool _isEditMode = false;
 
   @override
   void initState() {
@@ -1110,7 +1109,7 @@ class _MainDashboardState extends State<MainDashboard> {
   Widget _buildWeeklyAchievements() {
     final achievements = _dashboardData?.weeklyAchievements ?? [];
     
-    if (achievements.isEmpty && !_isEditMode) {
+    if (achievements.isEmpty) {
       return _buildEmptyDataMessage();
     }
     
@@ -1121,57 +1120,14 @@ class _MainDashboardState extends State<MainDashboard> {
     for (int i = 0; i < achievements.length; i++) {
       list.add(
         Expanded(
-          child: _isEditMode
-              ? _buildEditableAchievementCard(
-                  achievements[i].title,
-                  achievements[i].value,
-                  i < colors.length ? colors[i] : SeoguColors.primary,
-                  i,
-                )
-              : _buildAchievementCard(
-                  achievements[i].title,
-                  achievements[i].value,
-                  i < colors.length ? colors[i] : SeoguColors.primary,
-                ),
+          child: _buildAchievementCard(
+            achievements[i].title,
+            achievements[i].value,
+            i < colors.length ? colors[i] : SeoguColors.primary,
+          ),
         )
       );
       if (i < achievements.length - 1) list.add(const SizedBox(width: 16));
-    }
-
-    // 편집 모드에서 추가 버튼
-    if (_isEditMode) {
-      list.add(
-        Expanded(
-          child: InkWell(
-            onTap: _addNewAchievement,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Colors.grey.withOpacity(0.3),
-                  width: 1,
-                ),
-              ),
-              child: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.add, color: Colors.grey, size: 24),
-                  SizedBox(height: 6),
-                  Text(
-                    '추가',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
     }
 
     return Container(
@@ -1190,29 +1146,13 @@ class _MainDashboardState extends State<MainDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                '🎯 금주 주요 성과',
-                style: TextStyle(
-                  fontSize: 19,
-                  fontWeight: FontWeight.bold,
-                  color: SeoguColors.textPrimary,
-                ),
-              ),
-              IconButton(
-                icon: Icon(
-                  _isEditMode ? Icons.check : Icons.edit,
-                  color: _isEditMode ? SeoguColors.success : SeoguColors.textSecondary,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _isEditMode = !_isEditMode;
-                  });
-                },
-              ),
-            ],
+          const Text(
+            '🎯 금주 주요 성과',
+            style: TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
+              color: SeoguColors.textPrimary,
+            ),
           ),
           const SizedBox(height: 16),
           Row(
@@ -1256,213 +1196,6 @@ class _MainDashboardState extends State<MainDashboard> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildEditableAchievementCard(String title, String value, Color color, int index) {
-    return Stack(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: color.withOpacity(0.3),
-              width: 1,
-            ),
-          ),
-          child: Column(
-            children: [
-              InkWell(
-                onTap: () => _editAchievementTitle(index),
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 19,
-                    color: Color(0xFF64748B),
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 6),
-              InkWell(
-                onTap: () => _editAchievementValue(index),
-                child: Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        Positioned(
-          top: -8,
-          right: -8,
-          child: IconButton(
-            icon: const Icon(Icons.close, size: 20),
-            color: Colors.red,
-            onPressed: () => _deleteAchievement(index),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _addNewAchievement() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        String title = '';
-        String value = '';
-        
-        return AlertDialog(
-          title: const Text('새 성과 추가'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: const InputDecoration(
-                  labelText: '제목',
-                  hintText: '예: 신규 가맹점',
-                ),
-                onChanged: (val) => title = val,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                decoration: const InputDecoration(
-                  labelText: '값',
-                  hintText: '예: 47개',
-                ),
-                onChanged: (val) => value = val,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('취소'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (title.isNotEmpty && value.isNotEmpty) {
-                  setState(() {
-                    _dashboardData?.weeklyAchievements.add(
-                      WeeklyAchievement(title: title, value: value),
-                    );
-                  });
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Text('추가'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _editAchievementTitle(int index) {
-    final achievement = _dashboardData?.weeklyAchievements[index];
-    if (achievement == null) return;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        String newTitle = achievement.title;
-        
-        return AlertDialog(
-          title: const Text('제목 수정'),
-          content: TextField(
-            controller: TextEditingController(text: achievement.title),
-            onChanged: (val) => newTitle = val,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('취소'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _dashboardData?.weeklyAchievements[index] = 
-                    WeeklyAchievement(title: newTitle, value: achievement.value);
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text('저장'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _editAchievementValue(int index) {
-    final achievement = _dashboardData?.weeklyAchievements[index];
-    if (achievement == null) return;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        String newValue = achievement.value;
-        
-        return AlertDialog(
-          title: const Text('값 수정'),
-          content: TextField(
-            controller: TextEditingController(text: achievement.value),
-            onChanged: (val) => newValue = val,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('취소'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _dashboardData?.weeklyAchievements[index] = 
-                    WeeklyAchievement(title: achievement.title, value: newValue);
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text('저장'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _deleteAchievement(int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('삭제 확인'),
-          content: const Text('이 성과를 삭제하시겠습니까?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('취소'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _dashboardData?.weeklyAchievements.removeAt(index);
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text('삭제', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
     );
   }
 }

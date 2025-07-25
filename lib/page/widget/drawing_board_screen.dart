@@ -4,17 +4,18 @@ import 'package:flutter/services.dart';
 import 'package:screenshot/screenshot.dart';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import '../../core/colors.dart';
 
 class DrawingBoardScreen extends StatefulWidget {
   final Widget? backgroundWidget;
   final GlobalKey? captureKey;
-  
+
   const DrawingBoardScreen({
     super.key,
     this.backgroundWidget,
     this.captureKey,
-  }) : assert(backgroundWidget != null || captureKey != null, 
-         'Either backgroundWidget or captureKey must be provided');
+  }) : assert(backgroundWidget != null || captureKey != null,
+  'Either backgroundWidget or captureKey must be provided');
 
   @override
   State<DrawingBoardScreen> createState() => _DrawingBoardScreenState();
@@ -26,7 +27,7 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
   Uint8List? _backgroundImage;
   final List<DrawnLine> _lines = <DrawnLine>[];
   final List<DrawnLine> _undoLines = <DrawnLine>[];
-  Color _selectedColor = const Color(0xFF1E3A8A); // 서구 메인 블루
+  Color _selectedColor = Colors.red;
   double _strokeWidth = 4.0;
   bool _isLoading = true;
   bool _showBackground = true;
@@ -43,27 +44,20 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
     super.dispose();
   }
 
-  /// 배경 위젯 또는 화면을 캡처하여 드로잉 배경으로 사용합니다.
-  /// 
-  /// 다음 순서로 캡처를 시도합니다:
-  /// 1. captureKey가 제공된 경우: RenderRepaintBoundary에서 직접 캡처
-  /// 2. backgroundWidget이 RepaintBoundary인 경우: 해당 위젯에서 캡처  
-  /// 3. screenshot 패키지를 사용하여 위젯 캡처
-  /// 4. 모든 방법 실패 시: 빈 배경으로 진행
   Future<void> _captureBackground() async {
     try {
       // captureKey가 제공된 경우 (실제 화면 캡처)
       if (widget.captureKey != null) {
         // 약간의 지연 후 캡처 (렌더링 완료 대기)
         await Future.delayed(const Duration(milliseconds: 300));
-        
-        final RenderRepaintBoundary? boundary = 
-            widget.captureKey!.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-            
+
+        final RenderRepaintBoundary? boundary =
+        widget.captureKey!.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+
         if (boundary != null) {
           final ui.Image image = await boundary.toImage(pixelRatio: 1.0);
           final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-          
+
           if (byteData != null) {
             final Uint8List imageBytes = byteData.buffer.asUint8List();
             setState(() {
@@ -74,7 +68,7 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
           }
         }
       }
-      
+
       // backgroundWidget이 제공된 경우 (위젯에서 캡처)
       if (widget.backgroundWidget != null) {
         // RepaintBoundary에서 직접 캡처하기
@@ -82,16 +76,16 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
           final repaintBoundary = widget.backgroundWidget as RepaintBoundary;
           if (repaintBoundary.key != null && repaintBoundary.key is GlobalKey) {
             final GlobalKey boundaryKey = repaintBoundary.key as GlobalKey;
-            
+
             await Future.delayed(const Duration(milliseconds: 500));
-            
-            final RenderRepaintBoundary? boundary = 
-                boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-                
+
+            final RenderRepaintBoundary? boundary =
+            boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+
             if (boundary != null) {
               final ui.Image image = await boundary.toImage(pixelRatio: 1.0);
               final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-              
+
               if (byteData != null) {
                 final Uint8List imageBytes = byteData.buffer.asUint8List();
                 setState(() {
@@ -103,10 +97,10 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
             }
           }
         }
-        
+
         // screenshot 패키지로 위젯 캡처
         final size = MediaQuery.of(context).size;
-        
+
         final Uint8List? imageBytes = await _screenshotController.captureFromWidget(
           Container(
             width: size.width,
@@ -125,7 +119,7 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
           context: context,
           pixelRatio: 1.0,
         );
-        
+
         if (imageBytes != null) {
           setState(() {
             _backgroundImage = imageBytes;
@@ -134,13 +128,13 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
           return;
         }
       }
-      
+
       // 모든 캡처 방식 실패 시 빈 배경으로 진행
       setState(() {
         _backgroundImage = null;
         _isLoading = false;
       });
-      
+
     } catch (e) {
       setState(() {
         _backgroundImage = null;
@@ -193,46 +187,46 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
                   ),
                 ),
               ),
-          
-          // 그리기 캔버스
-          Positioned.fill(
-            child: GestureDetector(
-              onPanStart: (DragStartDetails details) {
-                _startNewLine(details.localPosition);
-              },
-              onPanUpdate: (DragUpdateDetails details) {
-                _addPointToLine(details.localPosition);
-              },
-              onPanEnd: (DragEndDetails details) {
-                _finishCurrentLine();
-              },
-              child: CustomPaint(
-                painter: DrawingPainter(_lines),
-                size: Size.infinite,
+
+            // 그리기 캔버스
+            Positioned.fill(
+              child: GestureDetector(
+                onPanStart: (DragStartDetails details) {
+                  _startNewLine(details.localPosition);
+                },
+                onPanUpdate: (DragUpdateDetails details) {
+                  _addPointToLine(details.localPosition);
+                },
+                onPanEnd: (DragEndDetails details) {
+                  _finishCurrentLine();
+                },
+                child: CustomPaint(
+                  painter: DrawingPainter(_lines),
+                  size: Size.infinite,
+                ),
               ),
             ),
-          ),
 
-          // 좌측 패널
-          Positioned(
-            left: 0,
-            top: 120,
-            bottom: 0,
-            child: _buildTool(),
-          ),
+            // 좌측 패널
+            Positioned(
+              left: 0,
+              top: 120,
+              bottom: 0,
+              child: _buildTool(),
+            ),
 
-          // 우축 패널
-          Positioned(
-            right: 0,
-            top: 120,
-            bottom: 0,
-            child: _buildTool(),
-          ),
-          
+            // 우축 패널
+            Positioned(
+              right: 0,
+              top: 120,
+              bottom: 0,
+              child: _buildTool(),
+            ),
 
-        ],
+
+          ],
+        ),
       ),
-    ),
     );
   }
 
@@ -340,11 +334,11 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
   }
 
   Widget _buildToolButton(
-    IconData icon,
-    String tooltip,
-    Color color,
-    VoidCallback? onPressed,
-  ) {
+      IconData icon,
+      String tooltip,
+      Color color,
+      VoidCallback? onPressed,
+      ) {
     return Tooltip(
       message: tooltip,
       child: Material(
@@ -373,25 +367,14 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
     );
   }
 
-  /// 드로잉용 색상 팔레트를 생성합니다.
-  /// 서구의 공식 브랜드 컬러를 포함한 다양한 색상을 제공하며,
-  /// 현재 선택된 색상에는 체크 표시와 테두리를 추가합니다.
-  /// 
-  /// Returns: 색상 선택 버튼들의 위젯 리스트
   List<Widget> _buildColorPalette() {
     final colors = [
-      const Color(0xFFEF4444),       // 서구 레드 (중요한 표시용)
-      const Color(0xFF1E3A8A),       // 서구 메인 블루 (공식 색상)
-      const Color(0xFF16A34A),       // 서구 그린 (긍정적 표시용)
-      const Color(0xFFFF9800),       // 주황색 (경고/주의용)
-      const Color(0xFF9C27B0),       // 보라색 (특별 표시용)
-      Colors.pink,
+      Colors.red,
+      Colors.blue,
+      Colors.green,
       Colors.yellow,
-      Colors.white,                  // 화이트 (지우기/수정용)
-      Colors.black,                  // 블랙 (기본 그리기용)
-      const Color(0xFF0891B2),       // 서구 틸
-      const Color(0xFF795548),       // 갈색 (자연스러운 표시용)
-      const Color(0xFF607D8B),       // 블루그레이 (중성 표시용)
+      Colors.white,
+      Colors.black,
     ];
 
     return colors.map((color) {
@@ -416,12 +399,12 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
             ),
             child: isSelected
                 ? Icon(
-                    Icons.check,
-                    color: color == Colors.white || color == Colors.yellow
-                        ? Colors.black
-                        : Colors.white,
-                    size: 16,
-                  )
+              Icons.check,
+              color: color == Colors.white || color == Colors.yellow
+                  ? Colors.black
+                  : Colors.white,
+              size: 16,
+            )
                 : null,
           ),
         ),
@@ -458,9 +441,6 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
 
   }
 
-  /// 새로운 선 그리기를 시작합니다.
-  /// [point]: 시작 지점의 좌표
-  /// 현재 선택된 색상과 굵기로 새로운 DrawnLine을 생성하고 redo 히스토리를 초기화합니다.
   void _startNewLine(Offset point) {
     setState(() {
       _lines.add(DrawnLine([point], _selectedColor, _strokeWidth));
@@ -468,8 +448,6 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
     });
   }
 
-  /// 현재 그리고 있는 선에 새로운 점을 추가합니다.
-  /// [point]: 추가할 점의 좌표
   void _addPointToLine(Offset point) {
     setState(() {
       if (_lines.isNotEmpty) {
@@ -478,19 +456,14 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
     });
   }
 
-  /// 현재 선 그리기를 완료합니다.
-  /// 필요시 추가 처리 로직을 구현할 수 있습니다.
   void _finishCurrentLine() {
-    // 현재 선 그리기 완료 - 추가 처리 로직 구현 가능
+    // 현재 선 그리기 완료
   }
 
-  /// 실행 취소가 가능한지 확인합니다.
   bool _canUndo() => _lines.isNotEmpty;
 
-  /// 다시 실행이 가능한지 확인합니다.
   bool _canRedo() => _undoLines.isNotEmpty;
 
-  /// 마지막 그린 선을 실행 취소합니다.
   void _undo() {
     if (_canUndo()) {
       setState(() {
@@ -499,7 +472,6 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
     }
   }
 
-  /// 실행 취소된 선을 다시 그립니다.
   void _redo() {
     if (_canRedo()) {
       setState(() {
@@ -565,8 +537,6 @@ class _DrawingBoardScreenState extends State<DrawingBoardScreen> {
   }
 }
 
-/// 그린 선을 나타내는 데이터 클래스입니다.
-/// 선의 점들, 색상, 굵기 정보를 포함합니다.
 class DrawnLine {
   final List<Offset> points;
   final Color color;
@@ -575,7 +545,6 @@ class DrawnLine {
   DrawnLine(this.points, this.color, this.strokeWidth);
 }
 
-/// 캔버스에 선들을 그리는 커스텀 페인터입니다.
 class DrawingPainter extends CustomPainter {
   final List<DrawnLine> lines;
 
@@ -602,10 +571,5 @@ class DrawingPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant DrawingPainter oldDelegate) {
-    // 선의 개수가 다르거나 마지막 선이 변경된 경우에만 다시 그리기
-    return lines.length != oldDelegate.lines.length ||
-           (lines.isNotEmpty && oldDelegate.lines.isNotEmpty && 
-            lines.last.points.length != oldDelegate.lines.last.points.length);
-  }
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
