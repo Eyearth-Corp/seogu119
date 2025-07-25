@@ -1,0 +1,347 @@
+{
+  "동천동": {
+    "dongMetrics": [
+      {
+        "title": "🏪 총 상인회2",
+        "value": "5",
+        "unit": "개"
+      },
+      {
+        "title": "✨ 가맹률",
+        "value": "92.1",
+        "unit": "%"
+      },
+      {
+        "title": "📊 이번주 방문",
+        "value": "24",
+        "unit": "회"
+      }
+    ],
+    "weeklyAchievements": [
+      {
+        "title": "신규 가맹",
+        "value": "2개"
+      },
+      {
+        "title": "민원 해결",
+        "value": "3건"
+      },
+      {
+        "title": "지원 예산",
+        "value": "150만원"
+      }
+    ],
+    "complaints": [
+      {
+        "keyword": "주차 문제",
+        "count": 8
+      },
+      {
+        "keyword": "소음 방해",
+        "count": 5
+      },
+      {
+        "keyword": "청소 문제",
+        "count": 2
+      }
+    ],
+    "businessTypes": [
+      {
+        "type": "음식점",
+        "count": 2,
+        "percentage": 40.0
+      },
+      {
+        "type": "소매점",
+        "count": 2,
+        "percentage": 30.0
+      },
+      {
+        "type": "서비스업",
+        "count": 1,
+        "percentage": 20.0
+      },
+      {
+        "type": "기타",
+        "count": 1,
+        "percentage": 10.0
+      }
+    ]
+  },
+  "유덕동": {
+    "dongMetrics": [
+      {
+        "title": "🏪 총 상인회",
+        "value": "3",
+        "unit": "개"
+      },
+      {
+        "title": "✨ 가맹률",
+        "value": "88.3",
+        "unit": "%"
+      },
+      {
+        "title": "📊 이번주 방문",
+        "value": "15",
+        "unit": "회"
+      }
+    ],
+    "weeklyAchievements": [
+      {
+        "title": "신규 가맹",
+        "value": "1개"
+      },
+      {
+        "title": "민원 해결",
+        "value": "2건"
+      },
+      {
+        "title": "지원 예산",
+        "value": "80만원"
+      }
+    ],
+    "complaints": [
+      {
+        "keyword": "소음 방해",
+        "count": 4
+      },
+      {
+        "keyword": "주차 문제",
+        "count": 3
+      },
+      {
+        "keyword": "청소 문제",
+        "count": 1
+      }
+    ],
+    "businessTypes": [
+      {
+        "type": "음식점",
+        "count": 1,
+        "percentage": 33.3
+      },
+      {
+        "type": "소매점",
+        "count": 1,
+        "percentage": 33.3
+      },
+      {
+        "type": "서비스업",
+        "count": 1,
+        "percentage": 33.3
+      },
+      {
+        "type": "기타",
+        "count": 0,
+        "percentage": 0.0
+      }
+    ]
+  },
+  "광천동": {
+    "dongMetrics": [
+      {
+        "title": "🏪 총 상인회",
+        "value": "1",
+        "unit": "개"
+      },
+      {
+        "title": "✨ 가맹률",
+        "value": "75.0",
+        "unit": "%"
+      },
+      {
+        "title": "📊 이번주 방문",
+        "value": "8",
+        "unit": "회"
+      }
+    ],
+    "weeklyAchievements": [
+      {
+        "title": "신규 가맹",
+        "value": "0개"
+      },
+      {
+        "title": "민원 해결",
+        "value": "1건"
+      },
+      {
+        "title": "지원 예산",
+        "value": "50만원"
+      }
+    ],
+    "complaints": [
+      {
+        "keyword": "청소 문제",
+        "count": 2
+      },
+      {
+        "keyword": "주차 문제",
+        "count": 1
+      },
+      {
+        "keyword": "소음 방해",
+        "count": 0
+      }
+    ],
+    "businessTypes": [
+      {
+        "type": "음식점",
+        "count": 1,
+        "percentage": 100.0
+      },
+      {
+        "type": "소매점",
+        "count": 0,
+        "percentage": 0.0
+      },
+      {
+        "type": "서비스업",
+        "count": 0,
+        "percentage": 0.0
+      },
+      {
+        "type": "기타",
+        "count": 0,
+        "percentage": 0.0
+      }
+    ]
+  },
+  "치평동": {
+    "dongMetrics": [
+      {
+        "title": "🏪 총 상인회",
+        "value": "18",
+        "unit": "개"
+      },
+      {
+        "title": "✨ 가맹률",
+        "value": "85.7",
+        "unit": "%"
+      },
+      {
+        "title": "📊 이번주 방문",
+        "value": "42",
+        "unit": "회"
+      }
+    ],
+    "weeklyAchievements": [
+      {
+        "title": "신규 가맹",
+        "value": "3개"
+      },
+      {
+        "title": "민원 해결",
+        "value": "5건"
+      },
+      {
+        "title": "지원 예산",
+        "value": "320만원"
+      }
+    ],
+    "complaints": [
+      {
+        "keyword": "주차 문제",
+        "count": 12
+      },
+      {
+        "keyword": "소음 방해",
+        "count": 8
+      },
+      {
+        "keyword": "청소 문제",
+        "count": 4
+      }
+    ],
+    "businessTypes": [
+      {
+        "type": "음식점",
+        "count": 7,
+        "percentage": 38.9
+      },
+      {
+        "type": "소매점",
+        "count": 5,
+        "percentage": 27.8
+      },
+      {
+        "type": "서비스업",
+        "count": 4,
+        "percentage": 22.2
+      },
+      {
+        "type": "기타",
+        "count": 2,
+        "percentage": 11.1
+      }
+    ]
+  },
+  "상무1동": {
+    "dongMetrics": [
+      {
+        "title": "🏪 총 상인회",
+        "value": "12",
+        "unit": "개"
+      },
+      {
+        "title": "✨ 가맹률",
+        "value": "89.5",
+        "unit": "%"
+      },
+      {
+        "title": "📊 이번주 방문",
+        "value": "28",
+        "unit": "회"
+      }
+    ],
+    "weeklyAchievements": [
+      {
+        "title": "신규 가맹",
+        "value": "2개"
+      },
+      {
+        "title": "민원 해결",
+        "value": "3건"
+      },
+      {
+        "title": "지원 예산",
+        "value": "200만원"
+      }
+    ],
+    "complaints": [
+      {
+        "keyword": "주차 문제",
+        "count": 7
+      },
+      {
+        "keyword": "소음 방해",
+        "count": 4
+      },
+      {
+        "keyword": "청소 문제",
+        "count": 2
+      }
+    ],
+    "businessTypes": [
+      {
+        "type": "음식점",
+        "count": 5,
+        "percentage": 41.7
+      },
+      {
+        "type": "소매점",
+        "count": 4,
+        "percentage": 33.3
+      },
+      {
+        "type": "서비스업",
+        "count": 2,
+        "percentage": 16.7
+      },
+      {
+        "type": "기타",
+        "count": 1,
+        "percentage": 8.3
+      }
+    ]
+  }
+}

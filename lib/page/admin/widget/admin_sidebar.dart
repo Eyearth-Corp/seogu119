@@ -57,7 +57,7 @@ class AdminSidebar extends StatelessWidget {
                     child: Text(
                       '서구 골목 관리자',
                       style: TextStyle(
-                          fontFamily: 'NotoSans',
+                        fontFamily: 'NotoSans',
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -156,7 +156,7 @@ class AdminSidebar extends StatelessWidget {
                     child: Text(
                       title,
                       style: TextStyle(
-                          fontFamily: 'NotoSans',
+                        fontFamily: 'NotoSans',
                         color: isSelected ? Colors.white : Colors.grey.shade400,
                         fontSize: 14,
                         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -198,7 +198,7 @@ class AdminSidebar extends StatelessWidget {
                 Text(
                   '로그아웃',
                   style: TextStyle(
-                          fontFamily: 'NotoSans',
+                    fontFamily: 'NotoSans',
                     color: Colors.red.shade300,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

@@ -40,7 +40,7 @@ flutter:
   assets:
     - assets/images/
     - assets/map/
-    - assets/excel/
+    - assets/data/
     
   fonts:
     - family: NotoSans

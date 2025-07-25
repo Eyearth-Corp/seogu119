@@ -1,12 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/colors.dart';
+import '../../data/main_data_parser.dart';
 
-class MainDashboard extends StatelessWidget {
+class MainDashboard extends StatefulWidget {
   const MainDashboard({super.key});
 
   @override
+  State<MainDashboard> createState() => _MainDashboardState();
+}
+
+class _MainDashboardState extends State<MainDashboard> {
+  MainDashboardData? _dashboardData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDashboardData();
+  }
+
+  Future<void> _loadDashboardData() async {
+    try {
+      final data = await MainDashboardData.loadFromAssets();
+      if (mounted) {
+        setState(() {
+          _dashboardData = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading dashboard data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Container(
+        margin: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade50,
+              Colors.indigo.shade100,
+            ],
+          ),
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (_dashboardData == null) {
+      return Container(
+        margin: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade50,
+              Colors.indigo.shade100,
+            ],
+          ),
+        ),
+        child: const Center(
+          child: Text('데이터를 불러올 수 없습니다.'),
+        ),
+      );
+    }
     return Container(
       margin: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
@@ -59,17 +132,63 @@ class MainDashboard extends StatelessWidget {
     );
   }
 
+  /// 빈 데이터 메시지를 표시하는 공통 위젯
+  Widget _buildEmptyDataMessage() {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: const Center(
+        child: Text(
+          '데이터가 없습니다.',
+          style: TextStyle(
+            fontSize: 19,
+            color: SeoguColors.textSecondary,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
   /// 상단 메트릭 카드들을 생성합니다.
-  /// 전체 가맹점 수, 이번주 신규 가맹점, 가맹률을 표시하며
-  /// 각각 서구 브랜드 컬러를 사용합니다.
+  /// JSON 데이터에서 로드된 메트릭 정보를 표시합니다.
   Widget _buildTopMetrics() {
+    final metrics = _dashboardData?.topMetrics ?? [];
+    
+    if (metrics.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+    
+    final colors = [SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent];
+
+    List<Widget> list = [];
+    for (int i = 0; i < metrics.length; i++) {
+      list.add(
+        Expanded(
+          child: _buildMetricCard(
+            metrics[i].title,
+            metrics[i].value,
+            metrics[i].unit,
+            i < colors.length ? colors[i] : SeoguColors.primary,
+          ),
+        )
+      );
+      if(i < metrics.length - 1) list.add(const SizedBox(width: 16));
+    }
+
     return Row(
       children: [
-        Expanded(child: _buildMetricCard('🏪 전체 가맹점', '11,426', '개', SeoguColors.primary)),
-        const SizedBox(width: 16),
-        Expanded(child: _buildMetricCard('✨ 이번주 신규', '47', '개', SeoguColors.secondary)),
-        const SizedBox(width: 16),
-        Expanded(child: _buildMetricCard('📊 가맹률', '85.2', '%', SeoguColors.accent)),
+        ...list
       ],
     );
   }
@@ -137,6 +256,42 @@ class MainDashboard extends StatelessWidget {
 
   // 2. 온누리 가맹점 추이
   Widget _buildOnNuriTrendChart() {
+    final trendChart = _dashboardData?.trendChart;
+    final chartData = trendChart?.data ?? [];
+    
+    if (chartData.isEmpty) {
+      return Container(
+        height: 200,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: SeoguColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: Text(
+            '차트 데이터가 없습니다.',
+            style: TextStyle(
+              fontSize: 16,
+              color: SeoguColors.textSecondary,
+            ),
+          ),
+        ),
+      );
+    }
+    
+    // 차트 범위 계산
+    final minX = chartData.map((e) => e.x).reduce((a, b) => a < b ? a : b);
+    final maxX = chartData.map((e) => e.x).reduce((a, b) => a > b ? a : b);
+    final minY = chartData.map((e) => e.y).reduce((a, b) => a < b ? a : b) - 5;
+    final maxY = chartData.map((e) => e.y).reduce((a, b) => a > b ? a : b) + 5;
+    
     return Container(
       height: 200,
       padding: const EdgeInsets.all(20),
@@ -154,9 +309,9 @@ class MainDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '📈 온누리 가맹점 추이',
-            style: TextStyle(
+          Text(
+            trendChart?.title ?? '📈 온누리 가맹점 추이',
+            style: const TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.bold,
               color: SeoguColors.textPrimary,
@@ -200,20 +355,13 @@ class MainDashboard extends StatelessWidget {
                   rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
                 borderData: FlBorderData(show: false),
-                minX: 0,
-                maxX: 5,
-                minY: 70,
-                maxY: 90,
+                minX: minX,
+                maxX: maxX,
+                minY: minY,
+                maxY: maxY,
                 lineBarsData: [
                   LineChartBarData(
-                    spots: const [
-                      FlSpot(0, 75),
-                      FlSpot(1, 78),
-                      FlSpot(2, 82),
-                      FlSpot(3, 80),
-                      FlSpot(4, 85),
-                      FlSpot(5, 87),
-                    ],
+                    spots: chartData.map((point) => FlSpot(point.x, point.y)).toList(),
                     isCurved: true,
                     color: SeoguColors.primary,
                     barWidth: 3,
@@ -239,6 +387,15 @@ class MainDashboard extends StatelessWidget {
 
   // 3. 동별 가맹률 현황
   Widget _buildDongMembershipStatus() {
+    final dongMembership = _dashboardData?.dongMembership;
+    final membershipData = dongMembership?.data ?? [];
+    
+    if (membershipData.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+    
+    final colors = [SeoguColors.secondary, SeoguColors.primary, SeoguColors.accent, SeoguColors.warning, SeoguColors.info];
+    
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -255,20 +412,21 @@ class MainDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '🗺️ 동별 가맹률 현황',
-            style: TextStyle(
+          Text(
+            dongMembership?.title ?? '🗺️ 동별 가맹률 현황',
+            style: const TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.bold,
               color: SeoguColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
-          _buildDongStatusItem('동천동', 92.1, SeoguColors.secondary),
-          _buildDongStatusItem('유촌동', 88.3, SeoguColors.primary),
-          _buildDongStatusItem('치평동', 85.7, SeoguColors.accent),
-          _buildDongStatusItem('화정2동', 82.4, SeoguColors.warning),
-          _buildDongStatusItem('화정4동', 81.4, SeoguColors.warning),
+          ...membershipData.asMap().entries.map((entry) {
+            final index = entry.key;
+            final data = entry.value;
+            final color = index < colors.length ? colors[index] : SeoguColors.primary;
+            return _buildDongStatusItem(data.name, data.percentage, color);
+          }).toList(),
         ],
       ),
     );
@@ -341,6 +499,27 @@ class MainDashboard extends StatelessWidget {
 
   // 4. 민원 TOP 3 키워드
   Widget _buildComplaintKeywords() {
+    final complaintKeywords = _dashboardData?.complaintKeywords;
+    final keywordData = complaintKeywords?.data ?? [];
+    
+    if (keywordData.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+    
+    // 순위별 색상 지정 (1=highlight, 2=warning, 3=primary)
+    Color getColorByRank(String rank) {
+      switch (rank) {
+        case '1':
+          return SeoguColors.highlight;
+        case '2':
+          return SeoguColors.warning;
+        case '3':
+          return SeoguColors.primary;
+        default:
+          return SeoguColors.primary;
+      }
+    }
+    
     return Container(
       height: 140,
       padding: const EdgeInsets.all(16),
@@ -358,9 +537,9 @@ class MainDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '🔥 민원 TOP 3 키워드',
-            style: TextStyle(
+          Text(
+            complaintKeywords?.title ?? '🔥 민원 TOP 3 키워드',
+            style: const TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.bold,
               color: SeoguColors.textPrimary,
@@ -369,11 +548,14 @@ class MainDashboard extends StatelessWidget {
           const SizedBox(height: 16),
           Expanded(
             child: Row(
-              children: [
-                _buildKeywordItem('1', '주차 문제', 34, SeoguColors.highlight),
-                _buildKeywordItem('2', '소음 방해', 28, SeoguColors.warning),
-                _buildKeywordItem('3', '청소 문제', 19, SeoguColors.primary),
-              ],
+              children: keywordData.map((data) {
+                return _buildKeywordItem(
+                  data.rank,
+                  data.keyword,
+                  data.count,
+                  getColorByRank(data.rank),
+                );
+              }).toList(),
             ),
           ),
         ],
@@ -436,6 +618,13 @@ class MainDashboard extends StatelessWidget {
   /// 터치 가능한 사례 목록을 표시하며, 각 항목을 터치하면 상세 정보 다이얼로그가 표시됩니다.
   /// [context]: 다이얼로그 표시를 위한 BuildContext
   Widget _buildComplaintCases(BuildContext context) {
+    final complaintCases = _dashboardData?.complaintCases;
+    final casesData = complaintCases?.data ?? [];
+    
+    if (casesData.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+    
     return Container(
       height: 170,
       padding: const EdgeInsets.all(20),
@@ -453,9 +642,9 @@ class MainDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '✅ 민원 해결 사례',
-            style: TextStyle(
+          Text(
+            complaintCases?.title ?? '✅ 민원 해결 사례',
+            style: const TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.bold,
               color: SeoguColors.textPrimary,
@@ -465,11 +654,14 @@ class MainDashboard extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCaseItem(context, '동천동 주차장 확장', '해결', '주차 공간 부족으로 인한 민원이 지속적으로 제기되어, 기존 주차장을 확장하고 새로운 주차구역을 확보했습니다.'),
-                _buildCaseItem(context, '유촌동 소음방해 개선', '진행중', '야간 시간대 상가 운영으로 인한 소음 문제를 해결하기 위해 방음시설 설치 및 운영시간 조정을 진행 중입니다.'),
-                _buildCaseItem(context, '청아동 청소 개선', '해결', '쓰레기 무단투기 및 청소 상태 불량 문제를 해결하기 위해 청소 주기를 단축하고 CCTV를 설치했습니다.'),
-              ],
+              children: casesData.map((caseData) {
+                return _buildCaseItem(
+                  context,
+                  caseData.title,
+                  caseData.status,
+                  caseData.detail,
+                );
+              }).toList(),
             ),
           ),
         ],
@@ -739,6 +931,8 @@ class MainDashboard extends StatelessWidget {
 
   // 6. 민원처리 실적
   Widget _buildComplaintPerformance() {
+    final complaintPerformance = _dashboardData?.complaintPerformance;
+    
     return Container(
       height: 160,
       padding: const EdgeInsets.all(20),
@@ -756,9 +950,9 @@ class MainDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '📋 민원처리 실적',
-            style: TextStyle(
+          Text(
+            complaintPerformance?.title ?? '📋 민원처리 실적',
+            style: const TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.bold,
               color: SeoguColors.textPrimary,
@@ -779,9 +973,9 @@ class MainDashboard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
-                      '187건',
-                      style: TextStyle(
+                    Text(
+                      complaintPerformance?.processed ?? '0건',
+                      style: const TextStyle(
                         fontSize: 23,
                         fontWeight: FontWeight.bold,
                         color: SeoguColors.success,
@@ -807,9 +1001,9 @@ class MainDashboard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
-                      '94.2%',
-                      style: TextStyle(
+                    Text(
+                      complaintPerformance?.rate ?? '0%',
+                      style: const TextStyle(
                         fontSize: 23,
                         fontWeight: FontWeight.bold,
                         color: SeoguColors.info,
@@ -827,6 +1021,13 @@ class MainDashboard extends StatelessWidget {
 
   // 7. 타 기관·지자체 주요 동향
   Widget _buildOtherOrganizationTrends(BuildContext context) {
+    final organizationTrends = _dashboardData?.organizationTrends;
+    final trendsData = organizationTrends?.data ?? [];
+    
+    if (trendsData.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+    
     return Container(
       height: 140,
       padding: const EdgeInsets.all(20),
@@ -844,9 +1045,9 @@ class MainDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '🌐 타 기관·지자체 주요 동향',
-            style: TextStyle(
+          Text(
+            organizationTrends?.title ?? '🌐 타 기관·지자체 주요 동향',
+            style: const TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.bold,
               color: SeoguColors.textPrimary,
@@ -856,10 +1057,13 @@ class MainDashboard extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTrendItem(context, '부산 동구 골목상권 활성화 사업', '부산 동구에서 추진 중인 골목상권 활성화 사업으로, 상인회 조직 강화와 디지털 마케팅 지원을 통해 매출 증대를 도모하고 있습니다. 총 50개 상인회가 참여하여 온라인 플랫폼 입점과 배달 서비스 확대를 진행 중입니다.'),
-                _buildTrendItem(context, '대구 중구 전통시장 디지털화', '대구 중구 전통시장의 디지털 전환 사업으로, QR코드 결제 시스템 도입과 온라인 쇼핑몰 구축을 통해 젊은 고객층 유입을 늘리고 있습니다. 현재 80% 이상의 점포가 디지털 결제 시스템을 도입하여 운영 중입니다.'),
-              ],
+              children: trendsData.map((trendData) {
+                return _buildTrendItem(
+                  context,
+                  trendData.title,
+                  trendData.detail,
+                );
+              }).toList(),
             ),
           ),
         ],
@@ -901,6 +1105,29 @@ class MainDashboard extends StatelessWidget {
 
   // 8. 금주 주요 성과
   Widget _buildWeeklyAchievements() {
+    final achievements = _dashboardData?.weeklyAchievements ?? [];
+    
+    if (achievements.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+    
+    final colors = [SeoguColors.secondary, SeoguColors.primary, SeoguColors.accent];
+
+    List<Widget> list = [];
+
+    for (int i = 0; i < achievements.length; i++) {
+      list.add(
+        Expanded(
+          child: _buildAchievementCard(
+            achievements[i].title,
+            achievements[i].value,
+            i < colors.length ? colors[i] : SeoguColors.primary,
+          ),
+        )
+      );
+      if (i < achievements.length - 1) list.add(const SizedBox(width: 16));
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -928,17 +1155,7 @@ class MainDashboard extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(
-                child: _buildAchievementCard('신규 가맹점', '47개', SeoguColors.secondary),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildAchievementCard('민원 해결', '23건', SeoguColors.primary),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildAchievementCard('지원 예산', '2.3억', SeoguColors.accent),
-              ),
+              ...list
             ],
           ),
         ],
