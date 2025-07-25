@@ -369,6 +369,569 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     });
   }
 
+  /// 성과 삭제
+  void _deleteAchievement(int index) {
+    setState(() {
+      final achievements = List<dynamic>.from(_editedData['weeklyAchievements'] as List<dynamic>? ?? []);
+      if (index >= 0 && index < achievements.length) {
+        achievements.removeAt(index);
+        _editedData['weeklyAchievements'] = achievements;
+      }
+    });
+  }
+
+  /// 새로운 성과 추가
+  Future<void> _addNewAchievement() async {
+    final titleController = TextEditingController();
+    final valueController = TextEditingController();
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('새 성과 추가'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                labelText: '제목',
+                hintText: '예: 신규 가맹점',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: valueController,
+              decoration: const InputDecoration(
+                labelText: '값',
+                hintText: '예: 47개',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('추가'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && titleController.text.isNotEmpty && valueController.text.isNotEmpty) {
+      setState(() {
+        final weeklyAchievements = _editedData['weeklyAchievements'] as List<dynamic>? ?? [];
+        weeklyAchievements.add({
+          'title': titleController.text,
+          'value': valueController.text,
+        });
+        _editedData['weeklyAchievements'] = weeklyAchievements;
+      });
+    }
+  }
+
+  /// 차트 데이터 편집 다이얼로그
+  Future<void> _showChartEditDialog() async {
+    final trendData = _editedData['trendChart'] as Map<String, dynamic>? ?? {};
+    final chartDataList = List<Map<String, dynamic>>.from(
+      (trendData['data'] as List<dynamic>? ?? []).map((item) => Map<String, dynamic>.from(item)),
+    );
+    
+    // 기본 데이터가 없으면 초기화
+    if (chartDataList.isEmpty) {
+      chartDataList.addAll([
+        {'x': 0, 'y': 75},
+        {'x': 1, 'y': 78},
+        {'x': 2, 'y': 82},
+        {'x': 3, 'y': 80},
+        {'x': 4, 'y': 85},
+        {'x': 5, 'y': 87},
+      ]);
+    }
+    
+    final List<TextEditingController> controllers = chartDataList
+        .map((data) => TextEditingController(text: data['y'].toString()))
+        .toList();
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('온누리 가맹점 추이 수정'),
+        content: Container(
+          width: 400,
+          constraints: const BoxConstraints(maxHeight: 400),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '각 포인트의 Y값(%)을 수정하세요',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: controllers.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 80,
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              'X: ${chartDataList[index]['x']}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: TextField(
+                              controller: controllers[index],
+                              decoration: InputDecoration(
+                                labelText: 'Y값 (%)',
+                                border: const OutlineInputBorder(),
+                                suffixText: '%',
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 12,
+                                ),
+                              ),
+                              keyboardType: TextInputType.number,
+                            ),
+                          ),
+                          if (controllers.length > 1)
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              color: Colors.red,
+                              onPressed: () {
+                                Navigator.pop(context);
+                                chartDataList.removeAt(index);
+                                _updateChartData(chartDataList);
+                                _showChartEditDialog();
+                              },
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  TextButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      final newX = chartDataList.isNotEmpty 
+                          ? (chartDataList.last['x'] as num) + 1 
+                          : 0;
+                      chartDataList.add({'x': newX, 'y': 85});
+                      _updateChartData(chartDataList);
+                      _showChartEditDialog();
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text('포인트 추가'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+            ),
+            child: const Text('저장'),
+          ),
+        ],
+      ),
+    );
+    
+    if (result == true) {
+      // 수정된 값들을 저장
+      for (int i = 0; i < controllers.length; i++) {
+        final yValue = double.tryParse(controllers[i].text) ?? chartDataList[i]['y'];
+        chartDataList[i]['y'] = yValue;
+      }
+      _updateChartData(chartDataList);
+    }
+    
+    // 컨트롤러 정리
+    for (final controller in controllers) {
+      controller.dispose();
+    }
+  }
+  
+  /// 차트 데이터 업데이트
+  void _updateChartData(List<Map<String, dynamic>> newData) {
+    setState(() {
+      if (_editedData['trendChart'] == null) {
+        _editedData['trendChart'] = {};
+      }
+      (_editedData['trendChart'] as Map<String, dynamic>)['data'] = newData;
+    });
+  }
+
+  /// 동별 가맹률 삭제
+  void _deleteDongMembership(int index) {
+    setState(() {
+      final dongData = _editedData['dongMembership'] as Map<String, dynamic>? ?? {};
+      final items = List<dynamic>.from(dongData['data'] as List<dynamic>? ?? []);
+      if (index >= 0 && index < items.length) {
+        items.removeAt(index);
+        if (_editedData['dongMembership'] == null) {
+          _editedData['dongMembership'] = {};
+        }
+        (_editedData['dongMembership'] as Map<String, dynamic>)['data'] = items;
+      }
+    });
+  }
+
+  /// 새로운 동별 가맹률 추가
+  Future<void> _addNewDongMembership() async {
+    final nameController = TextEditingController();
+    final percentageController = TextEditingController();
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('새 동 추가'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: '동 이름',
+                hintText: '예: 양동',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: percentageController,
+              decoration: const InputDecoration(
+                labelText: '가맹률',
+                hintText: '예: 85.5',
+                suffixText: '%',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('추가'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && nameController.text.isNotEmpty && percentageController.text.isNotEmpty) {
+      setState(() {
+        if (_editedData['dongMembership'] == null) {
+          _editedData['dongMembership'] = {'data': []};
+        }
+        final dongData = _editedData['dongMembership'] as Map<String, dynamic>;
+        final items = dongData['data'] as List<dynamic>? ?? [];
+        items.add({
+          'name': nameController.text,
+          'percentage': double.tryParse(percentageController.text) ?? 0,
+        });
+        dongData['data'] = items;
+      });
+    }
+  }
+
+  /// 민원 키워드 삭제
+  void _deleteComplaintKeyword(int index) {
+    setState(() {
+      final keywordData = _editedData['complaintKeywords'] as Map<String, dynamic>? ?? {};
+      final keywords = List<dynamic>.from(keywordData['data'] as List<dynamic>? ?? []);
+      if (index >= 0 && index < keywords.length) {
+        keywords.removeAt(index);
+        if (_editedData['complaintKeywords'] == null) {
+          _editedData['complaintKeywords'] = {};
+        }
+        (_editedData['complaintKeywords'] as Map<String, dynamic>)['data'] = keywords;
+      }
+    });
+  }
+
+  /// 새로운 민원 키워드 추가
+  Future<void> _addNewComplaintKeyword() async {
+    final keywordController = TextEditingController();
+    final countController = TextEditingController();
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('새 키워드 추가'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: keywordController,
+              decoration: const InputDecoration(
+                labelText: '키워드',
+                hintText: '예: 주차 문제',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: countController,
+              decoration: const InputDecoration(
+                labelText: '건수',
+                hintText: '예: 25',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('추가'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && keywordController.text.isNotEmpty && countController.text.isNotEmpty) {
+      setState(() {
+        if (_editedData['complaintKeywords'] == null) {
+          _editedData['complaintKeywords'] = {'data': []};
+        }
+        final keywordData = _editedData['complaintKeywords'] as Map<String, dynamic>;
+        final keywords = keywordData['data'] as List<dynamic>? ?? [];
+        keywords.add({
+          'rank': keywords.length + 1,
+          'keyword': keywordController.text,
+          'count': int.tryParse(countController.text) ?? 0,
+        });
+        keywordData['data'] = keywords;
+      });
+    }
+  }
+
+  /// 민원 사례 삭제
+  void _deleteComplaintCase(int index) {
+    setState(() {
+      final casesData = _editedData['complaintCases'] as Map<String, dynamic>? ?? {};
+      final cases = List<dynamic>.from(casesData['data'] as List<dynamic>? ?? []);
+      if (index >= 0 && index < cases.length) {
+        cases.removeAt(index);
+        if (_editedData['complaintCases'] == null) {
+          _editedData['complaintCases'] = {};
+        }
+        (_editedData['complaintCases'] as Map<String, dynamic>)['data'] = cases;
+      }
+    });
+  }
+
+  /// 타 기관 동향 삭제
+  void _deleteOrganizationTrend(int index) {
+    setState(() {
+      final trendsData = _editedData['organizationTrends'] as Map<String, dynamic>? ?? {};
+      final trends = List<dynamic>.from(trendsData['data'] as List<dynamic>? ?? []);
+      if (index >= 0 && index < trends.length) {
+        trends.removeAt(index);
+        if (_editedData['organizationTrends'] == null) {
+          _editedData['organizationTrends'] = {};
+        }
+        (_editedData['organizationTrends'] as Map<String, dynamic>)['data'] = trends;
+      }
+    });
+  }
+
+  /// 새로운 타 기관 동향 추가
+  Future<void> _addNewOrganizationTrend() async {
+    final titleController = TextEditingController();
+    final detailController = TextEditingController();
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('새 동향 추가'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: '동향 제목',
+                  hintText: '예: 부산 동구 골목상권 활성화 사업',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: detailController,
+                decoration: const InputDecoration(
+                  labelText: '상세 내용',
+                  hintText: '동향에 대한 상세 설명을 입력하세요',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('추가'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && titleController.text.isNotEmpty) {
+      setState(() {
+        if (_editedData['organizationTrends'] == null) {
+          _editedData['organizationTrends'] = {'data': []};
+        }
+        final trendsData = _editedData['organizationTrends'] as Map<String, dynamic>;
+        final trends = trendsData['data'] as List<dynamic>? ?? [];
+        trends.add({
+          'title': titleController.text,
+          'detail': detailController.text,
+        });
+        trendsData['data'] = trends;
+      });
+    }
+  }
+
+  /// 새로운 민원 사례 추가
+  Future<void> _addNewComplaintCase() async {
+    final titleController = TextEditingController();
+    final statusController = TextEditingController(text: '진행중');
+    final detailController = TextEditingController();
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('새 민원 사례 추가'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: '제목',
+                  hintText: '예: 동천동 주차장 확장',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: statusController.text,
+                decoration: const InputDecoration(
+                  labelText: '상태',
+                  border: OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(value: '해결', child: Text('해결')),
+                  DropdownMenuItem(value: '진행중', child: Text('진행중')),
+                ],
+                onChanged: (value) {
+                  statusController.text = value ?? '진행중';
+                },
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: detailController,
+                decoration: const InputDecoration(
+                  labelText: '상세 내용',
+                  hintText: '민원 해결 과정에 대한 설명을 입력하세요',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('추가'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && titleController.text.isNotEmpty) {
+      setState(() {
+        if (_editedData['complaintCases'] == null) {
+          _editedData['complaintCases'] = {'data': []};
+        }
+        final casesData = _editedData['complaintCases'] as Map<String, dynamic>;
+        final cases = casesData['data'] as List<dynamic>? ?? [];
+        cases.add({
+          'title': titleController.text,
+          'status': statusController.text,
+          'detail': detailController.text,
+        });
+        casesData['data'] = cases;
+      });
+    }
+  }
+
   /// 새로운 메트릭 추가
   Future<void> _addNewMetric() async {
     final titleController = TextEditingController();
@@ -669,13 +1232,24 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            trendData['title'] ?? '📈 온누리 가맹점 추이',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
+          Row(
+            children: [
+              Text(
+                trendData['title'] ?? '📈 온누리 가맹점 추이',
+                style: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: SeoguColors.textPrimary,
+                ),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.edit, size: 20),
+                color: SeoguColors.primary,
+                onPressed: () => _showChartEditDialog(),
+                tooltip: '그래프 수정',
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -759,13 +1333,24 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            dongData['title'] ?? '🗺️ 동별 가맹률 현황',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
+          Row(
+            children: [
+              Text(
+                dongData['title'] ?? '🗺️ 동별 가맹률 현황',
+                style: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: SeoguColors.textPrimary,
+                ),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.add, size: 20),
+                color: SeoguColors.primary,
+                onPressed: _addNewDongMembership,
+                tooltip: '동 추가',
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           ...items.asMap().entries.map((entry) {
@@ -776,6 +1361,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               (item['percentage'] ?? 0).toDouble(),
               [SeoguColors.secondary, SeoguColors.primary, SeoguColors.accent][index % 3],
               'dongMembership.data.$index.percentage',
+              index,
             );
           }).toList(),
         ],
@@ -783,7 +1369,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  Widget _buildEditableDongStatusItem(String dongName, double percentage, Color color, String editKey) {
+  Widget _buildEditableDongStatusItem(String dongName, double percentage, Color color, String editKey, int index) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
@@ -845,6 +1431,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   ),
                 ),
               ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, size: 18),
+                color: Colors.red.shade400,
+                onPressed: () => _showDeleteConfirmationDialog(
+                  dongName,
+                  () => _deleteDongMembership(index),
+                ),
+              ),
             ],
           ),
         ],
@@ -857,7 +1451,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     final keywords = (keywordData['data'] as List<dynamic>? ?? []);
 
     return Container(
-      height: 140,
+      height: 150,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: SeoguColors.surface,
@@ -873,13 +1467,24 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            keywordData['title'] ?? '🔥 민원 TOP 3 키워드',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
+          Row(
+            children: [
+              Text(
+                keywordData['title'] ?? '🔥 민원 TOP 3 키워드',
+                style: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: SeoguColors.textPrimary,
+                ),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.add, size: 20),
+                color: SeoguColors.primary,
+                onPressed: _addNewComplaintKeyword,
+                tooltip: '키워드 추가',
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -893,6 +1498,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   keyword['count'] ?? 0,
                   [SeoguColors.highlight, SeoguColors.warning, SeoguColors.primary][index % 3],
                   'complaintKeywords.data.$index',
+                  index,
                 );
               }).toList(),
             ),
@@ -902,7 +1508,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  Widget _buildEditableKeywordItem(String rank, String keyword, int count, Color color, String editKeyPrefix) {
+  Widget _buildEditableKeywordItem(String rank, String keyword, int count, Color color, String editKeyPrefix, int index) {
     return Expanded(
       child: Column(
         children: [
@@ -938,6 +1544,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     color: SeoguColors.textPrimary,
                     decoration: TextDecoration.underline,
                   ),
+                ),
+              ),
+              const SizedBox(width: 4),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, size: 16),
+                color: Colors.red.shade400,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => _showDeleteConfirmationDialog(
+                  keyword,
+                  () => _deleteComplaintKeyword(index),
                 ),
               ),
             ],
@@ -981,13 +1598,24 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            casesData['title'] ?? '✅ 민원 해결 사례',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
+          Row(
+            children: [
+              Text(
+                casesData['title'] ?? '✅ 민원 해결 사례',
+                style: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: SeoguColors.textPrimary,
+                ),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.add, size: 20),
+                color: SeoguColors.primary,
+                onPressed: _addNewComplaintCase,
+                tooltip: '사례 추가',
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -1001,6 +1629,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   caseItem['status'] ?? '',
                   caseItem['detail'] ?? '',
                   'complaintCases.data.$index',
+                  index,
                 );
               }).toList(),
             ),
@@ -1010,7 +1639,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  Widget _buildEditableCaseItem(String title, String status, String detail, String editKeyPrefix) {
+  Widget _buildEditableCaseItem(String title, String status, String detail, String editKeyPrefix, int index) {
     final isCompleted = status == '해결';
     return Expanded(
       child: InkWell(
@@ -1057,6 +1686,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     decoration: TextDecoration.underline,
                   ),
                 ),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline, size: 16),
+              color: Colors.red.shade400,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: () => _showDeleteConfirmationDialog(
+                title,
+                () => _deleteComplaintCase(index),
               ),
             ),
           ],
@@ -1183,13 +1822,24 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            trendsData['title'] ?? '🌐 타 기관·지자체 주요 동향',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
+          Row(
+            children: [
+              Text(
+                trendsData['title'] ?? '🌐 타 기관·지자체 주요 동향',
+                style: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: SeoguColors.textPrimary,
+                ),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.add, size: 20),
+                color: SeoguColors.primary,
+                onPressed: _addNewOrganizationTrend,
+                tooltip: '동향 추가',
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -1202,6 +1852,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   trend['title'] ?? '',
                   trend['detail'] ?? '',
                   'organizationTrends.data.$index',
+                  index,
                 );
               }).toList(),
             ),
@@ -1211,7 +1862,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  Widget _buildEditableTrendItem(String title, String detail, String editKeyPrefix) {
+  Widget _buildEditableTrendItem(String title, String detail, String editKeyPrefix, int index) {
     return Expanded(
       child: InkWell(
         onTap: () => _showEditDialog('$editKeyPrefix.title', '동향 제목', title),
@@ -1236,6 +1887,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline, size: 16),
+              color: Colors.red.shade400,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: () => _showDeleteConfirmationDialog(
+                title,
+                () => _deleteOrganizationTrend(index),
               ),
             ),
           ],
@@ -1273,25 +1934,53 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           ),
           const SizedBox(height: 16),
           Row(
-            children: achievements.asMap().entries.map((entry) {
-              final index = entry.key;
-              final achievement = entry.value;
-              return Expanded(
-                child: _buildEditableAchievementCard(
-                  achievement['title'] ?? '',
-                  achievement['value']?.toString() ?? '',
-                  [SeoguColors.secondary, SeoguColors.primary, SeoguColors.accent][index % 3],
-                  'weeklyAchievements.$index.value',
+            children: [
+              ...achievements.asMap().entries.map((entry) {
+                final index = entry.key;
+                final achievement = entry.value;
+                return Expanded(
+                  child: _buildEditableAchievementCard(
+                    achievement['title'] ?? '',
+                    achievement['value']?.toString() ?? '',
+                    [SeoguColors.secondary, SeoguColors.primary, SeoguColors.accent][index % 3],
+                    'weeklyAchievements.$index.value',
+                  ),
+                );
+              }).toList(),
+              const SizedBox(width: 16),
+              //TODO: 추가 버튼
+              SizedBox(
+                width: 60,
+                height: 94,
+                child: ElevatedButton(
+                  onPressed: _addNewAchievement,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: SeoguColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.zero,
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: 28,
+                  ),
                 ),
-              );
-            }).toList(),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
+
   Widget _buildEditableAchievementCard(String title, String value, Color color, String editKey) {
+    // editKey를 파싱하여 인덱스 추출
+    final keyParts = editKey.split('.');
+    final index = int.tryParse(keyParts[1]) ?? 0;
+    
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       padding: const EdgeInsets.all(12),
@@ -1305,12 +1994,29 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       ),
       child: Column(
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 19,
-              color: Color(0xFF64748B),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 19,
+                    color: Color(0xFF64748B),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, size: 16),
+                color: Colors.red.shade400,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => _showDeleteConfirmationDialog(
+                  title,
+                  () => _deleteAchievement(index),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 6),
           InkWell(
