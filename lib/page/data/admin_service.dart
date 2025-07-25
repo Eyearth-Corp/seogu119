@@ -548,73 +548,6 @@ class AdminService {
     }
   }
 
-  /// 2025-07-23 일자 임시 메인 대시보드 데이터 생성
-  static Future<bool> create20250723DashboardData() async {
-    final sampleData = {
-      'total_merchants': 11426,
-      'new_merchants_this_week': 47,
-      'membership_rate': 85.2,
-      'onnuri_trend_data': [
-        {'period': 'Week 1', 'percentage': 75.0},
-        {'period': 'Week 2', 'percentage': 78.0},
-        {'period': 'Week 3', 'percentage': 82.0},
-        {'period': 'Week 4', 'percentage': 80.0},
-        {'period': 'Week 5', 'percentage': 85.0},
-        {'period': 'Week 6', 'percentage': 87.0},
-      ],
-      'dong_membership_status': [
-        {'dong_name': '동천동', 'percentage': 92.1},
-        {'dong_name': '유촌동', 'percentage': 88.3},
-        {'dong_name': '치평동', 'percentage': 85.7},
-        {'dong_name': '화정2동', 'percentage': 82.4},
-        {'dong_name': '화정4동', 'percentage': 81.4},
-      ],
-      'complaint_keywords': [
-        {'rank': 1, 'keyword': '주차 문제', 'count': 34},
-        {'rank': 2, 'keyword': '소음 방해', 'count': 28},
-        {'rank': 3, 'keyword': '청소 문제', 'count': 19},
-      ],
-      'complaint_performance': {
-        'processed': 187,
-        'process_rate': 94.2,
-      },
-      'complaint_cases': [
-        {
-          'title': '동천동 주차장 확장',
-          'status': '해결',
-          'detail': '주차 공간 부족으로 인한 민원이 지속적으로 제기되어, 기존 주차장을 확장하고 새로운 주차구역을 확보했습니다.',
-        },
-        {
-          'title': '유촌동 소음방해 개선',
-          'status': '진행중',
-          'detail': '야간 시간대 상가 운영으로 인한 소음 문제를 해결하기 위해 방음시설 설치 및 운영시간 조정을 진행 중입니다.',
-        },
-        {
-          'title': '청아동 청소 개선',
-          'status': '해결',
-          'detail': '쓰레기 무단투기 및 청소 상태 불량 문제를 해결하기 위해 청소 주기를 단축하고 CCTV를 설치했습니다.',
-        },
-      ],
-      'other_organization_trends': [
-        {
-          'title': '부산 동구 골목상권 활성화 사업',
-          'detail': '부산 동구에서 추진 중인 골목상권 활성화 사업으로, 상인회 조직 강화와 디지털 마케팅 지원을 통해 매출 증대를 도모하고 있습니다.',
-        },
-        {
-          'title': '대구 중구 전통시장 디지털화',
-          'detail': '대구 중구 전통시장의 디지털 전환 사업으로, QR코드 결제 시스템 도입과 온라인 쇼핑몰 구축을 통해 젊은 고객층 유입을 늘리고 있습니다.',
-        },
-      ],
-      'weekly_achievements': {
-        'new_merchants': 47,
-        'resolved_complaints': 23,
-        'support_budget': 230000000, // 2.3억 원
-      },
-    };
-
-    return await createMainDashboard('2025-07-23', sampleData);
-  }
-
   /// 대시보드 데이터를 API 요구사항에 맞는 형식으로 변환
   static Map<String, dynamic> _formatDashboardData(Map<String, dynamic> data) {
     // topMetrics 데이터의 모든 value를 문자열로 변환
@@ -769,7 +702,7 @@ class AdminService {
   /// 동별 대시보드 데이터 업데이트 (PUT)
   static Future<bool> updateDongDashboard(String dongName, String date, Map<String, dynamic> data) async {
     try {
-      final url = '$baseUrl/api/dong-dashboard/2025-07-25';
+      final url = '$baseUrl/api/dong-dashboard/dong/${Uri.encodeComponent(dongName)}/2025-07-25';
       print('🔗 동별 대시보드 업데이트 요청 URL: $url');
       print('📤 요청 데이터: $data');
       

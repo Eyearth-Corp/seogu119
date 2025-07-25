@@ -1221,11 +1221,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 
   Widget _buildEditableMetricCard(String title, String value, String unit, Color color, String editKey) {
-    print("title : $title");
-    print("value : $value");
-    print("unit : $unit");
-    print("color : $color");
-    // editKey를 파싱하여 인덱스 추출
+    // editKey를 파싱하여 인덱스 추출 
     final keyParts = editKey.split('.');
     final index = int.tryParse(keyParts[1]) ?? 0;
     
