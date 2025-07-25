@@ -9,6 +9,20 @@ import 'core/fonts.dart';
 class App extends StatelessWidget {
   const App({super.key});
 
+  /// 관리자 인증 상태 확인
+  Future<bool> _checkAdminAuth() async {
+    try {
+      await AdminService.loadStoredToken();
+      if (AdminService.isLoggedIn) {
+        return await AdminService.validateToken();
+      }
+      return false;
+    } catch (e) {
+      print('인증 확인 중 오류: $e');
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,9 +50,41 @@ class App extends StatelessWidget {
               );
             case '/admin/dashboard':
               return MaterialPageRoute(
-                builder: (context) => AdminService.isLoggedIn
-                    ? const AdminDashboardPage()
-                    : const AdminLoginPage(),
+                builder: (context) => FutureBuilder<bool>(
+                  future: _checkAdminAuth(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Scaffold(
+                        backgroundColor: Color(0xFFF5F7FA),
+                        body: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                '인증 확인 중...',
+                                style: TextStyle(
+                                  fontFamily: 'NotoSans',
+                                  fontSize: 16,
+                                  color: Color(0xFF718096),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+                    
+                    if (snapshot.data == true) {
+                      return const AdminDashboardPage();
+                    } else {
+                      return const AdminLoginPage();
+                    }
+                  },
+                ),
                 settings: settings,
               );
             default:

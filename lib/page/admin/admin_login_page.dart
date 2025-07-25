@@ -14,7 +14,47 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _isCheckingToken = true;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAutoLogin();
+  }
+
+  /// 자동 로그인 확인
+  Future<void> _checkAutoLogin() async {
+    try {
+      // 저장된 토큰 로드
+      await AdminService.loadStoredToken();
+      
+      // 토큰이 유효한지 확인
+      if (AdminService.isLoggedIn) {
+        final isValid = await AdminService.validateToken();
+        if (isValid && mounted) {
+          print('🔄 자동 로그인 성공! 관리자 대시보드로 이동');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AdminDashboardPage(),
+            ),
+          );
+          return;
+        }
+      }
+      
+      print('ℹ️ 자동 로그인 불가 - 로그인 화면 표시');
+    } catch (e) {
+      print('💥 자동 로그인 확인 중 오류: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCheckingToken = false;
+        });
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -62,6 +102,32 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // 토큰 확인 중일 때 로딩 화면 표시
+    if (_isCheckingToken) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF5F7FA),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+              ),
+              SizedBox(height: 16),
+              Text(
+                '로그인 상태 확인 중...',
+                style: TextStyle(
+                  fontFamily: 'NotoSans',
+                  fontSize: 16,
+                  color: Color(0xFF718096),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       body: Center(
