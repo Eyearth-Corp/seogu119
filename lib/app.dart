@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:seogu119/page/home_page.dart';
 import 'package:seogu119/page/admin/admin_login_page.dart';
 import 'package:seogu119/page/admin/admin_dashboard_page.dart';
-import 'package:seogu119/page/admin/dong_admin_dashboard_page.dart';
-import 'package:seogu119/page/admin/admin_guard.dart' hide AdminDashboardPage;
 import 'package:seogu119/page/data/admin_service.dart';
 import 'core/fonts.dart';
 
@@ -130,7 +128,8 @@ class App extends StatelessWidget {
                       }
                       
                       if (snapshot.data == true) {
-                        return DongAdminDashboardPage(dongName: dongName);
+                        return Container();
+                        //return DongAdminDashboardPage(dongName: dongName);
                       } else {
                         return const AdminLoginPage();
                       }
