@@ -171,7 +171,10 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
       
       for (int i = 0; i < parts.length - 1; i++) {
         if (current[parts[i]] == null) {
-          current[parts[i]] = {};
+          current[parts[i]] = <String, dynamic>{};
+        }
+        if (current[parts[i]] is! Map<String, dynamic>) {
+          current[parts[i]] = <String, dynamic>{};
         }
         current = current[parts[i]] as Map<String, dynamic>;
       }
@@ -571,7 +574,7 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
               Expanded(
                 child: _buildEditableMetricCard(
                   '🏪 총 상인회',
-                  (_selectedDong?.merchantList.length ?? 0).toString(),
+                  _getNestedValue('total_merchants')?.toString() ?? (_selectedDong?.merchantList.length ?? 0).toString(),
                   '개',
                   _selectedDong?.color ?? SeoguColors.primary,
                   'total_merchants',

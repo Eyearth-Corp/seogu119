@@ -115,6 +115,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   /// 필드 편집 다이얼로그
   Future<void> _showEditDialog(String key, String title, dynamic currentValue) async {
+    print("key: $key, title: $title, currentValue: $currentValue");
+
     final controller = TextEditingController(text: currentValue?.toString() ?? '');
     
     final result = await showDialog<String>(
@@ -154,18 +156,45 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   /// 중첩된 키 값 업데이트
   void _updateNestedValue(String key, dynamic value) {
+    print("key $key : value : $value");
     if (key.contains('.')) {
       final parts = key.split('.');
-      Map<String, dynamic> current = _editedData;
-      
+      dynamic current = _editedData;
+
       for (int i = 0; i < parts.length - 1; i++) {
-        if (current[parts[i]] == null) {
-          current[parts[i]] = {};
+        final currentKey = parts[i];
+        if (int.tryParse(currentKey) != null) {
+          // 배열 인덱스인 경우
+          final index = int.parse(currentKey);
+          if (current is List && index < current.length) {
+            current = current[index];
+          } else {
+            return; // 잘못된 인덱스
+          }
+        } else {
+          // 객체 키인 경우  
+          if (current is Map<String, dynamic>) {
+            if (current[currentKey] == null) {
+              current[currentKey] = <String, dynamic>{};
+            }
+            current = current[currentKey];
+          } else {
+            return; // 잘못된 타입
+          }
         }
-        current = current[parts[i]] as Map<String, dynamic>;
       }
-      
-      current[parts.last] = value;
+
+      final lastKey = parts.last;
+      if (int.tryParse(lastKey) != null) {
+        final index = int.parse(lastKey);
+        if (current is List && index < current.length) {
+          current[index] = value;
+        }
+      } else {
+        if (current is Map<String, dynamic>) {
+          current[lastKey] = value;
+        }
+      }
     } else {
       _editedData[key] = value;
     }
@@ -1150,7 +1179,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 
   Widget _buildTopMetrics() {
-    final metrics = _editedData['topMetrics'] as List<dynamic>? ?? [];
+    final metricsData = _editedData['topMetrics'];
+    final metrics = (metricsData is List) ? metricsData : <dynamic>[];
     
     return Row(
       children: [
@@ -1191,6 +1221,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 
   Widget _buildEditableMetricCard(String title, String value, String unit, Color color, String editKey) {
+    print("title : $title");
+    print("value : $value");
+    print("unit : $unit");
+    print("color : $color");
     // editKey를 파싱하여 인덱스 추출
     final keyParts = editKey.split('.');
     final index = int.tryParse(keyParts[1]) ?? 0;
