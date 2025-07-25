@@ -705,13 +705,32 @@ class AdminService {
       final url = '$baseUrl/api/dong-dashboard/dong/${Uri.encodeComponent(dongName)}/2025-07-25';
       print('🔗 동별 대시보드 업데이트 요청 URL: $url');
       print('📤 요청 데이터: $data');
+      print('📤 요청 데이터 JSON: ${jsonEncode(data)}');
       
       // API 요구사항에 맞는 형식으로 데이터 구조화
       final requestBody = {
         'dong_name': dongName,
         'data_date': '2025-07-25',
-        'data_json': _formatDongDashboardData(data),
+        'dongMetrics': data['dongMetrics'] ?? [
+          {'title': '🏪 총 상인회', 'value': data['total_merchants']?.toString() ?? '0', 'unit': '개'},
+          {'title': '✨ 가맹률', 'value': data['membership_rate']?.toString() ?? '85.0', 'unit': '%'},
+          {'title': '📊 이번주 방문', 'value': data['weekly_visits']?.toString() ?? '12', 'unit': '회'},
+        ],
+        'weeklyAchievements': data['weeklyAchievements'] ?? [
+          {'title': '신규 가맹', 'value': data['achievements']?['new_merchants'] ?? '2개'},
+          {'title': '민원 해결', 'value': data['achievements']?['resolved_complaints'] ?? '1건'},
+          {'title': '지원 예산', 'value': data['achievements']?['support_budget'] ?? '150만원'},
+        ],
+        'complaints': _formatComplaints(data['complaints'] ?? []),
+        'businessTypes': data['businessTypes'] ?? [
+          {'type': '음식점', 'count': 2, 'percentage': 40},
+          {'type': '소매점', 'count': 2, 'percentage': 30},
+          {'type': '서비스업', 'count': 1, 'percentage': 20},
+          {'type': '기타', 'count': 1, 'percentage': 10},
+        ],
       };
+      
+      print('📤 최종 요청 본문: ${jsonEncode(requestBody)}');
       
       final response = await http.put(
         Uri.parse(url),
@@ -737,29 +756,64 @@ class AdminService {
         }
       }
       return false;
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('💥 $dongName 대시보드 업데이트 예외 발생: $e');
+      print('💥 스택 트레이스: $stackTrace');
       return false;
+    }
+  }
+
+  /// complaints 데이터 형식 변환
+  static List<Map<String, dynamic>> _formatComplaints(List<dynamic> complaints) {
+    try {
+      print('📋 민원 데이터 변환 시작: $complaints');
+      
+      final result = complaints.map((complaint) {
+        if (complaint is Map) {
+          final keyword = complaint['keyword']?.toString() ?? '';
+          final count = _parseToInt(complaint['count']);
+          
+          print('📋 민원 아이템 변환: keyword=$keyword, count=$count (원본: ${complaint['count']})');
+          
+          return {
+            'keyword': keyword,
+            'count': count,
+          };
+        }
+        return {'keyword': '', 'count': 0};
+      }).toList();
+      
+      print('📋 민원 데이터 변환 완료: $result');
+      return result;
+      
+    } catch (e, stackTrace) {
+      print('💥 민원 데이터 변환 오류: $e');
+      print('💥 스택 트레이스: $stackTrace');
+      return [
+        {'keyword': '주차 문제', 'count': 0},
+        {'keyword': '소음 방해', 'count': 0},
+        {'keyword': '청소 문제', 'count': 0},
+      ];
     }
   }
 
   /// 동별 대시보드 데이터를 API 요구사항에 맞는 형식으로 변환
   static Map<String, dynamic> _formatDongDashboardData(Map<String, dynamic> data) {
     return {
-      'metrics': [
+      'metrics': data['dongMetrics'] ?? [
         {
           'title': '🏪 총 상인회',
-          'value': data['total_merchants']?.toString() ?? '0',
+          'value': '0',
           'unit': '개'
         },
         {
           'title': '✨ 가맹률',
-          'value': data['membership_rate']?.toString() ?? '85.0',
+          'value': '85.0',
           'unit': '%'
         },
         {
           'title': '📊 이번주 방문',
-          'value': data['weekly_visits']?.toString() ?? '12',
+          'value': '12',
           'unit': '회'
         },
       ],
@@ -769,12 +823,24 @@ class AdminService {
         'noise': data['complaints']?['noise'] ?? 3,
         'cleaning': data['complaints']?['cleaning'] ?? 2,
       },
-      'achievements': {
-        'new_merchants': data['achievements']?['new_merchants'] ?? '2개',
-        'resolved_complaints': data['achievements']?['resolved_complaints'] ?? '1건',
-        'support_budget': data['achievements']?['support_budget'] ?? '50만원',
-      },
+      'achievements': data['weeklyAchievements'] ?? [
+        {'title': '신규 가맹', 'value': '2개'},
+        {'title': '민원 해결', 'value': '1건'},
+        {'title': '지원 예산', 'value': '50만원'},
+      ],
+      'businessTypes': data['businessTypes'] ?? [],
     };
+  }
+
+  /// 값을 int로 안전하게 변환
+  static int _parseToInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) {
+      return int.tryParse(value) ?? 0;
+    }
+    return 0;
   }
 
   /// 에러 메시지 추출
