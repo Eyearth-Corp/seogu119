@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../data/admin_service.dart';
+import '../data/dong_list.dart';
+import 'dong_admin_dashboard_page.dart';
 import '../../core/colors.dart';
 
 class AdminDashboardPage extends StatefulWidget {
@@ -973,6 +975,26 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         foregroundColor: Colors.black,
         elevation: 1,
         actions: [
+          // 동별 관리 대시보드 버튼
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.location_city, color: SeoguColors.primary),
+            tooltip: '동별 대시보드',
+            onSelected: (dongName) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DongAdminDashboardPage(dongName: dongName),
+                ),
+              );
+            },
+            itemBuilder: (context) => DongList.all.map((dong) => 
+              PopupMenuItem<String>(
+                value: dong.name,
+                child: Text(dong.name),
+              ),
+            ).toList(),
+          ),
+          const SizedBox(width: 8),
           if (_availableDates.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(right: 16),
@@ -1006,6 +1028,85 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         children: [
+                          // 동 목록 Wrap 위젯
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            margin: const EdgeInsets.only(bottom: 20),
+                            decoration: BoxDecoration(
+                              color: SeoguColors.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  '🗺️ 동별 관리 대시보드',
+                                  style: TextStyle(
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                    color: SeoguColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: DongList.all.map((dong) {
+                                    return InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => DongAdminDashboardPage(dongName: dong.name),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          color: dong.color.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(20),
+                                          border: Border.all(
+                                            color: dong.color.withOpacity(0.3),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              width: 8,
+                                              height: 8,
+                                              decoration: BoxDecoration(
+                                                color: dong.color,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              dong.name,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: SeoguColors.textPrimary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
+                            ),
+                          ),
                           _buildTopMetrics(),
                           const SizedBox(height: 20),
                           _buildWeeklyAchievements(),

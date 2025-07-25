@@ -694,6 +694,142 @@ class AdminService {
     return num.toString();
   }
 
+  /// 동별 대시보드 데이터 조회 (GET)
+  static Future<Map<String, dynamic>?> getDongDashboard(String dongName) async {
+    try {
+      final url = 'https://seogu119-api.eyearth.net/api/dong-dashboard/$dongName';
+      
+      print('🔗 동별 대시보드 요청 URL: $url');
+      
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      print('📡 응답 상태코드: ${response.statusCode}');
+      print('📡 응답 본문: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print('✅ $dongName 대시보드 데이터 수신 성공');
+        return data;
+      }
+    } catch (e) {
+      print('💥 $dongName 대시보드 조회 예외 발생: $e');
+    }
+    return null;
+  }
+
+  /// 특정 날짜의 동별 대시보드 데이터 조회 (GET)
+  static Future<Map<String, dynamic>?> getDongDashboardByDate(String dongName, String date) async {
+    try {
+      final url = 'https://seogu119-api.eyearth.net/api/dong-dashboard/$dongName/$date';
+      
+      print('🔗 특정 날짜 동별 대시보드 요청 URL: $url');
+      
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      print('📡 응답 상태코드: ${response.statusCode}');
+      print('📡 응답 본문: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print('✅ $dongName ($date) 대시보드 데이터 수신 성공');
+        return data;
+      }
+    } catch (e) {
+      print('💥 $dongName ($date) 대시보드 조회 예외 발생: $e');
+    }
+    return null;
+  }
+
+  /// 동별 대시보드 데이터 업데이트 (PUT)
+  static Future<bool> updateDongDashboard(String dongName, String date, Map<String, dynamic> data) async {
+    try {
+      final url = '$baseUrl/api/dong-dashboard/$dongName/$date';
+      print('🔗 동별 대시보드 업데이트 요청 URL: $url');
+      print('📤 요청 데이터: $data');
+      
+      // API 요구사항에 맞는 형식으로 데이터 구조화
+      final requestBody = {
+        'dong_name': dongName,
+        'data_date': date,
+        'data_json': _formatDongDashboardData(data),
+      };
+      
+      final response = await http.put(
+        Uri.parse(url),
+        headers: _headers,
+        body: jsonEncode(requestBody),
+      );
+
+      print('📡 응답 상태코드: ${response.statusCode}');
+      print('📡 응답 본문: ${response.body}');
+
+      if (response.statusCode == 200) {
+        print('✅ $dongName 대시보드 업데이트 성공');
+        return true;
+      } else {
+        print('❌ $dongName 대시보드 업데이트 실패: ${response.statusCode}');
+        if (response.body.isNotEmpty) {
+          try {
+            final errorData = jsonDecode(response.body);
+            print('❌ 서버 에러 메시지: $errorData');
+          } catch (e) {
+            print('❌ 원시 에러 응답: ${response.body}');
+          }
+        }
+      }
+      return false;
+    } catch (e) {
+      print('💥 $dongName 대시보드 업데이트 예외 발생: $e');
+      return false;
+    }
+  }
+
+  /// 동별 대시보드 데이터를 API 요구사항에 맞는 형식으로 변환
+  static Map<String, dynamic> _formatDongDashboardData(Map<String, dynamic> data) {
+    return {
+      'metrics': [
+        {
+          'title': '🏪 총 상인회',
+          'value': data['total_merchants']?.toString() ?? '0',
+          'unit': '개'
+        },
+        {
+          'title': '✨ 가맹률',
+          'value': data['membership_rate']?.toString() ?? '85.0',
+          'unit': '%'
+        },
+        {
+          'title': '📊 이번주 방문',
+          'value': data['weekly_visits']?.toString() ?? '12',
+          'unit': '회'
+        },
+      ],
+      'merchants': data['merchants'] ?? [],
+      'complaints': {
+        'parking': data['complaints']?['parking'] ?? 5,
+        'noise': data['complaints']?['noise'] ?? 3,
+        'cleaning': data['complaints']?['cleaning'] ?? 2,
+      },
+      'achievements': {
+        'new_merchants': data['achievements']?['new_merchants'] ?? '2개',
+        'resolved_complaints': data['achievements']?['resolved_complaints'] ?? '1건',
+        'support_budget': data['achievements']?['support_budget'] ?? '50만원',
+      },
+    };
+  }
+
   /// 에러 메시지 추출
   static String getErrorMessage(dynamic error) {
     if (error is Map<String, dynamic>) {
