@@ -24,6 +24,7 @@ dependencies:
   speech_balloon: ^0.0.3
   flutter_drawing_board: ^0.9.8
   screenshot: ^3.0.0
+  http: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -40,7 +41,6 @@ flutter:
   assets:
     - assets/images/
     - assets/map/
-    - assets/data/
     
   fonts:
     - family: NotoSans

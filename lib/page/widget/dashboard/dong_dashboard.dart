@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'package:flutter/services.dart';
 import '../../data/dong_list.dart';
 import '../../../core/colors.dart';
+import '../../../services/api_service.dart';
 
 class DongDashboard extends StatefulWidget {
   final Dong dong;
@@ -22,6 +22,8 @@ class DongDashboard extends StatefulWidget {
 
 class _DongDashboardState extends State<DongDashboard> {
   Map<String, dynamic>? dongData;
+  bool isLoading = true;
+  String? errorMessage;
 
   @override
   void initState() {
@@ -31,19 +33,32 @@ class _DongDashboardState extends State<DongDashboard> {
 
   Future<void> _loadDongData() async {
     try {
-      final String response = await rootBundle.loadString('assets/data/dong_data.json');
-      final Map<String, dynamic> data = json.decode(response);
       setState(() {
-        dongData = data[widget.dong.name];
+        isLoading = true;
+        errorMessage = null;
+      });
+      
+      final today = DateTime.now();
+      final dateString = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+      
+      final data = await ApiService.getDongDashboard(widget.dong.name, dateString);
+      
+      setState(() {
+        dongData = data;
+        isLoading = false;
       });
     } catch (e) {
       print('동별 대시보드 데이터 로드 실패: $e');
+      setState(() {
+        errorMessage = e.toString();
+        isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (dongData == null) {
+    if (isLoading) {
       return Container(
         margin: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
@@ -59,6 +74,58 @@ class _DongDashboardState extends State<DongDashboard> {
         ),
         child: const Center(
           child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    
+    if (errorMessage != null) {
+      return Container(
+        margin: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade50,
+              Colors.indigo.shade100,
+            ],
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: SeoguColors.highlight,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '데이터를 불러올 수 없습니다',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: SeoguColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                errorMessage!,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: SeoguColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _loadDongData,
+                child: const Text('다시 시도'),
+              ),
+            ],
+          ),
         ),
       );
     }

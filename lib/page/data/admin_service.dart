@@ -18,13 +18,16 @@ class AdminService {
   /// 관리자 로그인
   static Future<bool> login(String username, String password) async {
     try {
-      final url = '$baseUrl/admin/login';
+      final url = '$baseUrl/api/admin/login';
       print('🔗 로그인 요청 URL: $url');
       print('📤 요청 데이터: username=$username, password=${password.replaceAll(RegExp(r'.'), '*')}');
       
       final response = await http.post(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
         body: jsonEncode({
           'username': username,
           'password': password,
@@ -39,9 +42,28 @@ class AdminService {
         final data = jsonDecode(response.body);
         print('✅ JSON 파싱 성공: $data');
         
-        // FastAPI는 직접 토큰을 반환 (BaseResponse 형식이 아님)
-        if (data['access_token'] != null) {
+        // API 응답 구조에 따라 토큰 추출
+        if (data['success'] == true && data['data'] != null) {
+          final responseData = data['data'];
+          if (responseData['access_token'] != null) {
+            _authToken = responseData['access_token'];
+            print('🎉 로그인 성공! 토큰 저장됨: ${_authToken?.substring(0, 20)}...');
+            return true;
+          } else if (responseData['token'] != null) {
+            _authToken = responseData['token'];
+            print('🎉 로그인 성공! 토큰 저장됨: ${_authToken?.substring(0, 20)}...');
+            return true;
+          } else {
+            print('❌ 토큰이 data 객체에 없음: $responseData');
+          }
+        } else if (data['access_token'] != null) {
+          // 기존 호환성을 위한 fallback
           _authToken = data['access_token'];
+          print('🎉 로그인 성공! 토큰 저장됨: ${_authToken?.substring(0, 20)}...');
+          return true;
+        } else if (data['token'] != null) {
+          // 기존 호환성을 위한 fallback
+          _authToken = data['token'];
           print('🎉 로그인 성공! 토큰 저장됨: ${_authToken?.substring(0, 20)}...');
           return true;
         } else {
@@ -71,7 +93,7 @@ class AdminService {
     try {
       if (_authToken != null) {
         await http.post(
-          Uri.parse('$baseUrl/admin/logout'),
+          Uri.parse('$baseUrl/api/admin/logout'),
           headers: _headers,
         );
       }
@@ -86,7 +108,7 @@ class AdminService {
   static Future<Map<String, dynamic>?> getCurrentAdmin() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/admin/me'),
+        Uri.parse('$baseUrl/api/admin/me'),
         headers: _headers,
       );
 
@@ -95,6 +117,7 @@ class AdminService {
         if (data['success'] == true) {
           return data['data'];
         }
+        return data; // API 응답 구조가 다를 수 있으므로 전체 데이터 반환
       }
     } catch (e) {
       print('Get admin error: $e');
@@ -248,7 +271,7 @@ class AdminService {
   static Future<bool> changePassword(String currentPassword, String newPassword) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/admin/change-password'),
+        Uri.parse('$baseUrl/api/admin/change-password'),
         headers: _headers,
         body: jsonEncode({
           'current_password': currentPassword,
@@ -261,5 +284,27 @@ class AdminService {
       print('Change password error: $e');
       return false;
     }
+  }
+
+  /// 토큰 유효성 검증
+  static Future<bool> validateToken() async {
+    if (_authToken == null) return false;
+    
+    try {
+      final admin = await getCurrentAdmin();
+      return admin != null;
+    } catch (e) {
+      print('Token validation error: $e');
+      _authToken = null; // 토큰이 유효하지 않으면 제거
+      return false;
+    }
+  }
+
+  /// 에러 메시지 추출
+  static String getErrorMessage(dynamic error) {
+    if (error is Map<String, dynamic>) {
+      return error['detail'] ?? error['message'] ?? '알 수 없는 오류가 발생했습니다.';
+    }
+    return error.toString();
   }
 }

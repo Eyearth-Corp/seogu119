@@ -290,6 +290,11 @@ class MainDashboardData {
     );
   }
 
+  /// API 응답 데이터에서 메인 대시보드 데이터를 생성합니다.
+  factory MainDashboardData.fromMap(Map<String, dynamic> data) {
+    return MainDashboardData.fromJson(data);
+  }
+
   /// JSON 파일에서 메인 대시보드 데이터를 로드합니다.
   static Future<MainDashboardData> loadFromAssets() async {
     try {
