@@ -617,12 +617,26 @@ class AdminService {
 
   /// 대시보드 데이터를 API 요구사항에 맞는 형식으로 변환
   static Map<String, dynamic> _formatDashboardData(Map<String, dynamic> data) {
+    // topMetrics 데이터의 모든 value를 문자열로 변환
+    List<Map<String, dynamic>> topMetrics = [];
+    if (data['topMetrics'] != null && data['topMetrics'] is List) {
+      topMetrics = (data['topMetrics'] as List).map((metric) {
+        return {
+          'title': metric['title']?.toString() ?? '',
+          'value': metric['value']?.toString() ?? '0',
+          'unit': metric['unit']?.toString() ?? '',
+        };
+      }).toList();
+    } else {
+      topMetrics = [
+        {'title': '🏪 전체 가맹점', 'value': (data['total_merchants'] ?? 11426).toString(), 'unit': '개'},
+        {'title': '✨ 이번주 신규', 'value': (data['new_merchants_this_week'] ?? 47).toString(), 'unit': '개'},
+        {'title': '📊 가맹률', 'value': (data['membership_rate'] ?? 85.2).toString(), 'unit': '%'},
+      ];
+    }
+    
     return {
-      'topMetrics': data['topMetrics'] ?? [
-        {'title': '🏪 전체 가맹점', 'value': data['total_merchants']?.toString() ?? '11426', 'unit': '개'},
-        {'title': '✨ 이번주 신규', 'value': data['new_merchants_this_week']?.toString() ?? '47', 'unit': '개'},
-        {'title': '📊 가맹률', 'value': data['membership_rate']?.toString() ?? '85.2', 'unit': '%'},
-      ],
+      'topMetrics': topMetrics,
       'trendChart': data['trendChart'] ?? {
         'title': '📈 온누리 가맹점 추이',
         'data': data['onnuri_trend_data'] ?? [
