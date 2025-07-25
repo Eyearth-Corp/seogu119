@@ -726,7 +726,7 @@ class AdminService {
   /// 특정 날짜의 동별 대시보드 데이터 조회 (GET)
   static Future<Map<String, dynamic>?> getDongDashboardByDate(String dongName, String date) async {
     try {
-      final url = 'https://seogu119-api.eyearth.net/api/dong-dashboard/$dongName/$date';
+      final url = 'https://seogu119-api.eyearth.net/api/dong-dashboard/dong/${Uri.encodeComponent(dongName)}/2025-07-25';
       
       print('🔗 특정 날짜 동별 대시보드 요청 URL: $url');
       
@@ -755,7 +755,7 @@ class AdminService {
   /// 동별 대시보드 데이터 업데이트 (PUT)
   static Future<bool> updateDongDashboard(String dongName, String date, Map<String, dynamic> data) async {
     try {
-      final url = '$baseUrl/api/dong-dashboard/$dongName/$date';
+      final url = '$baseUrl/api/dong-dashboard/dong/${Uri.encodeComponent(dongName)}/2025-07-25';
       print('🔗 동별 대시보드 업데이트 요청 URL: $url');
       print('📤 요청 데이터: $data');
       

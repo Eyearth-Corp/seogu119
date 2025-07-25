@@ -47,7 +47,7 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
     });
 
     try {
-      final response = await AdminService.getDongDashboard(widget.dongName);
+      final response = await AdminService.getDongDashboardByDate(widget.dongName, '2025-07-25');
       
       if (response != null) {
         // availableDates 설정

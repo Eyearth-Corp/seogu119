@@ -266,8 +266,6 @@ flutter test
 flutter build web
 ```
 
-
-
 # 서구 골목경제 119 대시보드 API
 
 FastAPI + MySQL을 사용한 서구 골목경제 119 대시보드 API 서버입니다. JWT 인증을 통한 보안 관리와 동별 가맹점 정보를 제공합니다.
@@ -517,6 +515,113 @@ GET /api/dong-dashboard/dong/동천동/2025-07-25  # 특정 동의 특정 날짜
 }
 ```
 
+#### 5. 동별 대시보드 데이터 생성 (인증 필요)
+```http
+POST /api/dong-dashboard
+Authorization: Bearer {access_token}
+Content-Type: application/json
+
+{
+  "data_date": "2025-07-26",
+  "data_json": {
+    "동천동": {
+      "dongMetrics": [
+        {"title": "🏪 총 상인회", "value": "6", "unit": "개"},
+        {"title": "✨ 가맹률", "value": "94.5", "unit": "%"}
+      ],
+      "weeklyAchievements": [
+        {"title": "신규 가맹", "value": "3개"},
+        {"title": "매출 증가", "value": "12%"}
+      ],
+      "complaints": [
+        {"keyword": "주차 문제", "count": 5},
+        {"keyword": "소음 방해", "count": 3}
+      ],
+      "businessTypes": [
+        {"type": "음식점", "count": 25, "percentage": 45.0},
+        {"type": "소매점", "count": 20, "percentage": 35.0}
+      ]
+    },
+    "유촌동": {
+      "dongMetrics": [
+        {"title": "🏪 총 상인회", "value": "4", "unit": "개"},
+        {"title": "✨ 가맹률", "value": "88.7", "unit": "%"}
+      ],
+      "weeklyAchievements": [
+        {"title": "신규 가맹", "value": "2개"},
+        {"title": "매출 증가", "value": "8%"}
+      ],
+      "complaints": [
+        {"keyword": "배달 문제", "count": 4},
+        {"keyword": "접근성", "count": 2}
+      ],
+      "businessTypes": [
+        {"type": "음식점", "count": 18, "percentage": 40.0},
+        {"type": "서비스업", "count": 15, "percentage": 30.0}
+      ]
+    }
+  }
+}
+```
+
+**응답 예시:**
+```json
+{
+  "success": true,
+  "message": "동별 대시보드 데이터가 성공적으로 생성되었습니다.",
+  "data": {
+    "data_date": "2025-07-26",
+    "created_at": "2025-07-25T17:20:25",
+    "created_by": "admin",
+    "dong_count": 2
+  }
+}
+```
+
+#### 6. 동별 대시보드 데이터 수정 (인증 필요)
+```http
+PUT /api/dong-dashboard/2025-07-26
+Authorization: Bearer {access_token}
+Content-Type: application/json
+
+{
+  "data_json": {
+    "동천동": {
+      "dongMetrics": [
+        {"title": "🏪 총 상인회", "value": "7", "unit": "개"},
+        {"title": "✨ 가맹률", "value": "96.2", "unit": "%"}
+      ],
+      "weeklyAchievements": [
+        {"title": "신규 가맹", "value": "5개"},
+        {"title": "매출 증가", "value": "15%"}
+      ],
+      "complaints": [
+        {"keyword": "주차 문제", "count": 3},
+        {"keyword": "소음 방해", "count": 2}
+      ],
+      "businessTypes": [
+        {"type": "음식점", "count": 28, "percentage": 50.0},
+        {"type": "소매점", "count": 18, "percentage": 32.0}
+      ]
+    }
+  }
+}
+```
+
+**응답 예시:**
+```json
+{
+  "success": true,
+  "message": "동별 대시보드 데이터가 성공적으로 수정되었습니다.",
+  "data": {
+    "data_date": "2025-07-26",
+    "updated_at": "2025-07-25T17:25:30",
+    "updated_by": "admin",
+    "dong_count": 1
+  }
+}
+```
+
 ### 관리자 정보 API
 
 #### 현재 로그인한 관리자 정보 조회
@@ -545,6 +650,8 @@ Authorization: Bearer {access_token}
 - `PUT /api/admin/change-password` - 비밀번호 변경
 - `POST /api/main-dashboard` - 메인 데이터 생성
 - `PUT /api/main-dashboard/{date}` - 메인 데이터 수정
+- `POST /api/dong-dashboard` - 동별 데이터 생성
+- `PUT /api/dong-dashboard/{date}` - 동별 데이터 수정
 
 ### 인증이 불필요한 엔드포인트
 - `GET /` - Health Check
@@ -634,3 +741,5 @@ curl -X POST "http://localhost:8000/api/admin/login" \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "admin123"}'
 ```
+
+
