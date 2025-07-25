@@ -36,7 +36,15 @@ class App extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomePage(),
+        // !변경하지 말것
+        '/': (context) => FittedBox(
+          fit: BoxFit.contain,
+          child: SizedBox(
+              width: 2560, //고정
+              height: 1440, //고정
+              child: HomePage()
+          ),
+        ),
         '/admin': (context) => const AdminLoginPage(),
       },
       onGenerateRoute: (settings) {

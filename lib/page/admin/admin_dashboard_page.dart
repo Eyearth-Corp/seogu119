@@ -330,6 +330,116 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     }
   }
 
+  /// 삭제 확인 다이얼로그
+  Future<void> _showDeleteConfirmationDialog(String itemName, VoidCallback onConfirm) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('삭제 확인'),
+        content: Text('정말로 "$itemName"을(를) 삭제하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      onConfirm();
+    }
+  }
+
+  /// 메트릭 삭제
+  void _deleteMetric(int index) {
+    setState(() {
+      final metrics = List<dynamic>.from(_editedData['topMetrics'] as List<dynamic>? ?? []);
+      if (index >= 0 && index < metrics.length) {
+        metrics.removeAt(index);
+        _editedData['topMetrics'] = metrics;
+      }
+    });
+  }
+
+  /// 새로운 메트릭 추가
+  Future<void> _addNewMetric() async {
+    final titleController = TextEditingController();
+    final valueController = TextEditingController();
+    final unitController = TextEditingController();
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('새 메트릭 추가'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                labelText: '제목',
+                hintText: '예: 🏪 전체 가맹점',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: valueController,
+              decoration: const InputDecoration(
+                labelText: '값',
+                hintText: '예: 11,426',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: unitController,
+              decoration: const InputDecoration(
+                labelText: '단위',
+                hintText: '예: 개, %',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('추가'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && titleController.text.isNotEmpty && valueController.text.isNotEmpty) {
+      setState(() {
+        final topMetrics = _editedData['topMetrics'] as List<dynamic>? ?? [];
+        topMetrics.add({
+          'title': titleController.text,
+          'value': valueController.text,
+          'unit': unitController.text,
+        });
+        _editedData['topMetrics'] = topMetrics;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -418,22 +528,48 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     final metrics = _editedData['topMetrics'] as List<dynamic>? ?? [];
     
     return Row(
-      children: metrics.map((metric) {
-        final index = metrics.indexOf(metric);
-        return Expanded(
-          child: _buildEditableMetricCard(
-            metric['title'] ?? '',
-            metric['value']?.toString() ?? '',
-            metric['unit'] ?? '',
-            [SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent][index % 3],
-            'topMetrics.$index.value',
+      children: [
+        ...metrics.map((metric) {
+          final index = metrics.indexOf(metric);
+          return Expanded(
+            child: _buildEditableMetricCard(
+              metric['title'] ?? '',
+              metric['value']?.toString() ?? '',
+              metric['unit'] ?? '',
+              [SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent][index % 3],
+              'topMetrics.$index.value',
+            ),
+          );
+        }).toList(),
+        const SizedBox(width: 16),
+        SizedBox(
+          width: 60,
+          height: 94,
+          child: ElevatedButton(
+            onPressed: _addNewMetric,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: EdgeInsets.zero,
+            ),
+            child: const Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 28,
+            ),
           ),
-        );
-      }).toList(),
+        ),
+      ],
     );
   }
 
   Widget _buildEditableMetricCard(String title, String value, String unit, Color color, String editKey) {
+    // editKey를 파싱하여 인덱스 추출
+    final keyParts = editKey.split('.');
+    final index = int.tryParse(keyParts[1]) ?? 0;
+    
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       padding: const EdgeInsets.all(16),
@@ -451,13 +587,26 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 19,
-              color: SeoguColors.textSecondary,
-              fontWeight: FontWeight.w500,
-            ),
+          Row(
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 19,
+                  color: SeoguColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, size: 20),
+                color: Colors.red.shade400,
+                onPressed: () => _showDeleteConfirmationDialog(
+                  title,
+                  () => _deleteMetric(index),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 10),
           InkWell(
