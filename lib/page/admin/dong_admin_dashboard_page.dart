@@ -90,6 +90,15 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
     _editedData.clear();
     if (_dashboardData != null) {
       _editedData.addAll(_dashboardData!);
+      
+      // complaints가 List로 온 경우 Map으로 변환
+      if (_editedData['complaints'] is List) {
+        _editedData['complaints'] = {
+          'parking': 5,
+          'noise': 3,
+          'cleaning': 2,
+        };
+      }
     }
   }
 
@@ -329,93 +338,6 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
     }
   }
 
-  /// 상인회 삭제
-  void _deleteMerchant(int index) {
-    setState(() {
-      final merchants = List<dynamic>.from(_editedData['merchants'] as List<dynamic>? ?? []);
-      if (index >= 0 && index < merchants.length) {
-        merchants.removeAt(index);
-        _editedData['merchants'] = merchants;
-      }
-    });
-  }
-
-  /// 새로운 상인회 추가
-  Future<void> _addNewMerchant() async {
-    final nameController = TextEditingController();
-    final xController = TextEditingController();
-    final yController = TextEditingController();
-    
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('새 상인회 추가'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: '상인회 이름',
-                hintText: '예: 동천동상인회',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: xController,
-              decoration: const InputDecoration(
-                labelText: 'X 좌표',
-                hintText: '예: 360',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: yController,
-              decoration: const InputDecoration(
-                labelText: 'Y 좌표',
-                hintText: '예: 257',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('추가'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: SeoguColors.primary,
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (result == true && nameController.text.isNotEmpty) {
-      setState(() {
-        final merchants = _editedData['merchants'] as List<dynamic>? ?? [];
-        final nextId = merchants.isNotEmpty 
-          ? (merchants.map((m) => m['id'] as int? ?? 0).reduce((a, b) => a > b ? a : b)) + 1
-          : 1;
-        
-        merchants.add({
-          'id': nextId,
-          'name': nameController.text,
-          'x': double.tryParse(xController.text) ?? 0,
-          'y': double.tryParse(yController.text) ?? 0,
-        });
-        _editedData['merchants'] = merchants;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -463,11 +385,11 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
                           const SizedBox(height: 20),
                           _buildDongMetrics(),
                           const SizedBox(height: 20),
-                          _buildMerchantsList(),
+                          _buildWeeklyAchievements(),
                           const SizedBox(height: 20),
-                          _buildDongComplaints(),
+                          _buildComplaints(),
                           const SizedBox(height: 20),
-                          _buildDongAchievements(),
+                          _buildMerchantList(),
                           const SizedBox(height: 80), // 버튼 공간 확보
                         ],
                       ),
@@ -493,6 +415,558 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
                   ],
                 ),
     );
+  }
+
+  // 동별 메트릭 카드들
+  Widget _buildDongMetrics() {
+    if (_editedData.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(40),
+        decoration: BoxDecoration(
+          color: SeoguColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: Text(
+            '데이터가 없습니다.',
+            style: TextStyle(
+              fontSize: 18,
+              color: SeoguColors.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      );
+    }
+
+    final metrics = _editedData['metrics'] as List<dynamic>? ?? [];
+    if (metrics.isEmpty) {
+      // 기본 메트릭 데이터 생성
+      final defaultMetrics = [
+        {'title': '🏪 총 상인회', 'value': '${_selectedDong?.merchantList.length ?? 0}', 'unit': '개'},
+        {'title': '✨ 가맹률', 'value': '85.0', 'unit': '%'},
+        {'title': '📊 이번주 방문', 'value': '12', 'unit': '회'},
+      ];
+      
+      return Row(
+        children: [
+          for (int i = 0; i < defaultMetrics.length && i < 3; i++) ...[
+            Expanded(
+              child: _buildMetricCard(
+                defaultMetrics[i]['title'] ?? '',
+                defaultMetrics[i]['value'] ?? '',
+                defaultMetrics[i]['unit'] ?? '',
+                i == 0 ? _selectedDong?.color ?? SeoguColors.primary : (i == 1 ? SeoguColors.success : SeoguColors.warning),
+                'metrics.$i.value',
+                defaultMetrics[i]['value'],
+              ),
+            ),
+            if (i < 2) const SizedBox(width: 16),
+          ],
+        ],
+      );
+    }
+    
+    return Row(
+      children: [
+        for (int i = 0; i < metrics.length && i < 3; i++) ...[
+          Expanded(
+            child: _buildMetricCard(
+              metrics[i]['title'] ?? '',
+              metrics[i]['value'] ?? '',
+              metrics[i]['unit'] ?? '',
+              i == 0 ? _selectedDong?.color ?? SeoguColors.primary : (i == 1 ? SeoguColors.success : SeoguColors.warning),
+              'metrics.$i.value',
+              metrics[i]['value'],
+            ),
+          ),
+          if (i < metrics.length - 1 && i < 2) const SizedBox(width: 16),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildMetricCard(String title, String value, String unit, Color color, String editKey, dynamic editValue) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+              color: SeoguColors.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _showEditDialog(editKey, title, editValue),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      border: Border(bottom: BorderSide(color: SeoguColors.textSecondary, width: 1)),
+                    ),
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Text(
+                  unit,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: SeoguColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 주간 성과 섹션
+  Widget _buildWeeklyAchievements() {
+    final achievements = _editedData['achievements'] as Map<String, dynamic>? ?? {};
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '🎯 ${widget.dongName} 금주 성과',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: SeoguColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildAchievementCard(
+                  '신규 가맹',
+                  achievements['new_merchants']?.toString() ?? '2개',
+                  _selectedDong?.color ?? SeoguColors.primary,
+                  'achievements.new_merchants',
+                  achievements['new_merchants'],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildAchievementCard(
+                  '민원 해결',
+                  achievements['resolved_complaints']?.toString() ?? '1건',
+                  SeoguColors.primary,
+                  'achievements.resolved_complaints',
+                  achievements['resolved_complaints'],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildAchievementCard(
+                  '지원 예산',
+                  achievements['support_budget']?.toString() ?? '50만원',
+                  SeoguColors.accent,
+                  'achievements.support_budget',
+                  achievements['support_budget'],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAchievementCard(String title, String value, Color color, String editKey, dynamic editValue) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+              color: SeoguColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          GestureDetector(
+            onTap: () => _showEditDialog(editKey, title, editValue),
+            child: Container(
+              decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: SeoguColors.textSecondary, width: 1)),
+              ),
+              child: Text(
+                value,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 민원 현황 섹션
+  Widget _buildComplaints() {
+    final complaints = _editedData['complaints'] as Map<String, dynamic>? ?? {};
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '🔥 ${widget.dongName} 민원 현황',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: SeoguColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildComplaintItem(
+                  '주차 문제',
+                  complaints['parking']?.toString() ?? '5',
+                  SeoguColors.highlight,
+                  'complaints.parking',
+                  complaints['parking'],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildComplaintItem(
+                  '소음 방해',
+                  complaints['noise']?.toString() ?? '3',
+                  SeoguColors.warning,
+                  'complaints.noise',
+                  complaints['noise'],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildComplaintItem(
+                  '청소 문제',
+                  complaints['cleaning']?.toString() ?? '2',
+                  SeoguColors.primary,
+                  'complaints.cleaning',
+                  complaints['cleaning'],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComplaintItem(String title, String count, Color color, String editKey, dynamic editValue) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.warning,
+                  size: 12,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                color: SeoguColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () => _showEditDialog(editKey, title, editValue),
+          child: Container(
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: SeoguColors.textSecondary, width: 1)),
+            ),
+            child: Text(
+              '${count}건',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: SeoguColors.textSecondary,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 상인회 목록 섹션
+  Widget _buildMerchantList() {
+    final merchants = _editedData['merchants'] as List<dynamic>? ?? _selectedDong?.merchantList ?? [];
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: _selectedDong?.color ?? SeoguColors.primary,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '🏪 ${widget.dongName} 상인회 목록 (${merchants.length}개)',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: SeoguColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          merchants.isEmpty
+              ? Container(
+                  padding: const EdgeInsets.all(40),
+                  child: const Center(
+                    child: Text(
+                      '데이터가 없습니다.',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: SeoguColors.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: merchants.length,
+                  itemBuilder: (context, index) {
+                    final merchant = merchants[index];
+                    return _buildMerchantCard(merchant, index);
+                  },
+                ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMerchantCard(dynamic merchant, int index) {
+    final name = merchant is Map ? merchant['name'] ?? '' : (merchant.name ?? '');
+    final id = merchant is Map ? merchant['id'] ?? index + 1 : (merchant.id ?? index + 1);
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: (_selectedDong?.color ?? SeoguColors.primary).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: (_selectedDong?.color ?? SeoguColors.primary).withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Text(
+            '$id. $name',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: SeoguColors.textPrimary,
+            ),
+          ),
+          const Spacer(),
+        ],
+      ),
+    );
+  }
+
+  // 상인회 추가 다이얼로그
+  Future<void> _showAddMerchantDialog() async {
+    final nameController = TextEditingController();
+    final xController = TextEditingController();
+    final yController = TextEditingController();
+    
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('새 상인회 추가'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: '상인회 이름',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: xController,
+              decoration: const InputDecoration(
+                labelText: 'X 좌표',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: yController,
+              decoration: const InputDecoration(
+                labelText: 'Y 좌표',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (nameController.text.isNotEmpty) {
+                Navigator.pop(context, {
+                  'name': nameController.text,
+                  'x': double.tryParse(xController.text) ?? 0.0,
+                  'y': double.tryParse(yController.text) ?? 0.0,
+                });
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+            ),
+            child: const Text('추가'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        if (_editedData['merchants'] == null) {
+          _editedData['merchants'] = List.from(_selectedDong?.merchantList ?? []);
+        }
+        final merchants = _editedData['merchants'] as List;
+        final newId = merchants.length + 1;
+        merchants.add({
+          'id': newId,
+          'name': result['name'],
+          'x': result['x'],
+          'y': result['y'],
+        });
+      });
+    }
   }
 
   Widget _buildDongHeader() {
@@ -541,435 +1015,5 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
     );
   }
 
-  Widget _buildDongMetrics() {
-    final metrics = _editedData['metrics'] as List<dynamic>? ?? [];
-    
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '📊 동별 주요 지표',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildEditableMetricCard(
-                  '🏪 총 상인회',
-                  _getNestedValue('total_merchants')?.toString() ?? (_selectedDong?.merchantList.length ?? 0).toString(),
-                  '개',
-                  _selectedDong?.color ?? SeoguColors.primary,
-                  'total_merchants',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildEditableMetricCard(
-                  '✨ 가맹률',
-                  _getNestedValue('membership_rate')?.toString() ?? '85.0',
-                  '%',
-                  SeoguColors.success,
-                  'membership_rate',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildEditableMetricCard(
-                  '📊 이번주 방문',
-                  _getNestedValue('weekly_visits')?.toString() ?? '12',
-                  '회',
-                  SeoguColors.warning,
-                  'weekly_visits',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildEditableMetricCard(String title, String value, String unit, Color color, String editKey) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              color: SeoguColors.textSecondary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 10),
-          InkWell(
-            onTap: () => _showEditDialog(editKey, title, value),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 2),
-                  child: Text(
-                    unit,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: SeoguColors.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMerchantsList() {
-    final merchants = _selectedDong?.merchantList ?? [];
-    
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text(
-                '🏪 상인회 목록',
-                style: TextStyle(
-                  fontSize: 19,
-                  fontWeight: FontWeight.bold,
-                  color: SeoguColors.textPrimary,
-                ),
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.add, size: 20),
-                color: SeoguColors.primary,
-                onPressed: _addNewMerchant,
-                tooltip: '상인회 추가',
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          ...merchants.asMap().entries.map((entry) {
-            final index = entry.key;
-            final merchant = entry.value;
-            return _buildMerchantItem(merchant, index);
-          }).toList(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMerchantItem(Merchant merchant, int index) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: (_selectedDong?.color ?? SeoguColors.primary).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: (_selectedDong?.color ?? SeoguColors.primary).withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: _selectedDong?.color ?? SeoguColors.primary,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Center(
-              child: Text(
-                merchant.id.toString(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  merchant.name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: SeoguColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '좌표: (${merchant.x.toInt()}, ${merchant.y.toInt()})',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: SeoguColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline, size: 20),
-            color: Colors.red.shade400,
-            onPressed: () => _showDeleteConfirmationDialog(
-              merchant.name,
-              () => _deleteMerchant(index),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDongComplaints() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '🔥 ${widget.dongName} 민원 현황',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildComplaintItem(
-                  '주차 문제',
-                  _getNestedValue('complaints.parking')?.toString() ?? '5',
-                  SeoguColors.highlight,
-                  'complaints.parking',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildComplaintItem(
-                  '소음 방해',
-                  _getNestedValue('complaints.noise')?.toString() ?? '3',
-                  SeoguColors.warning,
-                  'complaints.noise',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildComplaintItem(
-                  '청소 문제',
-                  _getNestedValue('complaints.cleaning')?.toString() ?? '2',
-                  SeoguColors.primary,
-                  'complaints.cleaning',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildComplaintItem(String title, String count, Color color, String editKey) {
-    return Column(
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            color: SeoguColors.textPrimary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: () => _showEditDialog(editKey, title, count),
-          child: Text(
-            '${count}건',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: color,
-              decoration: TextDecoration.underline,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDongAchievements() {
-    final achievements = _editedData['achievements'] as List<dynamic>? ?? [];
-    
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '🎯 ${widget.dongName} 금주 성과',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildAchievementCard(
-                  '신규 가맹',
-                  _getNestedValue('achievements.new_merchants')?.toString() ?? '2개',
-                  _selectedDong?.color ?? SeoguColors.primary,
-                  'achievements.new_merchants',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildAchievementCard(
-                  '민원 해결',
-                  _getNestedValue('achievements.resolved_complaints')?.toString() ?? '1건',
-                  SeoguColors.success,
-                  'achievements.resolved_complaints',
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildAchievementCard(
-                  '지원 예산',
-                  _getNestedValue('achievements.support_budget')?.toString() ?? '50만원',
-                  SeoguColors.accent,
-                  'achievements.support_budget',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAchievementCard(String title, String value, Color color, String editKey) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              color: SeoguColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 6),
-          InkWell(
-            onTap: () => _showEditDialog(editKey, title, value),
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: color,
-                decoration: TextDecoration.underline,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
