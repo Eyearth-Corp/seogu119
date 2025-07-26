@@ -32,7 +32,7 @@ class ApiService {
     try {
       final encodedDongName = Uri.encodeComponent(dongName);
       final response = await http.get(
-        Uri.parse('$baseUrl/dong-dashboard/dong/$encodedDongName/$date'),
+        Uri.parse('$baseUrl/dong-dashboard/dong/$encodedDongName/2025-07-25'),
         headers: {
           'Content-Type': 'application/json',
         },

@@ -48,6 +48,10 @@ class _DongDashboardState extends State<DongDashboard> {
         isLoading = false;
       });
     } catch (e) {
+      String baseUrl = 'https://seogu119-api.eyearth.net/api';
+      final encodedDongName = Uri.encodeComponent(widget.dong.name);
+      var url = '$baseUrl/api/dong-dashboard/dong/$encodedDongName/2025-07-25';
+      print('URL : $url');
       print('동별 대시보드 데이터 로드 실패: $e');
       setState(() {
         errorMessage = e.toString();
