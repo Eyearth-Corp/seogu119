@@ -439,6 +439,8 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
 
   /// 데이터 저장
   Future<void> _saveData() async {
+    print("_editedData : ${_editedData}");
+
     const fixedDate = '2025-07-25';
 
     setState(() {
