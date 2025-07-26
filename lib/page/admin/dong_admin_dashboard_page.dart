@@ -459,7 +459,8 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
         );
         
         if (success) {
-          await _loadDashboardData(_selectedDate ?? fixedDate);
+          // 저장 성공 시 현재 편집된 데이터를 유지하기 위해 다시 로드하지 않음
+          // await _loadDashboardData(_selectedDate ?? fixedDate);
         }
       }
     } catch (e) {
