@@ -1713,7 +1713,25 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
 
   void _addComplaint(String title, int count) {
     setState(() {
-      final complaints = _editedData['complaints'] as Map<String, dynamic>? ?? {};
+      // complaints가 List인 경우 Map으로 변환
+      Map<String, dynamic> complaints;
+      if (_editedData['complaints'] is List) {
+        complaints = {};
+        // 기존 List 데이터를 Map으로 변환
+        final complaintsList = _editedData['complaints'] as List;
+        for (var complaint in complaintsList) {
+          if (complaint is Map<String, dynamic>) {
+            final keyword = complaint['keyword']?.toString() ?? '';
+            final count = complaint['count'] ?? 0;
+            if (keyword.isNotEmpty) {
+              complaints[keyword] = count;
+            }
+          }
+        }
+      } else {
+        complaints = _editedData['complaints'] as Map<String, dynamic>? ?? {};
+      }
+      
       final newKey = title.replaceAll(' ', '_').toLowerCase();
       complaints[newKey] = count;
       _editedData['complaints'] = complaints;

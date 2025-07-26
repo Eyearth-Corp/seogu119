@@ -1375,10 +1375,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
                 borderData: FlBorderData(show: false),
-                minX: 0,
-                maxX: 5,
-                minY: 70,
-                maxY: 90,
                 lineBarsData: [
                   LineChartBarData(
                     spots: chartData,
