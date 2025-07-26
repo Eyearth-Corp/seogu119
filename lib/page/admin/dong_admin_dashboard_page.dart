@@ -406,6 +406,17 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
     }
   }
 
+  /// 주요 지표 삭제
+  void _deleteDongMetric(int index) {
+    setState(() {
+      final metrics = List<dynamic>.from(_editedData['dongMetrics'] as List<dynamic>? ?? []);
+      if (index >= 0 && index < metrics.length) {
+        metrics.removeAt(index);
+        _editedData['dongMetrics'] = metrics;
+      }
+    });
+  }
+
   /// 상인회 삭제
   void _deleteMerchant(int index) {
     setState(() {
@@ -417,6 +428,77 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
         _updateMerchantCount();
       }
     });
+  }
+
+  /// 새로운 주요 지표 추가
+  Future<void> _addNewDongMetric() async {
+    final titleController = TextEditingController();
+    final valueController = TextEditingController();
+    final unitController = TextEditingController();
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('새 주요 지표 추가'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                labelText: '제목',
+                hintText: '예: 🏪 총 상인회',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: valueController,
+              decoration: const InputDecoration(
+                labelText: '값',
+                hintText: '예: 5',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: unitController,
+              decoration: const InputDecoration(
+                labelText: '단위',
+                hintText: '예: 개, %',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('추가'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && titleController.text.isNotEmpty && valueController.text.isNotEmpty) {
+      setState(() {
+        final dongMetrics = _editedData['dongMetrics'] as List<dynamic>? ?? [];
+        dongMetrics.add({
+          'title': titleController.text,
+          'value': valueController.text,
+          'unit': unitController.text,
+        });
+        _editedData['dongMetrics'] = dongMetrics;
+      });
+    }
   }
 
   /// 새로운 상인회 추가
@@ -653,35 +735,71 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '📊 주요 지표',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
+          Row(
+            children: [
+              const Text(
+                '📊 주요 지표',
+                style: TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: SeoguColors.textPrimary,
+                ),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.add, size: 20),
+                color: SeoguColors.primary,
+                onPressed: _addNewDongMetric,
+                tooltip: '지표 추가',
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Row(
-            children: metrics.map((metric) {
-              final index = metrics.indexOf(metric);
-              return Expanded(
-                child: _buildEditableMetricCard(
-                  metric['title'] ?? '',
-                  metric['value']?.toString() ?? '',
-                  metric['unit'] ?? '',
-                  [SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent][index % 3],
-                  'dongMetrics.$index.value',
+            children: [
+              ...metrics.map((metric) {
+                final index = metrics.indexOf(metric);
+                return Expanded(
+                  child: _buildEditableMetricCard(
+                    metric['title'] ?? '',
+                    metric['value']?.toString() ?? '',
+                    metric['unit'] ?? '',
+                    [SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent][index % 3],
+                    'dongMetrics.$index.value',
+                    index,
+                  ),
+                );
+              }).toList(),
+              if (metrics.length < 4) // 최대 4개까지 추가 버튼 표시
+                const SizedBox(width: 16),
+              if (metrics.length < 4)
+                SizedBox(
+                  width: 60,
+                  height: 94,
+                  child: ElevatedButton(
+                    onPressed: _addNewDongMetric,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: SeoguColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
                 ),
-              );
-            }).toList(),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEditableMetricCard(String title, String value, String unit, Color color, String editKey) {
+  Widget _buildEditableMetricCard(String title, String value, String unit, Color color, String editKey, int index) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       padding: const EdgeInsets.all(16),
@@ -696,14 +814,30 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 14,
-              color: SeoguColors.textSecondary,
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: SeoguColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, size: 16),
+                color: Colors.red.shade400,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => _showDeleteConfirmationDialog(
+                  title,
+                  () => _deleteDongMetric(index),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           InkWell(
@@ -777,12 +911,18 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              _buildComplaintItem('주차 문제', getComplaintCount('주차 문제'), SeoguColors.warning, 'complaints.parking'),
-              _buildComplaintItem('소음 방해', getComplaintCount('소음 방해'), SeoguColors.primary, 'complaints.noise'),
-              _buildComplaintItem('청소 문제', getComplaintCount('청소 문제'), SeoguColors.secondary, 'complaints.cleaning'),
-            ],
+          _buildComplaintsList(),
+          const SizedBox(height: 12),
+          Center(
+            child: TextButton.icon(
+              onPressed: _showAddComplaintDialog,
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('민원 유형 추가'),
+              style: TextButton.styleFrom(
+                foregroundColor: SeoguColors.primary,
+                textStyle: const TextStyle(fontSize: 14),
+              ),
+            ),
           ),
         ],
       ),
@@ -987,14 +1127,27 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
             children: achievements.map((achievement) {
               final index = achievements.indexOf(achievement);
               return Expanded(
-                child: _buildAchievementCard(
+                child: _buildAchievementCardWithDelete(
                   achievement['title'] ?? '',
                   achievement['value']?.toString() ?? '',
                   [SeoguColors.secondary, SeoguColors.primary, SeoguColors.accent][index % 3],
                   'weeklyAchievements.$index.value',
+                  index,
                 ),
               );
             }).toList(),
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: TextButton.icon(
+              onPressed: _showAddAchievementDialog,
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('성과 항목 추가'),
+              style: TextButton.styleFrom(
+                foregroundColor: SeoguColors.primary,
+                textStyle: const TextStyle(fontSize: 14),
+              ),
+            ),
           ),
         ],
       ),
@@ -1039,5 +1192,311 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
         ],
       ),
     );
+  }
+
+  Widget _buildAchievementCardWithDelete(String title, String value, Color color, String editKey, int index) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: SeoguColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              if (index >= 3) // 기본 3개 항목은 삭제 불가
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, size: 14),
+                  color: Colors.red.shade400,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () => _showDeleteConfirmationDialog(
+                    title,
+                    () => _deleteAchievement(index),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          InkWell(
+            onTap: () => _showEditDialog(editKey, title, value),
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: color,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddComplaintDialog() {
+    final titleController = TextEditingController();
+    final countController = TextEditingController(text: '0');
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('민원 유형 추가'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                labelText: '민원 유형',
+                hintText: '예: 불법주차',
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: countController,
+              decoration: const InputDecoration(
+                labelText: '건수',
+              ),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (titleController.text.isNotEmpty) {
+                _addComplaint(titleController.text, int.tryParse(countController.text) ?? 0);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('추가'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddAchievementDialog() {
+    final titleController = TextEditingController();
+    final valueController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('성과 항목 추가'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                labelText: '성과 제목',
+                hintText: '예: 교육 횟수',
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: valueController,
+              decoration: const InputDecoration(
+                labelText: '성과 값',
+                hintText: '예: 5회',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (titleController.text.isNotEmpty && valueController.text.isNotEmpty) {
+                _addAchievement(titleController.text, valueController.text);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('추가'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addComplaint(String title, int count) {
+    setState(() {
+      final complaints = _editedData['complaints'] as Map<String, dynamic>? ?? {};
+      final newKey = title.replaceAll(' ', '_').toLowerCase();
+      complaints[newKey] = count;
+      _editedData['complaints'] = complaints;
+    });
+  }
+
+  void _addAchievement(String title, String value) {
+    setState(() {
+      final achievements = List<Map<String, dynamic>>.from(
+        _editedData['weeklyAchievements'] as List<dynamic>? ?? []
+      );
+      achievements.add({'title': title, 'value': value});
+      _editedData['weeklyAchievements'] = achievements;
+    });
+  }
+
+  void _deleteAchievement(int index) {
+    setState(() {
+      final achievements = List<Map<String, dynamic>>.from(
+        _editedData['weeklyAchievements'] as List<dynamic>? ?? []
+      );
+      if (index < achievements.length && index >= 3) { // 기본 3개 항목은 삭제 불가
+        achievements.removeAt(index);
+        _editedData['weeklyAchievements'] = achievements;
+      }
+    });
+  }
+
+  Widget _buildComplaintsList() {
+    // complaints 데이터 처리 - Map 또는 List 형태 모두 지원
+    Map<String, dynamic> complaints = {};
+    
+    final complaintsData = _editedData['complaints'];
+    if (complaintsData is Map<String, dynamic>) {
+      complaints = complaintsData;
+    } else if (complaintsData is List) {
+      // List 형태일 경우 Map으로 변환
+      complaints = {
+        'parking': 5,
+        'noise': 3,
+        'cleaning': 2,
+      };
+      // API 응답에서 실제 값 추출
+      for (var item in complaintsData) {
+        if (item is Map<String, dynamic>) {
+          final keyword = item['keyword']?.toString() ?? '';
+          final count = item['count'] ?? 0;
+          
+          if (keyword == '주차 문제') complaints['parking'] = count;
+          else if (keyword == '소음 방해') complaints['noise'] = count;
+          else if (keyword == '청소 문제') complaints['cleaning'] = count;
+        }
+      }
+    } else {
+      complaints = {'parking': 5, 'noise': 3, 'cleaning': 2};
+    }
+    
+    final colors = [SeoguColors.warning, SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent];
+    
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: complaints.entries.map((entry) {
+        final index = complaints.keys.toList().indexOf(entry.key);
+        final title = _getComplaintTitle(entry.key);
+        final count = entry.value as int;
+        final color = colors[index % colors.length];
+        
+        return SizedBox(
+          width: (MediaQuery.of(context).size.width - 80) / 3 - 8,
+          child: _buildComplaintItemWithDelete(title, count, color, 'complaints.${entry.key}', entry.key),
+        );
+      }).toList(),
+    );
+  }
+
+  String _getComplaintTitle(String key) {
+    switch (key) {
+      case 'parking': return '주차 문제';
+      case 'noise': return '소음 방해'; 
+      case 'cleaning': return '청소 문제';
+      default: return key.replaceAll('_', ' ');
+    }
+  }
+
+  Widget _buildComplaintItemWithDelete(String title, int count, Color color, String editKey, String complaintKey) {
+    final isBasicComplaint = ['parking', 'noise', 'cleaning'].contains(complaintKey);
+    
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: SeoguColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              if (!isBasicComplaint) // 기본 민원 유형은 삭제 불가
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, size: 14),
+                  color: Colors.red.shade400,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () => _showDeleteConfirmationDialog(
+                    title,
+                    () => _deleteComplaint(complaintKey),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          InkWell(
+            onTap: () => _showEditDialog(editKey, title, count),
+            child: Text(
+              '$count건',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: color,
+                decoration: TextDecoration.underline,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteComplaint(String key) {
+    setState(() {
+      final complaints = Map<String, dynamic>.from(_editedData['complaints'] as Map<String, dynamic>? ?? {});
+      complaints.remove(key);
+      _editedData['complaints'] = complaints;
+    });
   }
 }
