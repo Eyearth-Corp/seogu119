@@ -13,6 +13,16 @@ class AdminService {
   static String? _authToken;
   static bool get isLoggedIn => _authToken != null;
 
+  /// JSON을 읽기 쉽게 포맷팅하는 헬퍼 메서드
+  static String _formatJson(dynamic json) {
+    try {
+      const encoder = JsonEncoder.withIndent('  ');
+      return encoder.convert(json);
+    } catch (e) {
+      return json.toString();
+    }
+  }
+
   /// 저장된 토큰을 로드하고 유효성을 검증합니다
   static Future<void> loadStoredToken() async {
     try {
@@ -20,21 +30,16 @@ class AdminService {
       final token = prefs.getString(_tokenKey);
       
       if (token != null) {
-        print('📱 저장된 토큰 발견: ${token.substring(0, 20)}...');
         
         // JWT 토큰 만료 여부 확인
         if (!JwtDecoder.isExpired(token)) {
           _authToken = token;
-          print('✅ 토큰이 유효합니다. 자동 로그인 성공');
         } else {
-          print('⏰ 토큰이 만료되었습니다. 토큰 제거');
           await prefs.remove(_tokenKey);
         }
       } else {
-        print('📱 저장된 토큰이 없습니다');
       }
     } catch (e) {
-      print('💥 토큰 로드 중 오류: $e');
       // JWT 디코딩 실패 시 토큰 제거
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_tokenKey);
@@ -46,9 +51,7 @@ class AdminService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_tokenKey, token);
-      print('💾 토큰 저장 완료');
     } catch (e) {
-      print('💥 토큰 저장 중 오류: $e');
     }
   }
 
@@ -57,9 +60,7 @@ class AdminService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_tokenKey);
-      print('🗑️ 저장된 토큰 제거 완료');
     } catch (e) {
-      print('💥 토큰 제거 중 오류: $e');
     }
   }
 
@@ -72,8 +73,6 @@ class AdminService {
   static Future<bool> login(String username, String password) async {
     try {
       final url = '$baseUrl/api/admin/login';
-      print('🔗 로그인 요청 URL: $url');
-      print('📤 요청 데이터: username=$username, password=${password.replaceAll(RegExp(r'.'), '*')}');
       
       final response = await http.post(
         Uri.parse(url),
@@ -87,13 +86,9 @@ class AdminService {
         }),
       );
 
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 헤더: ${response.headers}');
-      print('📡 응답 본문: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print('✅ JSON 파싱 성공: $data');
         
         // API 응답 구조에 따라 토큰 추출
         if (data['success'] == true && data['data'] != null) {
@@ -101,46 +96,35 @@ class AdminService {
           if (responseData['access_token'] != null) {
             _authToken = responseData['access_token'];
             await _saveToken(_authToken!);
-            print('🎉 로그인 성공! 토큰 저장됨: ${_authToken?.substring(0, 20)}...');
             return true;
           } else if (responseData['token'] != null) {
             _authToken = responseData['token'];
             await _saveToken(_authToken!);
-            print('🎉 로그인 성공! 토큰 저장됨: ${_authToken?.substring(0, 20)}...');
             return true;
           } else {
-            print('❌ 토큰이 data 객체에 없음: $responseData');
           }
         } else if (data['access_token'] != null) {
           // 기존 호환성을 위한 fallback
           _authToken = data['access_token'];
           await _saveToken(_authToken!);
-          print('🎉 로그인 성공! 토큰 저장됨: ${_authToken?.substring(0, 20)}...');
           return true;
         } else if (data['token'] != null) {
           // 기존 호환성을 위한 fallback
           _authToken = data['token'];
           await _saveToken(_authToken!);
-          print('🎉 로그인 성공! 토큰 저장됨: ${_authToken?.substring(0, 20)}...');
           return true;
         } else {
-          print('❌ 토큰이 응답에 없음: $data');
         }
       } else {
-        print('❌ HTTP 오류: ${response.statusCode} - ${response.reasonPhrase}');
         if (response.body.isNotEmpty) {
           try {
             final errorData = jsonDecode(response.body);
-            print('❌ 서버 에러 메시지: $errorData');
           } catch (e) {
-            print('❌ 원시 에러 응답: ${response.body}');
           }
         }
       }
       return false;
     } catch (e) {
-      print('💥 로그인 예외 발생: $e');
-      print('💥 스택 트레이스: ${StackTrace.current}');
       return false;
     }
   }
@@ -155,7 +139,6 @@ class AdminService {
         );
       }
     } catch (e) {
-      print('Logout error: $e');
     } finally {
       _authToken = null;
       await _removeStoredToken();
@@ -178,7 +161,6 @@ class AdminService {
         return data; // API 응답 구조가 다를 수 있으므로 전체 데이터 반환
       }
     } catch (e) {
-      print('Get admin error: $e');
     }
     return null;
   }
@@ -186,7 +168,6 @@ class AdminService {
   /// 특정 URL에서 데이터를 가져오는 범용 메서드
   static Future<dynamic> fetchFromURL(String url) async {
     try {
-      print('🌐 API 호출: $url');
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -195,18 +176,14 @@ class AdminService {
         },
       );
 
-      print('📡 API 응답 상태: ${response.statusCode}');
-      print('📡 API 응답 본문: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return data;
       } else {
-        print('❌ HTTP 오류: ${response.statusCode} - ${response.reasonPhrase}');
         return null;
       }
     } catch (e) {
-      print('💥 API 호출 예외: $e');
       rethrow;
     }
   }
@@ -241,7 +218,6 @@ class AdminService {
         }
       }
     } catch (e) {
-      print('Get merchants error: $e');
     }
     return null;
   }
@@ -257,7 +233,6 @@ class AdminService {
 
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
-      print('Create merchant error: $e');
       return false;
     }
   }
@@ -273,7 +248,6 @@ class AdminService {
 
       return response.statusCode == 200;
     } catch (e) {
-      print('Update merchant error: $e');
       return false;
     }
   }
@@ -288,7 +262,6 @@ class AdminService {
 
       return response.statusCode == 200;
     } catch (e) {
-      print('Delete merchant error: $e');
       return false;
     }
   }
@@ -308,7 +281,6 @@ class AdminService {
         }
       }
     } catch (e) {
-      print('Get statistics error: $e');
     }
     return null;
   }
@@ -328,7 +300,6 @@ class AdminService {
         }
       }
     } catch (e) {
-      print('Get dong status error: $e');
     }
     return null;
   }
@@ -348,7 +319,6 @@ class AdminService {
         }
       }
     } catch (e) {
-      print('Get dates error: $e');
     }
     return [];
   }
@@ -367,7 +337,6 @@ class AdminService {
 
       return response.statusCode == 200;
     } catch (e) {
-      print('Change password error: $e');
       return false;
     }
   }
@@ -379,7 +348,6 @@ class AdminService {
     try {
       // JWT 만료 여부 먼저 확인
       if (JwtDecoder.isExpired(_authToken!)) {
-        print('⏰ JWT 토큰이 만료되었습니다');
         _authToken = null;
         await _removeStoredToken();
         return false;
@@ -390,13 +358,11 @@ class AdminService {
       if (admin != null) {
         return true;
       } else {
-        print('❌ 서버에서 토큰 유효성 검증 실패');
         _authToken = null;
         await _removeStoredToken();
         return false;
       }
     } catch (e) {
-      print('Token validation error: $e');
       _authToken = null;
       await _removeStoredToken();
       return false;
@@ -408,7 +374,6 @@ class AdminService {
     try {
       final url = 'https://seogu119-api.eyearth.net/api/main-dashboard';
       
-      print('🔗 메인 대시보드 요청 URL: $url');
       
       final response = await http.get(
         Uri.parse(url),
@@ -418,16 +383,12 @@ class AdminService {
         },
       );
 
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 본문: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print('✅ 메인 대시보드 데이터 수신 성공');
         return data;
       }
     } catch (e) {
-      print('💥 메인 대시보드 조회 예외 발생: $e');
     }
     return null;
   }
@@ -437,7 +398,6 @@ class AdminService {
     try {
       final url = 'https://seogu119-api.eyearth.net/api/main-dashboard/$date';
       
-      print('🔗 특정 날짜 메인 대시보드 요청 URL: $url');
       
       final response = await http.get(
         Uri.parse(url),
@@ -447,16 +407,12 @@ class AdminService {
         },
       );
 
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 본문: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print('✅ $date 메인 대시보드 데이터 수신 성공');
         return data;
       }
     } catch (e) {
-      print('💥 $date 메인 대시보드 조회 예외 발생: $e');
     }
     return null;
   }
@@ -465,8 +421,6 @@ class AdminService {
   static Future<bool> createMainDashboard(String date, Map<String, dynamic> data) async {
     try {
       final url = '$baseUrl/api/main-dashboard';
-      print('🔗 메인 대시보드 생성 요청 URL: $url');
-      print('📤 요청 데이터: $data');
       
       // API 요구사항에 맞는 형식으로 데이터 구조화
       final requestBody = {
@@ -480,26 +434,19 @@ class AdminService {
         body: jsonEncode(requestBody),
       );
 
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 본문: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print('✅ 메인 대시보드 생성 성공');
         return true;
       } else {
-        print('❌ 메인 대시보드 생성 실패: ${response.statusCode}');
         if (response.body.isNotEmpty) {
           try {
             final errorData = jsonDecode(response.body);
-            print('❌ 서버 에러 메시지: $errorData');
           } catch (e) {
-            print('❌ 원시 에러 응답: ${response.body}');
           }
         }
       }
       return false;
     } catch (e) {
-      print('💥 메인 대시보드 생성 예외 발생: $e');
       return false;
     }
   }
@@ -508,8 +455,6 @@ class AdminService {
   static Future<bool> updateMainDashboard(String date, Map<String, dynamic> data) async {
     try {
       final url = 'https://seogu119-api.eyearth.net/api/main-dashboard/$date';
-      print('🔗 메인 대시보드 업데이트 요청 URL: $url');
-      print('📤 요청 데이터: $data');
       
       // API 요구사항에 맞는 형식으로 데이터 구조화
       final formattedData = _formatDashboardData(data);
@@ -524,26 +469,19 @@ class AdminService {
         body: jsonEncode(requestBody),
       );
 
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 본문: ${response.body}');
 
       if (response.statusCode == 200) {
-        print('✅ 메인 대시보드 업데이트 성공');
         return true;
       } else {
-        print('❌ 메인 대시보드 업데이트 실패: ${response.statusCode}');
         if (response.body.isNotEmpty) {
           try {
             final errorData = jsonDecode(response.body);
-            print('❌ 서버 에러 메시지: $errorData');
           } catch (e) {
-            print('❌ 원시 에러 응답: ${response.body}');
           }
         }
       }
       return false;
     } catch (e) {
-      print('💥 메인 대시보드 업데이트 예외 발생: $e');
       return false;
     }
   }
@@ -646,7 +584,6 @@ class AdminService {
     try {
       final url = 'https://seogu119-api.eyearth.net/api/dong-dashboard/dong/${Uri.encodeComponent(dongName)}/2025-07-25';
       
-      print('🔗 동별 대시보드 요청 URL: $url');
       
       final response = await http.get(
         Uri.parse(url),
@@ -656,16 +593,12 @@ class AdminService {
         },
       );
 
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 본문: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print('✅ $dongName 대시보드 데이터 수신 성공');
         return data;
       }
     } catch (e) {
-      print('💥 $dongName 대시보드 조회 예외 발생: $e');
     }
     return null;
   }
@@ -675,7 +608,6 @@ class AdminService {
     try {
       final url = 'https://seogu119-api.eyearth.net/api/dong-dashboard/dong/${Uri.encodeComponent(dongName)}/2025-07-25';
       
-      print('🔗 특정 날짜 동별 대시보드 요청 URL: $url');
       
       final response = await http.get(
         Uri.parse(url),
@@ -685,16 +617,12 @@ class AdminService {
         },
       );
 
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 본문: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print('✅ $dongName ($date) 대시보드 데이터 수신 성공');
         return data;
       }
     } catch (e) {
-      print('💥 $dongName ($date) 대시보드 조회 예외 발생: $e');
     }
     return null;
   }
@@ -703,48 +631,69 @@ class AdminService {
   static Future<bool> updateDongDashboard(String dongName, String date, Map<String, dynamic> data) async {
     try {
       final url = '$baseUrl/api/dong-dashboard/dong/${Uri.encodeComponent(dongName)}/2025-07-25';
-      print('🔗 동별 대시보드 업데이트 요청 URL: $url');
-      print('📤 요청 데이터: $data');
+
+      //json dump
+
       
       // API 요구사항에 맞는 형식으로 데이터 구조화
-      final requestBody = {
-        'dong_name': dongName,
-        'data_date': '2025-07-25',
-        'data_json': _formatDongDashboardData(data),
+      final requestBody = _formatDongDashboardData(data);
+      
+      final headers = {
+        'Content-Type': 'application/json',
+        'accept': 'application/json',
+        if (_authToken != null) 'Authorization': 'Bearer $_authToken',
       };
+      
       
       final response = await http.put(
         Uri.parse(url),
-        headers: _headers,
+        headers: headers,
         body: jsonEncode(requestBody),
       );
 
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 본문: ${response.body}');
 
       if (response.statusCode == 200) {
-        print('✅ $dongName 대시보드 업데이트 성공');
         return true;
       } else {
-        print('❌ $dongName 대시보드 업데이트 실패: ${response.statusCode}');
         if (response.body.isNotEmpty) {
           try {
             final errorData = jsonDecode(response.body);
-            print('❌ 서버 에러 메시지: $errorData');
           } catch (e) {
-            print('❌ 원시 에러 응답: ${response.body}');
           }
         }
       }
       return false;
     } catch (e) {
-      print('💥 $dongName 대시보드 업데이트 예외 발생: $e');
       return false;
     }
   }
 
   /// 동별 대시보드 데이터를 API 요구사항에 맞는 형식으로 변환
   static Map<String, dynamic> _formatDongDashboardData(Map<String, dynamic> data) {
+    // complaints 데이터를 적절히 처리
+    List<Map<String, dynamic>> complaints = [];
+    if (data['complaints'] != null) {
+      if (data['complaints'] is List) {
+        // 이미 적절한 형식인 경우
+        complaints = List<Map<String, dynamic>>.from(data['complaints']);
+      } else {
+        // 단일 값인 경우 기본 구조로 변환
+        final count = _parseToInt(data['complaints']);
+        complaints = [
+          {'keyword': '주차 문제', 'count': count},
+          {'keyword': '소음 방해', 'count': count},
+          {'keyword': '청소 문제', 'count': count},
+        ];
+      }
+    } else {
+      // 기본값 설정
+      complaints = [
+        {'keyword': '주차 문제', 'count': 5},
+        {'keyword': '소음 방해', 'count': 3},
+        {'keyword': '청소 문제', 'count': 2},
+      ];
+    }
+
     return {
       'dongMetrics': data['dongMetrics'] ?? [
         {
@@ -763,21 +712,8 @@ class AdminService {
           'unit': '회'
         },
       ],
-      'merchants': _convertToList(data['merchants']),
-      'complaints': [
-        {
-          'keyword': '주차 문제',
-          'count': data['complaints']?['parking'] ?? 5,
-        },
-        {
-          'keyword': '소음 방해',
-          'count': data['complaints']?['noise'] ?? 3,
-        },
-        {
-          'keyword': '청소 문제',
-          'count': data['complaints']?['cleaning'] ?? 2,
-        },
-      ],
+      'merchants': data['merchants'] ?? [],
+      'complaints': complaints,
       'weeklyAchievements': data['weeklyAchievements'] ?? [
         {'title': '신규 가맹', 'value': '2개'},
         {'title': '민원 해결', 'value': '1건'},

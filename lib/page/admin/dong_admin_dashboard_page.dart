@@ -137,11 +137,11 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
           'x': m.x,
           'y': m.y,
         }).toList(),
-        'complaints': {
-          'parking': 5,
-          'noise': 3,
-          'cleaning': 2,
-        },
+        'complaints': [
+          {'keyword': '주차 문제', 'count': 5},
+          {'keyword': '소음 방해', 'count': 3},
+          {'keyword': '청소 문제', 'count': 2},
+        ],
         'weeklyAchievements': [
           {'title': '신규 가맹', 'value': '2개'},
           {'title': '민원 해결', 'value': '1건'},
@@ -369,7 +369,7 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
   bool _isNumericField(String key) {
     final numericFields = {
       'total_merchants', 'membership_rate', 'weekly_visits',
-      'parking', 'noise', 'cleaning', 'count', 'percentage', 'value', 'x', 'y'
+      'count', 'percentage', 'value', 'x', 'y'
     };
     
     return numericFields.any((field) => key.contains(field));
@@ -886,9 +886,9 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
                           const SizedBox(height: 20),
                           _buildDongMetrics(),
                           const SizedBox(height: 20),
-                          _buildComplaints(),
-                          const SizedBox(height: 20),
                           _buildMerchants(),
+                          const SizedBox(height: 20),
+                          _buildComplaints(),
                           const SizedBox(height: 20),
                           _buildWeeklyAchievements(),
                           const SizedBox(height: 80), // 버튼 공간 확보
@@ -1126,104 +1126,7 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
     );
   }
 
-  Widget _buildComplaints() {
-    final complaintsData = _editedData['complaints'];
-    final complaints = (complaintsData is List) ? complaintsData : <dynamic>[];
-    
-    // API 응답에서 키워드별로 카운트 추출
-    int getComplaintCount(String keyword) {
-      for (var complaint in complaints) {
-        if (complaint is Map && complaint['keyword'] == keyword) {
-          return complaint['count'] ?? 0;
-        }
-      }
-      return 0;
-    }
-    
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '📢 민원 현황',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildComplaintsList(),
-          const SizedBox(height: 12),
-          Center(
-            child: TextButton.icon(
-              onPressed: _showAddComplaintDialog,
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('민원 유형 추가'),
-              style: TextButton.styleFrom(
-                foregroundColor: SeoguColors.primary,
-                textStyle: const TextStyle(fontSize: 14),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildComplaintItem(String title, int count, Color color, String editKey) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: color.withOpacity(0.3),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 14,
-                color: SeoguColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            InkWell(
-              onTap: () => _showEditDialog(editKey, title, count),
-              child: Text(
-                '$count건',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildMerchants() {
     final merchants = _editedData['merchants'] as List<dynamic>? ?? [];
@@ -1347,6 +1250,237 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
         ],
       ),
     );
+  }
+
+  Widget _buildComplaints() {
+    final complaints = _editedData['complaints'] as List<dynamic>? ?? [];
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text(
+                '🔥 민원 키워드',
+                style: TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: SeoguColors.textPrimary,
+                ),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.add, size: 20),
+                color: SeoguColors.primary,
+                onPressed: _addNewComplaint,
+                tooltip: '민원 키워드 추가',
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...complaints.asMap().entries.map((entry) {
+            final index = entry.key;
+            final complaint = entry.value;
+            return _buildComplaintItem(
+              complaint['keyword'] ?? '',
+              complaint['count']?.toString() ?? '0',
+              index,
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComplaintItem(String keyword, String count, int index) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Colors.grey.shade200,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: InkWell(
+              onTap: () => _showEditDialog('complaints.$index.keyword', '민원 키워드', keyword),
+              child: Text(
+                keyword,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: SeoguColors.textPrimary,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: InkWell(
+              onTap: () => _showEditDialog('complaints.$index.count', '민원 건수', count),
+              child: Text(
+                '$count건',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: SeoguColors.textSecondary,
+                  decoration: TextDecoration.underline,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, size: 18),
+            color: Colors.red.shade400,
+            onPressed: () => _showDeleteConfirmationDialog(
+              keyword,
+              () => _deleteComplaint(index),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 새로운 민원 키워드 추가
+  Future<void> _addNewComplaint() async {
+    final keywordController = TextEditingController();
+    final countController = TextEditingController();
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text(
+          '새 민원 키워드 추가',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: SeoguColors.textPrimary,
+          ),
+        ),
+        content: Container(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: keywordController,
+                decoration: InputDecoration(
+                  labelText: '민원 키워드',
+                  hintText: '예: 교통 문제',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: SeoguColors.primary, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  filled: true,
+                  fillColor: Colors.grey.shade50,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: countController,
+                decoration: InputDecoration(
+                  labelText: '민원 건수',
+                  hintText: '예: 5',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: SeoguColors.primary, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  filled: true,
+                  fillColor: Colors.grey.shade50,
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.grey.shade600,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: const Text(
+              '취소',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              elevation: 2,
+            ),
+            child: const Text(
+              '추가',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      ),
+    );
+
+    if (result == true && keywordController.text.isNotEmpty && countController.text.isNotEmpty) {
+      setState(() {
+        final complaints = _editedData['complaints'] as List<dynamic>? ?? [];
+        complaints.add({
+          'keyword': keywordController.text,
+          'count': int.tryParse(countController.text) ?? 0,
+        });
+        _editedData['complaints'] = complaints;
+      });
+    }
+  }
+
+  /// 민원 키워드 삭제
+  void _deleteComplaint(int index) {
+    setState(() {
+      final complaints = List<dynamic>.from(_editedData['complaints'] as List<dynamic>? ?? []);
+      if (index >= 0 && index < complaints.length) {
+        complaints.removeAt(index);
+        _editedData['complaints'] = complaints;
+      }
+    });
   }
 
   Widget _buildWeeklyAchievements() {
@@ -1505,108 +1639,6 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
     );
   }
 
-  void _showAddComplaintDialog() {
-    final titleController = TextEditingController();
-    final countController = TextEditingController(text: '0');
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: const Text(
-          '민원 유형 추가',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: SeoguColors.textPrimary,
-          ),
-        ),
-        content: Container(
-          width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  labelText: '민원 유형',
-                  hintText: '예: 불법주차',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: SeoguColors.primary, width: 2),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  filled: true,
-                  fillColor: Colors.grey.shade50,
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: countController,
-                decoration: InputDecoration(
-                  labelText: '건수',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: SeoguColors.primary, width: 2),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  filled: true,
-                  fillColor: Colors.grey.shade50,
-                ),
-                keyboardType: TextInputType.number,
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.grey.shade600,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            ),
-            child: const Text(
-              '취소',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (titleController.text.isNotEmpty) {
-                _addComplaint(titleController.text, int.tryParse(countController.text) ?? 0);
-                Navigator.pop(context);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: SeoguColors.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 2,
-            ),
-            child: const Text(
-              '추가',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
-        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-      ),
-    );
-  }
 
   void _showAddAchievementDialog() {
     final titleController = TextEditingController();
@@ -1711,32 +1743,6 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
     );
   }
 
-  void _addComplaint(String title, int count) {
-    setState(() {
-      // complaints가 List인 경우 Map으로 변환
-      Map<String, dynamic> complaints;
-      if (_editedData['complaints'] is List) {
-        complaints = {};
-        // 기존 List 데이터를 Map으로 변환
-        final complaintsList = _editedData['complaints'] as List;
-        for (var complaint in complaintsList) {
-          if (complaint is Map<String, dynamic>) {
-            final keyword = complaint['keyword']?.toString() ?? '';
-            final count = complaint['count'] ?? 0;
-            if (keyword.isNotEmpty) {
-              complaints[keyword] = count;
-            }
-          }
-        }
-      } else {
-        complaints = _editedData['complaints'] as Map<String, dynamic>? ?? {};
-      }
-      
-      final newKey = title.replaceAll(' ', '_').toLowerCase();
-      complaints[newKey] = count;
-      _editedData['complaints'] = complaints;
-    });
-  }
 
   void _addAchievement(String title, String value) {
     setState(() {
@@ -1760,127 +1766,7 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
     });
   }
 
-  Widget _buildComplaintsList() {
-    // complaints 데이터 처리 - Map 또는 List 형태 모두 지원
-    Map<String, dynamic> complaints = {};
-    
-    final complaintsData = _editedData['complaints'];
-    if (complaintsData is Map<String, dynamic>) {
-      complaints = complaintsData;
-    } else if (complaintsData is List) {
-      // List 형태일 경우 Map으로 변환
-      complaints = {
-        'parking': 5,
-        'noise': 3,
-        'cleaning': 2,
-      };
-      // API 응답에서 실제 값 추출
-      for (var item in complaintsData) {
-        if (item is Map<String, dynamic>) {
-          final keyword = item['keyword']?.toString() ?? '';
-          final count = item['count'] ?? 0;
-          
-          if (keyword == '주차 문제') complaints['parking'] = count;
-          else if (keyword == '소음 방해') complaints['noise'] = count;
-          else if (keyword == '청소 문제') complaints['cleaning'] = count;
-        }
-      }
-    } else {
-      complaints = {'parking': 5, 'noise': 3, 'cleaning': 2};
-    }
-    
-    final colors = [SeoguColors.warning, SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent];
-    
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: complaints.entries.map((entry) {
-        final index = complaints.keys.toList().indexOf(entry.key);
-        final title = _getComplaintTitle(entry.key);
-        final count = entry.value as int;
-        final color = colors[index % colors.length];
-        
-        return SizedBox(
-          width: (MediaQuery.of(context).size.width - 80) / 3 - 8,
-          child: _buildComplaintItemWithDelete(title, count, color, 'complaints.${entry.key}', entry.key),
-        );
-      }).toList(),
-    );
-  }
 
-  String _getComplaintTitle(String key) {
-    switch (key) {
-      case 'parking': return '주차 문제';
-      case 'noise': return '소음 방해'; 
-      case 'cleaning': return '청소 문제';
-      default: return key.replaceAll('_', ' ');
-    }
-  }
 
-  Widget _buildComplaintItemWithDelete(String title, int count, Color color, String editKey, String complaintKey) {
-    final isBasicComplaint = ['parking', 'noise', 'cleaning'].contains(complaintKey);
-    
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: SeoguColors.textSecondary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              if (!isBasicComplaint) // 기본 민원 유형은 삭제 불가
-                IconButton(
-                  icon: const Icon(Icons.delete_outline, size: 14),
-                  color: Colors.red.shade400,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () => _showDeleteConfirmationDialog(
-                    title,
-                    () => _deleteComplaint(complaintKey),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          InkWell(
-            onTap: () => _showEditDialog(editKey, title, count),
-            child: Text(
-              '$count건',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: color,
-                decoration: TextDecoration.underline,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  void _deleteComplaint(String key) {
-    setState(() {
-      final complaints = Map<String, dynamic>.from(_editedData['complaints'] as Map<String, dynamic>? ?? {});
-      complaints.remove(key);
-      _editedData['complaints'] = complaints;
-    });
-  }
 }
