@@ -112,9 +112,9 @@ class _MainDashboardState extends State<MainDashboard> {
               // 상단 메트릭 카드들
               _buildTopMetrics(),
               const SizedBox(height: 20),
-              // 하단 주요 성과
-              _buildWeeklyAchievements(),
-              const SizedBox(height: 20),
+              // // 하단 주요 성과
+              // _buildWeeklyAchievements(),
+              // const SizedBox(height: 20),
               // 온누리 가맹점 추이
               _buildOnNuriTrendChart(),
               const SizedBox(height: 20),
@@ -292,13 +292,6 @@ class _MainDashboardState extends State<MainDashboard> {
         ),
       );
     }
-    
-    // 차트 범위 계산
-    final minX = chartData.map((e) => e.x).reduce((a, b) => a < b ? a : b);
-    final maxX = chartData.map((e) => e.x).reduce((a, b) => a > b ? a : b);
-    final minY = chartData.map((e) => e.y).reduce((a, b) => a < b ? a : b) - 5;
-    final maxY = chartData.map((e) => e.y).reduce((a, b) => a > b ? a : b) + 5;
-    
     return Container(
       height: 320,
       padding: const EdgeInsets.all(20),
@@ -362,10 +355,6 @@ class _MainDashboardState extends State<MainDashboard> {
                   rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
                 borderData: FlBorderData(show: false),
-                minX: minX,
-                maxX: maxX,
-                minY: minY,
-                maxY: maxY,
                 lineBarsData: [
                   LineChartBarData(
                     spots: chartData.map((point) => FlSpot(point.x, point.y)).toList(),
