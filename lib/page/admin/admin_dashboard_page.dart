@@ -460,15 +460,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         title: const Text('온누리 가맹점 추이 수정'),
         content: Container(
           width: 400,
-          constraints: const BoxConstraints(maxHeight: 400),
+          constraints: const BoxConstraints(maxHeight: 560),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                '각 포인트의 Y값(%)을 수정하세요',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-              const SizedBox(height: 16),
               Expanded(
                 child: ListView.builder(
                   shrinkWrap: true,
@@ -506,41 +501,40 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               keyboardType: TextInputType.number,
                             ),
                           ),
-                          if (controllers.length > 1)
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              color: Colors.red,
-                              onPressed: () {
-                                Navigator.pop(context);
-                                chartDataList.removeAt(index);
-                                _updateChartData(chartDataList);
-                                _showChartEditDialog();
-                              },
-                            ),
+                          // if (controllers.length > 1)
+                          //   IconButton(
+                          //     icon: const Icon(Icons.delete_outline),
+                          //     color: Colors.red,
+                          //     onPressed: () {
+                          //       Navigator.pop(context);
+                          //       chartDataList.removeAt(index);
+                          //       _updateChartData(chartDataList);
+                          //       _showChartEditDialog();
+                          //     },
+                          //   ),
                         ],
                       ),
                     );
                   },
                 ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      final newX = chartDataList.isNotEmpty 
-                          ? (chartDataList.last['x'] as num) + 1 
-                          : 0;
-                      chartDataList.add({'x': newX, 'y': 85});
-                      _updateChartData(chartDataList);
-                      _showChartEditDialog();
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text('포인트 추가'),
-                  ),
-                ],
-              ),
+              // Row(
+              //   children: [
+              //     TextButton.icon(
+              //       onPressed: () {
+              //         Navigator.pop(context);
+              //         final newX = chartDataList.isNotEmpty
+              //             ? (chartDataList.last['x'] as num) + 1
+              //             : 0;
+              //         chartDataList.add({'x': newX, 'y': 85});
+              //         _updateChartData(chartDataList);
+              //         _showChartEditDialog();
+              //       },
+              //       icon: const Icon(Icons.add),
+              //       label: const Text('포인트 추가'),
+              //     ),
+              //   ],
+              // ),
             ],
           ),
         ),
@@ -551,9 +545,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: SeoguColors.primary,
-            ),
             child: const Text('저장'),
           ),
         ],
@@ -1308,7 +1299,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         .toList();
 
     return Container(
-      height: 200,
+      height: 360,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: SeoguColors.surface,
@@ -1669,8 +1660,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     final casesData = _editedData['complaintCases'] as Map<String, dynamic>? ?? {};
     final cases = (casesData['data'] as List<dynamic>? ?? []);
 
+    double height = 88.0 + (42 * cases.length);
     return Container(
-      height: 170,
+      height: height,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: SeoguColors.surface,
@@ -1892,9 +1884,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   Widget _buildOtherOrganizationTrends() {
     final trendsData = _editedData['organizationTrends'] as Map<String, dynamic>? ?? {};
     final trends = (trendsData['data'] as List<dynamic>? ?? []);
-
+    double height = 88.0 + (42 * trends.length);
     return Container(
-      height: 140,
+      height: height,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: SeoguColors.surface,
