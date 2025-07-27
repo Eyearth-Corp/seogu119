@@ -249,12 +249,25 @@ class AdminService {
   }
 
   /// 상인회 정보 수정
-  static Future<bool> updateMerchant(int merchantId, Map<String, dynamic> updateData) async {
+  static Future<bool> updateMerchant(
+    int merchantId, {
+    String? merchantName,
+    String? president,
+    int? storeCount,
+    double? memberStoreCount,
+    double? membershipRate,
+  }) async {
     try {
+      final updateData = <String, dynamic>{};
+      if (merchantName != null) updateData['merchant_name'] = merchantName;
+      if (president != null) updateData['president'] = president;
+      if (storeCount != null) updateData['store_count'] = storeCount;
+      if (memberStoreCount != null) updateData['member_store_count'] = memberStoreCount;
+      if (membershipRate != null) updateData['membership_rate'] = membershipRate;
+
       final response = await http.put(
-        Uri.parse('$baseUrl/api/merchants/$merchantId'),
+        Uri.parse('$baseUrl/api/merchants/$merchantId?${_buildQueryString(updateData)}'),
         headers: _headers,
-        body: jsonEncode(updateData),
       );
 
       if (response.statusCode == 200) {
@@ -266,6 +279,13 @@ class AdminService {
       print('Error updating merchant $merchantId: $e');
       return false;
     }
+  }
+
+  /// 쿼리 스트링 빌드 헬퍼
+  static String _buildQueryString(Map<String, dynamic> params) {
+    return params.entries
+        .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value.toString())}')
+        .join('&');
   }
 
   /// 전체 통계 요약 조회
@@ -309,15 +329,11 @@ class AdminService {
   }
 
   /// 공지사항 생성
-  static Future<bool> createNotice(String dongName, String title, String content) async {
+  static Future<bool> createDistrictNotice(String dongName, String title, String content) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/api/districts/$dongName/notices'),
+        Uri.parse('$baseUrl/api/districts/$dongName/notices?title=${Uri.encodeComponent(title)}&content=${Uri.encodeComponent(content)}'),
         headers: _headers,
-        body: jsonEncode({
-          'title': title,
-          'content': content,
-        }),
       );
 
       if (response.statusCode == 200) {
@@ -339,9 +355,8 @@ class AdminService {
       if (content != null) updateData['content'] = content;
 
       final response = await http.put(
-        Uri.parse('$baseUrl/api/notices/$noticeId'),
+        Uri.parse('$baseUrl/api/notices/$noticeId?${_buildQueryString(updateData)}'),
         headers: _headers,
-        body: jsonEncode(updateData),
       );
 
       if (response.statusCode == 200) {

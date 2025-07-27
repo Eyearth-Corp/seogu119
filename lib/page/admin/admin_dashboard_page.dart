@@ -1095,10 +1095,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             icon: const Icon(Icons.location_city, color: SeoguColors.primary),
             tooltip: '동별 대시보드',
             onSelected: (dongName) {
-              // DongAdminDashboardPage removed
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('동별 대시보드 기능이 제거되었습니다.')),
-              );
+              Navigator.pushNamed(context, '/admin/dong/$dongName');
             },
             itemBuilder: (context) => DongList.all.map((dong) => 
               PopupMenuItem<String>(
@@ -1153,10 +1150,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                                   children: DongList.all.map((dong) {
                                     return InkWell(
                                       onTap: () {
-                                        // DongAdminDashboardPage removed
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('동별 대시보드 기능이 제거되었습니다.')),
-                                        );
+                                        Navigator.pushNamed(context, '/admin/dong/${dong.name}');
                                       },
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
