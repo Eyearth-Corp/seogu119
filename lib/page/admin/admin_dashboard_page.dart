@@ -1542,7 +1542,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               ),
               const SizedBox(width: 10),
               Container(
-                width: 100,
+                width: 120,
                 child: Text(
                   dongName,
                   style: const TextStyle(

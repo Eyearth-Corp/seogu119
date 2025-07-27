@@ -132,18 +132,11 @@ class _DongDashboardState extends State<DongDashboard> {
               // 상단 메트릭 카드들
               _buildTopMetrics(),
               const SizedBox(height: 20),
-              // 상인회 목록
-              _buildMerchantsList(),
-              const SizedBox(height: 20),
-              // 업종별 분포 차트
-              _buildBusinessTypesChart(),
-              const SizedBox(height: 20),
-              // 가맹률 분석
-              _buildMembershipAnalysis(),
-              const SizedBox(height: 20),
               // 최근 공지사항
               _buildRecentNotices(),
               const SizedBox(height: 20),
+              // 상인회 목록
+              _buildMerchantsList(),
             ],
           ),
         ),
@@ -188,7 +181,7 @@ class _DongDashboardState extends State<DongDashboard> {
                 Text(
                   '${widget.dongName} 대시보드',
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 19,
                     fontWeight: FontWeight.bold,
                     color: SeoguColors.textPrimary,
                   ),
@@ -196,7 +189,7 @@ class _DongDashboardState extends State<DongDashboard> {
                 Text(
                   '상인회 ${_dashboardData!.dongInfo.merchantCount}개 · 점포 ${_dashboardData!.dongInfo.totalStores}개',
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     color: SeoguColors.textSecondary,
                   ),
                 ),
@@ -218,75 +211,91 @@ class _DongDashboardState extends State<DongDashboard> {
     
     final colors = [SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent, SeoguColors.info];
 
-    return Wrap(
-      spacing: 16,
-      runSpacing: 16,
-      children: metrics.asMap().entries.map((entry) {
-        final index = entry.key;
-        final metric = entry.value;
-        final color = index < colors.length ? colors[index] : SeoguColors.primary;
-        
-        return SizedBox(
-          width: (MediaQuery.of(context).size.width - 80) / 2, // 2열 배치
-          child: _buildMetricCard(metric.title, metric.value, metric.unit, color),
-        );
-      }).toList(),
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: metrics.asMap().entries.map((entry) {
+            final index = entry.key;
+            final metric = entry.value;
+            final color = index < colors.length ? colors[index] : SeoguColors.primary;
+            return _buildMetricCard(metric.title, metric.value, metric.unit, color);
+          }).toList(),
+      ),
     );
+
+    // return Wrap(
+    //   spacing: 16,
+    //   runSpacing: 16,
+    //   children: metrics.asMap().entries.map((entry) {
+    //     final index = entry.key;
+    //     final metric = entry.value;
+    //     final color = index < colors.length ? colors[index] : SeoguColors.primary;
+    //
+    //     return SizedBox(
+    //       width: (MediaQuery.of(context).size.width - 80) / 2, // 2열 배치
+    //       child: _buildMetricCard(metric.title, metric.value, metric.unit, color),
+    //     );
+    //   }).toList(),
+    // );
   }
 
   /// 개별 메트릭 카드
   Widget _buildMetricCard(String title, String value, String unit, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              color: SeoguColors.textSecondary,
-              fontWeight: FontWeight.w500,
+    return Expanded(
+      flex: 1,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: SeoguColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 19,
+                color: SeoguColors.textSecondary,
+                fontWeight: FontWeight.w500,
               ),
-              const SizedBox(width: 4),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 2),
-                child: Text(
-                  unit,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: SeoguColors.textSecondary,
-                    fontWeight: FontWeight.w500,
+            ),
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: color,
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 4),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Text(
+                    unit,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: SeoguColors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -318,7 +327,7 @@ class _DongDashboardState extends State<DongDashboard> {
           const Text(
             '🏪 상인회 현황',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: SeoguColors.textPrimary,
             ),
@@ -353,7 +362,7 @@ class _DongDashboardState extends State<DongDashboard> {
                 Text(
                   merchant.merchantName,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 19,
                     fontWeight: FontWeight.w600,
                     color: SeoguColors.textPrimary,
                   ),
@@ -363,7 +372,7 @@ class _DongDashboardState extends State<DongDashboard> {
                   Text(
                     '회장: ${merchant.president}',
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       color: SeoguColors.textSecondary,
                     ),
                   ),
@@ -376,7 +385,7 @@ class _DongDashboardState extends State<DongDashboard> {
               '${merchant.storeCount}개',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 19,
                 color: SeoguColors.textPrimary,
               ),
             ),
@@ -386,7 +395,7 @@ class _DongDashboardState extends State<DongDashboard> {
               '${merchant.memberStoreCount}개',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 19,
                 color: SeoguColors.primary,
                 fontWeight: FontWeight.w600,
               ),
@@ -397,7 +406,7 @@ class _DongDashboardState extends State<DongDashboard> {
               '${merchant.membershipPercentage.toStringAsFixed(1)}%',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 19,
                 fontWeight: FontWeight.w600,
                 color: _getMembershipRateColor(merchant.membershipPercentage),
               ),
@@ -436,7 +445,7 @@ class _DongDashboardState extends State<DongDashboard> {
           const Text(
             '📊 업종별 분포',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: SeoguColors.textPrimary,
             ),
@@ -552,7 +561,7 @@ class _DongDashboardState extends State<DongDashboard> {
           const Text(
             '📈 가맹률 분석',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: SeoguColors.textPrimary,
             ),
@@ -600,7 +609,7 @@ class _DongDashboardState extends State<DongDashboard> {
           Text(
             count,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -608,7 +617,7 @@ class _DongDashboardState extends State<DongDashboard> {
           Text(
             range,
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 13,
               color: SeoguColors.textSecondary,
             ),
           ),
@@ -622,6 +631,7 @@ class _DongDashboardState extends State<DongDashboard> {
     final notices = _dashboardData?.notices ?? [];
     
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: SeoguColors.surface,
@@ -640,7 +650,7 @@ class _DongDashboardState extends State<DongDashboard> {
           const Text(
             '📢 최근 공지사항',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               color: SeoguColors.textPrimary,
             ),
@@ -680,7 +690,7 @@ class _DongDashboardState extends State<DongDashboard> {
             child: Text(
               notice.title,
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 19,
                 color: SeoguColors.textPrimary,
               ),
               maxLines: 1,
@@ -690,7 +700,7 @@ class _DongDashboardState extends State<DongDashboard> {
           Text(
             _formatDate(notice.createdAt),
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 13,
               color: SeoguColors.textSecondary,
             ),
           ),
@@ -718,7 +728,7 @@ class _DongDashboardState extends State<DongDashboard> {
         child: Text(
           '데이터가 없습니다.',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 19,
             color: SeoguColors.textSecondary,
             fontWeight: FontWeight.w500,
           ),
