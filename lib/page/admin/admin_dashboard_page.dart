@@ -16,8 +16,6 @@ class AdminDashboardPage extends StatefulWidget {
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
   Map<String, dynamic>? _dashboardData;
   bool _isLoading = false;
-  List<String> _availableDates = [];
-  String? _selectedDate;
   
   // 편집 가능한 필드들을 위한 로컬 상태
   final Map<String, dynamic> _editedData = {};
@@ -38,24 +36,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       final response = await AdminService.getMainDashboard();
       
       if (response != null) {
-        // availableDates 설정
-        if (response['availableDates'] != null) {
-          final dateList = List<String>.from(response['availableDates']);
-          setState(() {
-            _availableDates = dateList;
-            if (dateList.isNotEmpty && _selectedDate == null) {
-              _selectedDate = dateList.first;
-            }
-          });
-        }
-        
-        // data 설정
-        if (response['data'] != null) {
-          setState(() {
-            _dashboardData = response['data'];
-            _initializeEditedData();
-          });
-        }
+        setState(() {
+          _dashboardData = response;
+          _initializeEditedData();
+        });
       }
     } catch (e) {
       if (mounted) {
@@ -78,37 +62,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     _editedData.clear();
     if (_dashboardData != null) {
       _editedData.addAll(_dashboardData!);
-    }
-  }
-
-  /// 특정 날짜의 대시보드 데이터 로드
-  Future<void> _loadDashboardData(String date) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final response = await AdminService.getMainDashboardByDate(date);
-      
-      if (response != null && response['data'] != null) {
-        setState(() {
-          _dashboardData = response['data'];
-          _initializeEditedData();
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('데이터 로드 실패: ${AdminService.getErrorMessage(e)}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -283,15 +236,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   /// 데이터 저장
   Future<void> _saveData() async {
-    // 날짜를 '2025-07-25'로 고정
-    const fixedDate = '2025-07-25';
-
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final success = await AdminService.updateMainDashboard(fixedDate, _editedData);
+      final success = await AdminService.createOrUpdateMainDashboard(_editedData);
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -302,7 +252,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         );
         
         if (success) {
-          await _loadDashboardData(_selectedDate ?? fixedDate);
+          await _loadMainDashboardFromAPI();
         }
       }
     } catch (e) {
@@ -1158,27 +1108,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             ).toList(),
           ),
           const SizedBox(width: 8),
-          if (_availableDates.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: DropdownButton<String>(
-                value: _selectedDate,
-                items: _availableDates.map((date) => 
-                  DropdownMenuItem(
-                    value: date,
-                    child: Text(date),
-                  ),
-                ).toList(),
-                onChanged: (date) {
-                  if (date != null) {
-                    setState(() {
-                      _selectedDate = date;
-                    });
-                    _loadDashboardData(date);
-                  }
-                },
-              ),
-            ),
         ],
       ),
       body: _isLoading
@@ -1283,6 +1212,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                           _buildOtherOrganizationTrends(),
                           const SizedBox(height: 20),
                           _buildComplaintPerformance(),
+                          const SizedBox(height: 20),
+                          _buildDistrictsManagement(),
                           const SizedBox(height: 80), // 버튼 공간 확보
                         ],
                       ),
@@ -2293,5 +2224,241 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         ],
       ),
     );
+  }
+
+  /// 동별 상인회 관리 위젯
+  Widget _buildDistrictsManagement() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text(
+                '🏢 동별 상인회 관리',
+                style: TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: SeoguColors.textPrimary,
+                ),
+              ),
+              const Spacer(),
+              ElevatedButton.icon(
+                onPressed: _viewDistrictsSummary,
+                icon: const Icon(Icons.analytics, size: 18),
+                label: const Text('통계 보기'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: SeoguColors.primary,
+                  foregroundColor: Colors.white,
+                  textStyle: const TextStyle(fontSize: 14),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton.icon(
+                onPressed: _manageDistricts,
+                icon: const Icon(Icons.settings, size: 18),
+                label: const Text('관리'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: SeoguColors.secondary,
+                  foregroundColor: Colors.white,
+                  textStyle: const TextStyle(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            '새로운 Districts/Merchants API를 통해 동별 상인회 정보를 관리할 수 있습니다.',
+            style: TextStyle(
+              fontSize: 14,
+              color: SeoguColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 통계 요약 보기
+  Future<void> _viewDistrictsSummary() async {
+    try {
+      final summary = await AdminService.getStatisticsSummary();
+      if (summary != null && mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('전체 통계 요약'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('총 동 수: ${summary['summary']['total_districts']}개'),
+                Text('총 상인회 수: ${summary['summary']['total_merchants']}개'),
+                Text('총 점포 수: ${summary['summary']['total_stores']}개'),
+                Text('총 가맹점포 수: ${summary['summary']['total_member_stores']}개'),
+                Text('전체 가맹률: ${summary['summary']['overall_membership_rate']}%'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('확인'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('통계 로드 실패: ${AdminService.getErrorMessage(e)}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  /// 동별 관리 화면 이동
+  Future<void> _manageDistricts() async {
+    try {
+      final districts = await AdminService.getAllDistricts();
+      if (districts != null && mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('동별 상인회 관리'),
+            content: SizedBox(
+              width: double.maxFinite,
+              height: 400,
+              child: ListView.builder(
+                itemCount: districts.length,
+                itemBuilder: (context, index) {
+                  final district = districts[index];
+                  return ListTile(
+                    title: Text(district['dong_name']),
+                    subtitle: Text(
+                      '상인회: ${district['merchant_count']}개, '
+                      '점포: ${district['total_stores']}개, '
+                      '가맹률: ${district['avg_membership_rate'].toStringAsFixed(1)}%'
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.arrow_forward),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _viewDistrictDetail(district['dong_name']);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('닫기'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('동 목록 로드 실패: ${AdminService.getErrorMessage(e)}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  /// 특정 동의 상세 정보 보기
+  Future<void> _viewDistrictDetail(String dongName) async {
+    try {
+      final districtData = await AdminService.getMerchantsByDistrict(dongName);
+      if (districtData != null && mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('$dongName 상인회 목록'),
+            content: SizedBox(
+              width: double.maxFinite,
+              height: 400,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: SeoguColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('상인회 수: ${districtData['district']['merchant_count']}개'),
+                        Text('총 점포 수: ${districtData['district']['total_stores']}개'),
+                        Text('가맹점포 수: ${districtData['district']['total_member_stores']}개'),
+                        Text('전체 가맹률: ${districtData['district']['overall_membership_rate']}%'),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text('상인회 목록:', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: districtData['merchants'].length,
+                      itemBuilder: (context, index) {
+                        final merchant = districtData['merchants'][index];
+                        return ListTile(
+                          title: Text(merchant['merchant_name']),
+                          subtitle: Text(
+                            '회장: ${merchant['president'] ?? '미정'}, '
+                            '점포: ${merchant['store_count']}개, '
+                            '가맹률: ${(merchant['membership_rate'] * 100).toStringAsFixed(1)}%'
+                          ),
+                          dense: true,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('닫기'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('$dongName 정보 로드 실패: ${AdminService.getErrorMessage(e)}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

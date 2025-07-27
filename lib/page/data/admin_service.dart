@@ -188,28 +188,33 @@ class AdminService {
     }
   }
 
-  /// 가맹점 목록 조회 (관리자용)
-  static Future<Map<String, dynamic>?> getMerchants({
-    required String date,
-    String? dongName,
-    String? category,
-    String? status,
-    int page = 1,
-    int limit = 50,
-  }) async {
+  /// 전체 동 목록 조회
+  static Future<List<dynamic>?> getAllDistricts() async {
     try {
-      final queryParams = {
-        if (dongName != null) 'dong_name': dongName,
-        if (category != null) 'category': category,
-        if (status != null) 'status': status,
-        'page': page.toString(),
-        'limit': limit.toString(),
-      };
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/districts'),
+        headers: _headers,
+      );
 
-      final uri = Uri.parse('$baseUrl/api/merchant-details/$date')
-          .replace(queryParameters: queryParams);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return data['data']['districts'];
+        }
+      }
+    } catch (e) {
+      print('Error fetching districts: $e');
+    }
+    return null;
+  }
 
-      final response = await http.get(uri, headers: _headers);
+  /// 특정 동의 상인회 목록 조회
+  static Future<Map<String, dynamic>?> getMerchantsByDistrict(String dongName) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/districts/$dongName/merchants'),
+        headers: _headers,
+      );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -218,110 +223,157 @@ class AdminService {
         }
       }
     } catch (e) {
+      print('Error fetching merchants for $dongName: $e');
     }
     return null;
   }
 
-  /// 가맹점 생성
-  static Future<bool> createMerchant(String date, Map<String, dynamic> merchantData) async {
+  /// 특정 상인회 정보 조회
+  static Future<Map<String, dynamic>?> getMerchantDetail(int merchantId) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/merchant-details/$date'),
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/merchants/$merchantId'),
         headers: _headers,
-        body: jsonEncode(merchantData),
       );
 
-      return response.statusCode == 200 || response.statusCode == 201;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return data['data'];
+        }
+      }
     } catch (e) {
-      return false;
+      print('Error fetching merchant $merchantId: $e');
     }
+    return null;
   }
 
-  /// 가맹점 수정
-  static Future<bool> updateMerchant(String date, int merchantId, Map<String, dynamic> merchantData) async {
+  /// 상인회 정보 수정
+  static Future<bool> updateMerchant(int merchantId, Map<String, dynamic> updateData) async {
     try {
       final response = await http.put(
-        Uri.parse('$baseUrl/api/merchant-details/$date/$merchantId'),
+        Uri.parse('$baseUrl/api/merchants/$merchantId'),
         headers: _headers,
-        body: jsonEncode(merchantData),
+        body: jsonEncode(updateData),
       );
 
-      return response.statusCode == 200;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['success'] == true;
+      }
+      return false;
     } catch (e) {
+      print('Error updating merchant $merchantId: $e');
       return false;
     }
   }
 
-  /// 가맹점 삭제
-  static Future<bool> deleteMerchant(String date, int merchantId) async {
+  /// 전체 통계 요약 조회
+  static Future<Map<String, dynamic>?> getStatisticsSummary() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/statistics/summary'),
+        headers: _headers,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return data['data'];
+        }
+      }
+    } catch (e) {
+      print('Error fetching statistics summary: $e');
+    }
+    return null;
+  }
+
+  /// 동별 공지사항 목록 조회
+  static Future<Map<String, dynamic>?> getDistrictNotices(String dongName) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/districts/$dongName/notices'),
+        headers: _headers,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return data['data'];
+        }
+      }
+    } catch (e) {
+      print('Error fetching notices for $dongName: $e');
+    }
+    return null;
+  }
+
+  /// 공지사항 생성
+  static Future<bool> createNotice(String dongName, String title, String content) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/districts/$dongName/notices'),
+        headers: _headers,
+        body: jsonEncode({
+          'title': title,
+          'content': content,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['success'] == true;
+      }
+      return false;
+    } catch (e) {
+      print('Error creating notice: $e');
+      return false;
+    }
+  }
+
+  /// 공지사항 수정
+  static Future<bool> updateNotice(int noticeId, {String? title, String? content}) async {
+    try {
+      final updateData = <String, dynamic>{};
+      if (title != null) updateData['title'] = title;
+      if (content != null) updateData['content'] = content;
+
+      final response = await http.put(
+        Uri.parse('$baseUrl/api/notices/$noticeId'),
+        headers: _headers,
+        body: jsonEncode(updateData),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['success'] == true;
+      }
+      return false;
+    } catch (e) {
+      print('Error updating notice $noticeId: $e');
+      return false;
+    }
+  }
+
+  /// 공지사항 삭제
+  static Future<bool> deleteNotice(int noticeId) async {
     try {
       final response = await http.delete(
-        Uri.parse('$baseUrl/api/merchant-details/$date/$merchantId'),
+        Uri.parse('$baseUrl/api/notices/$noticeId'),
         headers: _headers,
       );
 
-      return response.statusCode == 200;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['success'] == true;
+      }
+      return false;
     } catch (e) {
+      print('Error deleting notice $noticeId: $e');
       return false;
     }
   }
 
-  /// 통계 데이터 조회
-  static Future<Map<String, dynamic>?> getStatistics(String date) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/api/statistics/$date'),
-        headers: _headers,
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['success'] == true) {
-          return data['data'];
-        }
-      }
-    } catch (e) {
-    }
-    return null;
-  }
-
-  /// 동별 가맹점 현황 조회
-  static Future<Map<String, dynamic>?> getDongMerchantStatus(String date, String dongName) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/api/dong-status/$date/$dongName'),
-        headers: _headers,
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['success'] == true) {
-          return data['data'];
-        }
-      }
-    } catch (e) {
-    }
-    return null;
-  }
-
-  /// 데이터 수집일 목록 조회
-  static Future<List<Map<String, dynamic>>> getAvailableDates() async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/api/dates'),
-        headers: _headers,
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['success'] == true && data['data'] is List) {
-          return List<Map<String, dynamic>>.from(data['data']);
-        }
-      }
-    } catch (e) {
-    }
-    return [];
-  }
 
   /// 비밀번호 변경
   static Future<bool> changePassword(String currentPassword, String newPassword) async {
@@ -372,32 +424,7 @@ class AdminService {
   /// 메인 대시보드 데이터 조회 (GET)
   static Future<Map<String, dynamic>?> getMainDashboard() async {
     try {
-      final url = 'https://seogu119-api.eyearth.net/api/main-dashboard';
-      
-      
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      );
-
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data;
-      }
-    } catch (e) {
-    }
-    return null;
-  }
-
-  /// 특정 날짜의 메인 대시보드 데이터 조회 (GET)
-  static Future<Map<String, dynamic>?> getMainDashboardByDate(String date) async {
-    try {
-      final url = 'https://seogu119-api.eyearth.net/api/main-dashboard/$date';
-      
+      final url = '$baseUrl/api/main-dashboard';
       
       final response = await http.get(
         Uri.parse(url),
@@ -407,24 +434,26 @@ class AdminService {
         },
       );
 
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return data['data'];
+        }
         return data;
       }
     } catch (e) {
+      print('Error fetching main dashboard: $e');
     }
     return null;
   }
 
-  /// 메인 대시보드 데이터 생성 (POST)
-  static Future<bool> createMainDashboard(String date, Map<String, dynamic> data) async {
+  /// 메인 대시보드 데이터 생성/업데이트 (POST/PUT)
+  static Future<bool> createOrUpdateMainDashboard(Map<String, dynamic> data) async {
     try {
       final url = '$baseUrl/api/main-dashboard';
       
       // API 요구사항에 맞는 형식으로 데이터 구조화
       final requestBody = {
-        'data_date': date,
         'data_json': _formatDashboardData(data),
       };
       
@@ -434,54 +463,21 @@ class AdminService {
         body: jsonEncode(requestBody),
       );
 
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
       } else {
         if (response.body.isNotEmpty) {
           try {
             final errorData = jsonDecode(response.body);
+            print('Error response: $errorData');
           } catch (e) {
+            print('Error parsing response: $e');
           }
         }
       }
       return false;
     } catch (e) {
-      return false;
-    }
-  }
-
-  /// 메인 대시보드 데이터 업데이트 (PUT)
-  static Future<bool> updateMainDashboard(String date, Map<String, dynamic> data) async {
-    try {
-      final url = 'https://seogu119-api.eyearth.net/api/main-dashboard/$date';
-      
-      // API 요구사항에 맞는 형식으로 데이터 구조화
-      final formattedData = _formatDashboardData(data);
-      final requestBody = {
-        'data_date': date,
-        'data_json': formattedData,
-      };
-      
-      final response = await http.put(
-        Uri.parse(url),
-        headers: _headers,
-        body: jsonEncode(requestBody),
-      );
-
-
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        if (response.body.isNotEmpty) {
-          try {
-            final errorData = jsonDecode(response.body);
-          } catch (e) {
-          }
-        }
-      }
-      return false;
-    } catch (e) {
+      print('Error updating main dashboard: $e');
       return false;
     }
   }
@@ -579,98 +575,6 @@ class AdminService {
     return num.toString();
   }
 
-  /// 구 정보 조회 (GET /api/districts)
-  static Future<List<Map<String, dynamic>>?> getDistricts() async {
-    try {
-      final url = '$baseUrl/api/districts';
-      
-      print('🔗 구 정보 요청 URL: $url');
-      
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      );
-
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 본문: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print('✅ 구 정보 데이터 수신 성공');
-        if (data is List) {
-          return List<Map<String, dynamic>>.from(data);
-        }
-        return [data];
-      }
-    } catch (e) {
-      print('💥 구 정보 조회 예외 발생: $e');
-    }
-    return null;
-  }
-
-  /// 동별 상인회 목록 조회 (GET /api/districts/{dong_name}/merchants)
-  static Future<List<Map<String, dynamic>>?> getDistrictMerchants(String dongName) async {
-    try {
-      final url = '$baseUrl/api/districts/${Uri.encodeComponent(dongName)}/merchants';
-      
-      print('🔗 동별 상인회 목록 요청 URL: $url');
-      
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      );
-
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 본문: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print('✅ $dongName 상인회 목록 데이터 수신 성공');
-        if (data is List) {
-          return List<Map<String, dynamic>>.from(data);
-        }
-        return [data];
-      }
-    } catch (e) {
-      print('💥 $dongName 상인회 목록 조회 예외 발생: $e');
-    }
-    return null;
-  }
-
-  /// 상인회 상세 정보 조회 (GET /api/merchants/{merchant_id})
-  static Future<Map<String, dynamic>?> getMerchantDetail(int merchantId) async {
-    try {
-      final url = '$baseUrl/api/merchants/$merchantId';
-      
-      print('🔗 상인회 상세 정보 요청 URL: $url');
-      
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      );
-
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 본문: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print('✅ 상인회 $merchantId 상세 정보 수신 성공');
-        return data;
-      }
-    } catch (e) {
-      print('💥 상인회 $merchantId 상세 정보 조회 예외 발생: $e');
-    }
-    return null;
-  }
 
 
 
@@ -702,64 +606,6 @@ class AdminService {
     return 0;
   }
 
-  /// 상인회 정보 수정 (PUT /api/merchants/{merchant_id})
-  static Future<bool> updateMerchantInfo(int merchantId, Map<String, dynamic> merchantData) async {
-    try {
-      final url = '$baseUrl/api/merchants/$merchantId';
-      
-      print('🔗 상인회 정보 수정 요청 URL: $url');
-      print('📤 요청 데이터: ${_formatJson(merchantData)}');
-      
-      final response = await http.put(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: jsonEncode(merchantData),
-      );
-
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 본문: ${response.body}');
-
-      if (response.statusCode == 200) {
-        print('✅ 상인회 $merchantId 정보 수정 성공');
-        return true;
-      }
-    } catch (e) {
-      print('💥 상인회 $merchantId 정보 수정 예외 발생: $e');
-    }
-    return false;
-  }
-
-  /// 통계 요약 조회 (GET /api/statistics/summary)
-  static Future<Map<String, dynamic>?> getStatisticsSummary() async {
-    try {
-      final url = '$baseUrl/api/statistics/summary';
-      
-      print('🔗 통계 요약 요청 URL: $url');
-      
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      );
-
-      print('📡 응답 상태코드: ${response.statusCode}');
-      print('📡 응답 본문: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print('✅ 통계 요약 데이터 수신 성공');
-        return data;
-      }
-    } catch (e) {
-      print('💥 통계 요약 조회 예외 발생: $e');
-    }
-    return null;
-  }
 
   /// 에러 메시지 추출
   static String getErrorMessage(dynamic error) {

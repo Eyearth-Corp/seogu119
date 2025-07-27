@@ -1,31 +1,143 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://seogu119-api.eyearth.net/api';
+  static const String _prodBaseUrl = 'https://seogu119-api.eyearth.net/api';
+  static const String _devBaseUrl = 'http://localhost:8000';
+  
+  static String get baseUrl => kDebugMode ? '$_devBaseUrl/api' : _prodBaseUrl;
   
   static Future<MainDashboardResponse> getMainDashboard() async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/main-dashboard'),
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/main-dashboard'),
+        headers: {'Content-Type': 'application/json'},
+      );
 
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      return MainDashboardResponse.fromJson(jsonData);
-    } else {
-      throw Exception('Failed to load main dashboard: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        
+        // API 응답이 BaseResponse 형식인지 확인
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return MainDashboardResponse.fromJson(jsonData['data']);
+        } else {
+          throw Exception('Invalid API response format');
+        }
+      } else {
+        throw Exception('Failed to load main dashboard: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('API Error: $e');
+      throw Exception('Network error: $e');
     }
   }
 
-  static Future<bool> updateMainDashboard(String date, MainDashboardData data) async {
-    final response = await http.put(
-      Uri.parse('$baseUrl/main-dashboard/$date'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(_formatDashboardDataForAPI(data)),
-    );
+  static Future<bool> updateMainDashboard(MainDashboardData data, String? token) async {
+    try {
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+      };
+      
+      if (token != null) {
+        headers['Authorization'] = 'Bearer $token';
+      }
 
-    return response.statusCode == 200;
+      final response = await http.post(
+        Uri.parse('$baseUrl/main-dashboard'),
+        headers: headers,
+        body: json.encode({
+          'data_json': _formatDashboardDataForAPI(data)
+        }),
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Update API Error: $e');
+      return false;
+    }
+  }
+
+  // 새로운 Districts API 메소드들
+  static Future<List<District>> getAllDistricts() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/districts'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          final districts = jsonData['data']['districts'] as List;
+          return districts.map((d) => District.fromJson(d)).toList();
+        }
+      }
+      throw Exception('Failed to load districts');
+    } catch (e) {
+      print('Districts API Error: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  static Future<DistrictMerchants> getMerchantsByDistrict(String dongName) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/districts/$dongName/merchants'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return DistrictMerchants.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load merchants for $dongName');
+    } catch (e) {
+      print('Merchants API Error: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  static Future<Merchant> getMerchantDetail(int merchantId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/merchants/$merchantId'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return Merchant.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load merchant $merchantId');
+    } catch (e) {
+      print('Merchant Detail API Error: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  static Future<StatisticsSummary> getStatisticsSummary() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/statistics/summary'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return StatisticsSummary.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load statistics summary');
+    } catch (e) {
+      print('Statistics API Error: $e');
+      throw Exception('Network error: $e');
+    }
   }
 
   /// API 요구사항에 맞는 형식으로 대시보드 데이터 변환
@@ -89,18 +201,15 @@ class ApiService {
 }
 
 class MainDashboardResponse {
-  final List<String> availableDates;
   final MainDashboardData data;
 
   MainDashboardResponse({
-    required this.availableDates,
     required this.data,
   });
 
   factory MainDashboardResponse.fromJson(Map<String, dynamic> json) {
     return MainDashboardResponse(
-      availableDates: List<String>.from(json['availableDates'] ?? []),
-      data: MainDashboardData.fromJson(json['data'] ?? {}),
+      data: MainDashboardData.fromJson(json),
     );
   }
 }
@@ -315,5 +424,227 @@ class TopMetric {
       'unit': unit,
       'color': color,
     };
+  }
+}
+
+// 새로운 API 모델들
+class District {
+  final int id;
+  final String dongName;
+  final int merchantCount;
+  final int totalStores;
+  final int totalMemberStores;
+  final double avgMembershipRate;
+  final String createdAt;
+  final String updatedAt;
+
+  District({
+    required this.id,
+    required this.dongName,
+    required this.merchantCount,
+    required this.totalStores,
+    required this.totalMemberStores,
+    required this.avgMembershipRate,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory District.fromJson(Map<String, dynamic> json) {
+    return District(
+      id: json['id'] ?? 0,
+      dongName: json['dong_name'] ?? '',
+      merchantCount: json['merchant_count'] ?? 0,
+      totalStores: json['total_stores'] ?? 0,
+      totalMemberStores: json['total_member_stores'] ?? 0,
+      avgMembershipRate: (json['avg_membership_rate'] ?? 0).toDouble(),
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+    );
+  }
+}
+
+class DistrictMerchants {
+  final DistrictInfo district;
+  final List<MerchantInfo> merchants;
+
+  DistrictMerchants({
+    required this.district,
+    required this.merchants,
+  });
+
+  factory DistrictMerchants.fromJson(Map<String, dynamic> json) {
+    return DistrictMerchants(
+      district: DistrictInfo.fromJson(json['district'] ?? {}),
+      merchants: (json['merchants'] as List?)
+          ?.map((m) => MerchantInfo.fromJson(m))
+          .toList() ?? [],
+    );
+  }
+}
+
+class DistrictInfo {
+  final int id;
+  final String dongName;
+  final int merchantCount;
+  final int totalStores;
+  final int totalMemberStores;
+  final double overallMembershipRate;
+
+  DistrictInfo({
+    required this.id,
+    required this.dongName,
+    required this.merchantCount,
+    required this.totalStores,
+    required this.totalMemberStores,
+    required this.overallMembershipRate,
+  });
+
+  factory DistrictInfo.fromJson(Map<String, dynamic> json) {
+    return DistrictInfo(
+      id: json['id'] ?? 0,
+      dongName: json['dong_name'] ?? '',
+      merchantCount: json['merchant_count'] ?? 0,
+      totalStores: json['total_stores'] ?? 0,
+      totalMemberStores: json['total_member_stores'] ?? 0,
+      overallMembershipRate: (json['overall_membership_rate'] ?? 0).toDouble(),
+    );
+  }
+}
+
+class MerchantInfo {
+  final int id;
+  final String merchantName;
+  final String? president;
+  final int storeCount;
+  final int? memberStoreCount;
+  final double membershipRate;
+  final String createdAt;
+  final String updatedAt;
+
+  MerchantInfo({
+    required this.id,
+    required this.merchantName,
+    this.president,
+    required this.storeCount,
+    this.memberStoreCount,
+    required this.membershipRate,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory MerchantInfo.fromJson(Map<String, dynamic> json) {
+    return MerchantInfo(
+      id: json['id'] ?? 0,
+      merchantName: json['merchant_name'] ?? '',
+      president: json['president'],
+      storeCount: json['store_count'] ?? 0,
+      memberStoreCount: json['member_store_count'],
+      membershipRate: (json['membership_rate'] ?? 0).toDouble(),
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+    );
+  }
+}
+
+class Merchant {
+  final int id;
+  final DistrictInfo district;
+  final String merchantName;
+  final String? president;
+  final int storeCount;
+  final int? memberStoreCount;
+  final double membershipRate;
+  final double membershipPercentage;
+  final String createdAt;
+  final String updatedAt;
+
+  Merchant({
+    required this.id,
+    required this.district,
+    required this.merchantName,
+    this.president,
+    required this.storeCount,
+    this.memberStoreCount,
+    required this.membershipRate,
+    required this.membershipPercentage,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory Merchant.fromJson(Map<String, dynamic> json) {
+    return Merchant(
+      id: json['id'] ?? 0,
+      district: DistrictInfo.fromJson(json['district'] ?? {}),
+      merchantName: json['merchant_name'] ?? '',
+      president: json['president'],
+      storeCount: json['store_count'] ?? 0,
+      memberStoreCount: json['member_store_count'],
+      membershipRate: (json['membership_rate'] ?? 0).toDouble(),
+      membershipPercentage: (json['membership_percentage'] ?? 0).toDouble(),
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+    );
+  }
+}
+
+class StatisticsSummary {
+  final SummaryData summary;
+  final List<TopDistrict> topDistricts;
+
+  StatisticsSummary({
+    required this.summary,
+    required this.topDistricts,
+  });
+
+  factory StatisticsSummary.fromJson(Map<String, dynamic> json) {
+    return StatisticsSummary(
+      summary: SummaryData.fromJson(json['summary'] ?? {}),
+      topDistricts: (json['top_districts'] as List?)
+          ?.map((d) => TopDistrict.fromJson(d))
+          .toList() ?? [],
+    );
+  }
+}
+
+class SummaryData {
+  final int totalDistricts;
+  final int totalMerchants;
+  final int totalStores;
+  final int totalMemberStores;
+  final double overallMembershipRate;
+
+  SummaryData({
+    required this.totalDistricts,
+    required this.totalMerchants,
+    required this.totalStores,
+    required this.totalMemberStores,
+    required this.overallMembershipRate,
+  });
+
+  factory SummaryData.fromJson(Map<String, dynamic> json) {
+    return SummaryData(
+      totalDistricts: json['total_districts'] ?? 0,
+      totalMerchants: json['total_merchants'] ?? 0,
+      totalStores: json['total_stores'] ?? 0,
+      totalMemberStores: json['total_member_stores'] ?? 0,
+      overallMembershipRate: (json['overall_membership_rate'] ?? 0).toDouble(),
+    );
+  }
+}
+
+class TopDistrict {
+  final String dongName;
+  final int merchantCount;
+
+  TopDistrict({
+    required this.dongName,
+    required this.merchantCount,
+  });
+
+  factory TopDistrict.fromJson(Map<String, dynamic> json) {
+    return TopDistrict(
+      dongName: json['dong_name'] ?? '',
+      merchantCount: json['merchant_count'] ?? 0,
+    );
   }
 }
