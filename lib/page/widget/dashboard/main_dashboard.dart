@@ -683,50 +683,48 @@ class _MainDashboardState extends State<MainDashboard> {
 
   Widget _buildCaseItem(BuildContext context, String title, String status, String detail) {
     final isCompleted = status == '해결';
-    return Expanded(
-      child: InkWell(
-        onTap: () => _showComplaintDetailDialog(context, title, status, detail),
-        child: Row(
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
+    return InkWell(
+      onTap: () => _showComplaintDetailDialog(context, title, status, detail),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: isCompleted ? SeoguColors.success : SeoguColors.warning,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 19,
+                color: SeoguColors.textPrimary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: isCompleted
+                  ? SeoguColors.success.withOpacity(0.1)
+                  : SeoguColors.warning.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              status,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
                 color: isCompleted ? SeoguColors.success : SeoguColors.warning,
-                borderRadius: BorderRadius.circular(4),
               ),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 19,
-                  color: SeoguColors.textPrimary,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: isCompleted 
-                    ? SeoguColors.success.withOpacity(0.1)
-                    : SeoguColors.warning.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                status,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: isCompleted ? SeoguColors.success : SeoguColors.warning,
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1067,20 +1065,18 @@ class _MainDashboardState extends State<MainDashboard> {
             ),
           ),
           const SizedBox(height: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: trendsData.map((trendData) {
-                return Container(
-                  height: 42,
-                  child: _buildTrendItem(
-                    context,
-                    trendData.title,
-                    trendData.detail,
-                  ),
-                );
-              }).toList(),
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: trendsData.map((trendData) {
+              return SizedBox(
+                height: 42,
+                child: _buildTrendItem(
+                  context,
+                  trendData.title,
+                  trendData.detail,
+                ),
+              );
+            }).toList(),
           ),
         ],
       ),
@@ -1088,33 +1084,31 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   Widget _buildTrendItem(BuildContext context, String title, String detail) {
-    return Expanded(
-      child: InkWell(
-        onTap: () => _showTrendDetailDialog(context, title, detail),
-        child: Row(
-          children: [
-            Container(
-              width: 4,
-              height: 4,
-              decoration: BoxDecoration(
-                color: const Color(0xFF64748B),
-                borderRadius: BorderRadius.circular(2),
-              ),
+    return InkWell(
+      onTap: () => _showTrendDetailDialog(context, title, detail),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 4,
+            decoration: BoxDecoration(
+              color: const Color(0xFF64748B),
+              borderRadius: BorderRadius.circular(2),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 19,
-                  color: SeoguColors.textPrimary,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 19,
+                color: SeoguColors.textPrimary,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
