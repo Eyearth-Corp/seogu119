@@ -6,6 +6,7 @@ import 'dart:html' as html;
 import 'widget/floating_action_buttons.dart';
 import 'widget/map_widget.dart';
 import 'widget/dashboard/main_dashboard.dart';
+import 'widget/dashboard/dong_dashboard.dart';
 import 'data/dong_list.dart';
 import '../core/colors.dart';
 
@@ -90,9 +91,113 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  /// 대시보드 공간 - 8개 섹션으로 구성
+  /// 메인 대시보드로 돌아가기
+  void _goToMainDashboard() {
+    setState(() {
+      _selectedDong = null;
+    });
+  }
+
+  /// 대시보드 공간 - 선택된 동에 따라 메인 또는 동별 대시보드 표시
   Widget _buildDashboardSpace() {
-    return const MainDashboard(key: ValueKey('main_dashboard'));
+    return Column(
+      children: [
+        // 대시보드 상단 헤더 (동 선택시만 표시)
+        if (_selectedDong != null) _buildDashboardHeader(),
+        
+        // 대시보드 내용
+        Expanded(
+          child: _selectedDong != null
+              ? DongDashboard(
+                  key: ValueKey('dong_dashboard_${_selectedDong!.name}'),
+                  dongName: _selectedDong!.name,
+                )
+              : const MainDashboard(key: ValueKey('main_dashboard')),
+        ),
+      ],
+    );
+  }
+
+  /// 대시보드 헤더 (동 선택시 표시)
+  Widget _buildDashboardHeader() {
+    return Container(
+      margin: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: SeoguColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.location_city,
+              color: SeoguColors.primary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${_selectedDong!.name} 대시보드',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: SeoguColors.textPrimary,
+                  ),
+                ),
+                Text(
+                  '상인회 ${_selectedDong!.merchantList.length}개 지역',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: SeoguColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          TextButton.icon(
+            onPressed: _goToMainDashboard,
+            icon: const Icon(
+              Icons.dashboard,
+              size: 16,
+              color: SeoguColors.primary,
+            ),
+            label: const Text(
+              '메인 대시보드',
+              style: TextStyle(
+                fontSize: 14,
+                color: SeoguColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: const BorderSide(color: SeoguColors.primary, width: 1),
+              ),
+              backgroundColor: SeoguColors.primary.withOpacity(0.05),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

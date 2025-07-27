@@ -1,0 +1,746 @@
+import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import '../../../core/colors.dart';
+import '../../data/dong_dashboard_data.dart';
+import '../../../services/dong_api_service.dart';
+
+class DongDashboard extends StatefulWidget {
+  final String dongName;
+  
+  const DongDashboard({
+    super.key,
+    required this.dongName,
+  });
+
+  @override
+  State<DongDashboard> createState() => _DongDashboardState();
+}
+
+class _DongDashboardState extends State<DongDashboard> {
+  DongDashboardData? _dashboardData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDashboardData();
+  }
+
+  @override
+  void didUpdateWidget(DongDashboard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.dongName != widget.dongName) {
+      _loadDashboardData();
+    }
+  }
+
+  Future<void> _loadDashboardData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final data = await DongApiService.getCompleteDongDashboard(widget.dongName);
+      if (mounted) {
+        setState(() {
+          _dashboardData = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading dong dashboard data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Container(
+        margin: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.green.shade50,
+              Colors.teal.shade100,
+            ],
+          ),
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (_dashboardData == null) {
+      return Container(
+        margin: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.green.shade50,
+              Colors.teal.shade100,
+            ],
+          ),
+        ),
+        child: const Center(
+          child: Text('데이터를 불러올 수 없습니다.'),
+        ),
+      );
+    }
+
+    return Container(
+      margin: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.green.shade50,
+            Colors.teal.shade100,
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              // 동 제목
+              _buildDongHeader(),
+              const SizedBox(height: 20),
+              // 상단 메트릭 카드들
+              _buildTopMetrics(),
+              const SizedBox(height: 20),
+              // 상인회 목록
+              _buildMerchantsList(),
+              const SizedBox(height: 20),
+              // 업종별 분포 차트
+              _buildBusinessTypesChart(),
+              const SizedBox(height: 20),
+              // 가맹률 분석
+              _buildMembershipAnalysis(),
+              const SizedBox(height: 20),
+              // 최근 공지사항
+              _buildRecentNotices(),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 동 제목 헤더
+  Widget _buildDongHeader() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: SeoguColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.location_city,
+              color: SeoguColors.primary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${widget.dongName} 대시보드',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: SeoguColors.textPrimary,
+                  ),
+                ),
+                Text(
+                  '상인회 ${_dashboardData!.dongInfo.merchantCount}개 · 점포 ${_dashboardData!.dongInfo.totalStores}개',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: SeoguColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 상단 메트릭 카드들
+  Widget _buildTopMetrics() {
+    final metrics = _dashboardData?.dongMetrics ?? [];
+    
+    if (metrics.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+    
+    final colors = [SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent, SeoguColors.info];
+
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      children: metrics.asMap().entries.map((entry) {
+        final index = entry.key;
+        final metric = entry.value;
+        final color = index < colors.length ? colors[index] : SeoguColors.primary;
+        
+        return SizedBox(
+          width: (MediaQuery.of(context).size.width - 80) / 2, // 2열 배치
+          child: _buildMetricCard(metric.title, metric.value, metric.unit, color),
+        );
+      }).toList(),
+    );
+  }
+
+  /// 개별 메트릭 카드
+  Widget _buildMetricCard(String title, String value, String unit, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              color: SeoguColors.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Text(
+                  unit,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: SeoguColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 상인회 목록
+  Widget _buildMerchantsList() {
+    final merchants = _dashboardData?.merchants ?? [];
+    
+    if (merchants.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '🏪 상인회 현황',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: SeoguColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: merchants.length,
+            separatorBuilder: (context, index) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final merchant = merchants[index];
+              return _buildMerchantItem(merchant);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 개별 상인회 아이템
+  Widget _buildMerchantItem(MerchantInfo merchant) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  merchant.merchantName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: SeoguColors.textPrimary,
+                  ),
+                ),
+                if (merchant.president.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    '회장: ${merchant.president}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: SeoguColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          Expanded(
+            child: Text(
+              '${merchant.storeCount}개',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: SeoguColors.textPrimary,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              '${merchant.memberStoreCount}개',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: SeoguColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              '${merchant.membershipPercentage.toStringAsFixed(1)}%',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: _getMembershipRateColor(merchant.membershipPercentage),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 업종별 분포 차트
+  Widget _buildBusinessTypesChart() {
+    final businessTypes = _dashboardData?.statistics.businessTypes ?? [];
+    
+    if (businessTypes.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+
+    return Container(
+      height: 300,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '📊 업종별 분포',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: SeoguColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: PieChart(
+                    PieChartData(
+                      sectionsSpace: 2,
+                      centerSpaceRadius: 40,
+                      sections: businessTypes.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final businessType = entry.value;
+                        final colors = [SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent, SeoguColors.info];
+                        final color = index < colors.length ? colors[index] : SeoguColors.primary;
+                        
+                        return PieChartSectionData(
+                          color: color,
+                          value: businessType.percentage,
+                          radius: 60,
+                          showTitle: false,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: businessTypes.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final businessType = entry.value;
+                      final colors = [SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent, SeoguColors.info];
+                      final color = index < colors.length ? colors[index] : SeoguColors.primary;
+                      
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: color,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                businessType.type,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: SeoguColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              '${businessType.count}개',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: SeoguColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 가맹률 분석
+  Widget _buildMembershipAnalysis() {
+    final merchants = _dashboardData?.merchants ?? [];
+    
+    if (merchants.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+
+    // 가맹률별 분류
+    final highRate = merchants.where((m) => m.membershipPercentage >= 80).length;
+    final mediumRate = merchants.where((m) => m.membershipPercentage >= 60 && m.membershipPercentage < 80).length;
+    final lowRate = merchants.where((m) => m.membershipPercentage < 60).length;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '📈 가맹률 분석',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: SeoguColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildAnalysisItem('우수', '$highRate개', '80% 이상', SeoguColors.success),
+              ),
+              Expanded(
+                child: _buildAnalysisItem('보통', '$mediumRate개', '60-79%', SeoguColors.warning),
+              ),
+              Expanded(
+                child: _buildAnalysisItem('미흡', '$lowRate개', '60% 미만', SeoguColors.error),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 분석 아이템
+  Widget _buildAnalysisItem(String label, String count, String range, Color color) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            count,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          Text(
+            range,
+            style: const TextStyle(
+              fontSize: 12,
+              color: SeoguColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 최근 공지사항
+  Widget _buildRecentNotices() {
+    final notices = _dashboardData?.notices ?? [];
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '📢 최근 공지사항',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: SeoguColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (notices.isEmpty)
+            const Text(
+              '등록된 공지사항이 없습니다.',
+              style: TextStyle(
+                fontSize: 14,
+                color: SeoguColors.textSecondary,
+              ),
+            )
+          else
+            ...notices.take(3).map((notice) => _buildNoticeItem(notice)).toList(),
+        ],
+      ),
+    );
+  }
+
+  /// 공지사항 아이템
+  Widget _buildNoticeItem(NoticeInfo notice) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: SeoguColors.primary,
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              notice.title,
+              style: const TextStyle(
+                fontSize: 14,
+                color: SeoguColors.textPrimary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Text(
+            _formatDate(notice.createdAt),
+            style: const TextStyle(
+              fontSize: 12,
+              color: SeoguColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 빈 데이터 메시지
+  Widget _buildEmptyDataMessage() {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: const Center(
+        child: Text(
+          '데이터가 없습니다.',
+          style: TextStyle(
+            fontSize: 16,
+            color: SeoguColors.textSecondary,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 가맹률에 따른 색상 반환
+  Color _getMembershipRateColor(double rate) {
+    if (rate >= 80) return SeoguColors.success;
+    if (rate >= 60) return SeoguColors.warning;
+    return SeoguColors.error;
+  }
+
+  /// 날짜 포맷팅
+  String _formatDate(String dateString) {
+    try {
+      final date = DateTime.parse(dateString);
+      return '${date.month}/${date.day}';
+    } catch (e) {
+      return '';
+    }
+  }
+}
