@@ -591,6 +591,40 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     });
   }
 
+  /// 동별 가맹률 위로 이동
+  void _moveDongMembershipUp(int index) {
+    setState(() {
+      final dongData = _editedData['dongMembership'] as Map<String, dynamic>? ?? {};
+      final items = List<dynamic>.from(dongData['data'] as List<dynamic>? ?? []);
+      if (index > 0 && index < items.length) {
+        final temp = items[index];
+        items[index] = items[index - 1];
+        items[index - 1] = temp;
+        if (_editedData['dongMembership'] == null) {
+          _editedData['dongMembership'] = {};
+        }
+        (_editedData['dongMembership'] as Map<String, dynamic>)['data'] = items;
+      }
+    });
+  }
+
+  /// 동별 가맹률 아래로 이동
+  void _moveDongMembershipDown(int index) {
+    setState(() {
+      final dongData = _editedData['dongMembership'] as Map<String, dynamic>? ?? {};
+      final items = List<dynamic>.from(dongData['data'] as List<dynamic>? ?? []);
+      if (index >= 0 && index < items.length - 1) {
+        final temp = items[index];
+        items[index] = items[index + 1];
+        items[index + 1] = temp;
+        if (_editedData['dongMembership'] == null) {
+          _editedData['dongMembership'] = {};
+        }
+        (_editedData['dongMembership'] as Map<String, dynamic>)['data'] = items;
+      }
+    });
+  }
+
   /// 새로운 동별 가맹률 추가
   Future<void> _addNewDongMembership() async {
     final nameController = TextEditingController();
@@ -1450,6 +1484,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 
   Widget _buildEditableDongStatusItem(String dongName, double percentage, Color color, String editKey, int index) {
+    final dongData = _editedData['dongMembership'] as Map<String, dynamic>? ?? {};
+    final items = (dongData['data'] as List<dynamic>? ?? []);
+    final isFirst = index == 0;
+    final isLast = index == items.length - 1;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
@@ -1510,6 +1549,20 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     ),
                   ),
                 ),
+              ),
+              // 위로 올리기 버튼
+              IconButton(
+                icon: const Icon(Icons.keyboard_arrow_up, size: 20),
+                color: isFirst ? Colors.grey.shade300 : SeoguColors.primary,
+                onPressed: isFirst ? null : () => _moveDongMembershipUp(index),
+                tooltip: '위로 이동',
+              ),
+              // 아래로 내리기 버튼
+              IconButton(
+                icon: const Icon(Icons.keyboard_arrow_down, size: 20),
+                color: isLast ? Colors.grey.shade300 : SeoguColors.primary,
+                onPressed: isLast ? null : () => _moveDongMembershipDown(index),
+                tooltip: '아래로 이동',
               ),
               IconButton(
                 icon: const Icon(Icons.delete_outline, size: 18),
