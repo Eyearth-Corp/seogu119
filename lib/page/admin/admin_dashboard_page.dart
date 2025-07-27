@@ -5,7 +5,6 @@ import 'package:fl_chart/fl_chart.dart';
 import '../data/admin_service.dart';
 import '../data/dong_list.dart';
 import '../../core/colors.dart';
-import 'dong_admin_dashboard_page.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -1146,11 +1145,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             icon: const Icon(Icons.location_city, color: SeoguColors.primary),
             tooltip: '동별 대시보드',
             onSelected: (dongName) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DongAdminDashboardPage(dongName: dongName),
-                ),
+              // DongAdminDashboardPage removed
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('동별 대시보드 기능이 제거되었습니다.')),
               );
             },
             itemBuilder: (context) => DongList.all.map((dong) => 
@@ -1227,11 +1224,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                                   children: DongList.all.map((dong) {
                                     return InkWell(
                                       onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => DongAdminDashboardPage(dongName: dong.name),
-                                          ),
+                                        // DongAdminDashboardPage removed
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('동별 대시보드 기능이 제거되었습니다.')),
                                         );
                                       },
                                       child: Container(

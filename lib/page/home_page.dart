@@ -96,12 +96,12 @@ class _HomePageState extends State<HomePage> {
     if (_selectedDong != null) {
       return DongDashboard(
         key: ValueKey('dong_dashboard_${_selectedDong!.name}'),
-        dong: _selectedDong!,
         onBackPressed: () => _onDongSelected(null),
         onMerchantSelected: _navigateToMerchant,
+        dong: _selectedDong!,
       );
     }
-    
+
     return const MainDashboard(key: ValueKey('main_dashboard'));
   }
 

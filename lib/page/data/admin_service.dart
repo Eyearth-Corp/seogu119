@@ -579,11 +579,12 @@ class AdminService {
     return num.toString();
   }
 
-  /// 동별 대시보드 데이터 조회 (GET)
-  static Future<Map<String, dynamic>?> getDongDashboard(String dongName) async {
+  /// 구 정보 조회 (GET /api/districts)
+  static Future<List<Map<String, dynamic>>?> getDistricts() async {
     try {
-      final url = 'https://seogu119-api.eyearth.net/api/dong-dashboard/dong/${Uri.encodeComponent(dongName)}/2025-07-25';
+      final url = '$baseUrl/api/districts';
       
+      print('🔗 구 정보 요청 URL: $url');
       
       final response = await http.get(
         Uri.parse(url),
@@ -593,21 +594,29 @@ class AdminService {
         },
       );
 
+      print('📡 응답 상태코드: ${response.statusCode}');
+      print('📡 응답 본문: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data;
+        print('✅ 구 정보 데이터 수신 성공');
+        if (data is List) {
+          return List<Map<String, dynamic>>.from(data);
+        }
+        return [data];
       }
     } catch (e) {
+      print('💥 구 정보 조회 예외 발생: $e');
     }
     return null;
   }
 
-  /// 특정 날짜의 동별 대시보드 데이터 조회 (GET)
-  static Future<Map<String, dynamic>?> getDongDashboardByDate(String dongName, String date) async {
+  /// 동별 상인회 목록 조회 (GET /api/districts/{dong_name}/merchants)
+  static Future<List<Map<String, dynamic>>?> getDistrictMerchants(String dongName) async {
     try {
-      final url = 'https://seogu119-api.eyearth.net/api/dong-dashboard/dong/${Uri.encodeComponent(dongName)}/2025-07-25';
+      final url = '$baseUrl/api/districts/${Uri.encodeComponent(dongName)}/merchants';
       
+      print('🔗 동별 상인회 목록 요청 URL: $url');
       
       final response = await http.get(
         Uri.parse(url),
@@ -617,12 +626,48 @@ class AdminService {
         },
       );
 
+      print('📡 응답 상태코드: ${response.statusCode}');
+      print('📡 응답 본문: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print('✅ $dongName 상인회 목록 데이터 수신 성공');
+        if (data is List) {
+          return List<Map<String, dynamic>>.from(data);
+        }
+        return [data];
+      }
+    } catch (e) {
+      print('💥 $dongName 상인회 목록 조회 예외 발생: $e');
+    }
+    return null;
+  }
+
+  /// 상인회 상세 정보 조회 (GET /api/merchants/{merchant_id})
+  static Future<Map<String, dynamic>?> getMerchantDetail(int merchantId) async {
+    try {
+      final url = '$baseUrl/api/merchants/$merchantId';
+      
+      print('🔗 상인회 상세 정보 요청 URL: $url');
+      
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      print('📡 응답 상태코드: ${response.statusCode}');
+      print('📡 응답 본문: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print('✅ 상인회 $merchantId 상세 정보 수신 성공');
         return data;
       }
     } catch (e) {
+      print('💥 상인회 $merchantId 상세 정보 조회 예외 발생: $e');
     }
     return null;
   }
@@ -630,27 +675,20 @@ class AdminService {
   /// 동별 대시보드 데이터 업데이트 (PUT)
   static Future<bool> updateDongDashboard(String dongName, String date, Map<String, dynamic> data) async {
     try {
-      final url = '$baseUrl/api/dong-dashboard/dong/${Uri.encodeComponent(dongName)}/2025-07-25';
-
-      //json dump
-
+      final url = '$baseUrl/api/dong-dashboard/2025-07-25';
       
       // API 요구사항에 맞는 형식으로 데이터 구조화
-      final requestBody = _formatDongDashboardData(data);
-      
-      final headers = {
-        'Content-Type': 'application/json',
-        'accept': 'application/json',
-        if (_authToken != null) 'Authorization': 'Bearer $_authToken',
+      final requestBody = {
+        'dong_name': dongName,
+        'data_date': '2025-07-25',
+        'data_json': _formatDongDashboardData(data),
       };
-      
       
       final response = await http.put(
         Uri.parse(url),
-        headers: headers,
+        headers: _headers,
         body: jsonEncode(requestBody),
       );
-
 
       if (response.statusCode == 200) {
         return true;
@@ -670,30 +708,6 @@ class AdminService {
 
   /// 동별 대시보드 데이터를 API 요구사항에 맞는 형식으로 변환
   static Map<String, dynamic> _formatDongDashboardData(Map<String, dynamic> data) {
-    // complaints 데이터를 적절히 처리
-    List<Map<String, dynamic>> complaints = [];
-    if (data['complaints'] != null) {
-      if (data['complaints'] is List) {
-        // 이미 적절한 형식인 경우
-        complaints = List<Map<String, dynamic>>.from(data['complaints']);
-      } else {
-        // 단일 값인 경우 기본 구조로 변환
-        final count = _parseToInt(data['complaints']);
-        complaints = [
-          {'keyword': '주차 문제', 'count': count},
-          {'keyword': '소음 방해', 'count': count},
-          {'keyword': '청소 문제', 'count': count},
-        ];
-      }
-    } else {
-      // 기본값 설정
-      complaints = [
-        {'keyword': '주차 문제', 'count': 5},
-        {'keyword': '소음 방해', 'count': 3},
-        {'keyword': '청소 문제', 'count': 2},
-      ];
-    }
-
     return {
       'dongMetrics': data['dongMetrics'] ?? [
         {
@@ -712,8 +726,21 @@ class AdminService {
           'unit': '회'
         },
       ],
-      'merchants': data['merchants'] ?? [],
-      'complaints': complaints,
+      'merchants': _convertToList(data['merchants']),
+      'complaints': [
+        {
+          'keyword': '주차 문제',
+          'count': data['complaints']?['parking'] ?? 5,
+        },
+        {
+          'keyword': '소음 방해',
+          'count': data['complaints']?['noise'] ?? 3,
+        },
+        {
+          'keyword': '청소 문제',
+          'count': data['complaints']?['cleaning'] ?? 2,
+        },
+      ],
       'weeklyAchievements': data['weeklyAchievements'] ?? [
         {'title': '신규 가맹', 'value': '2개'},
         {'title': '민원 해결', 'value': '1건'},
@@ -735,6 +762,11 @@ class AdminService {
   }
 
 
+
+
+
+
+
   /// 값을 int로 안전하게 변환
   static int _parseToInt(dynamic value) {
     if (value == null) return 0;
@@ -744,6 +776,65 @@ class AdminService {
       return int.tryParse(value) ?? 0;
     }
     return 0;
+  }
+
+  /// 상인회 정보 수정 (PUT /api/merchants/{merchant_id})
+  static Future<bool> updateMerchantInfo(int merchantId, Map<String, dynamic> merchantData) async {
+    try {
+      final url = '$baseUrl/api/merchants/$merchantId';
+      
+      print('🔗 상인회 정보 수정 요청 URL: $url');
+      print('📤 요청 데이터: ${_formatJson(merchantData)}');
+      
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode(merchantData),
+      );
+
+      print('📡 응답 상태코드: ${response.statusCode}');
+      print('📡 응답 본문: ${response.body}');
+
+      if (response.statusCode == 200) {
+        print('✅ 상인회 $merchantId 정보 수정 성공');
+        return true;
+      }
+    } catch (e) {
+      print('💥 상인회 $merchantId 정보 수정 예외 발생: $e');
+    }
+    return false;
+  }
+
+  /// 통계 요약 조회 (GET /api/statistics/summary)
+  static Future<Map<String, dynamic>?> getStatisticsSummary() async {
+    try {
+      final url = '$baseUrl/api/statistics/summary';
+      
+      print('🔗 통계 요약 요청 URL: $url');
+      
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      print('📡 응답 상태코드: ${response.statusCode}');
+      print('📡 응답 본문: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print('✅ 통계 요약 데이터 수신 성공');
+        return data;
+      }
+    } catch (e) {
+      print('💥 통계 요약 조회 예외 발생: $e');
+    }
+    return null;
   }
 
   /// 에러 메시지 추출
