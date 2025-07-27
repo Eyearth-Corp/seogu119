@@ -774,30 +774,34 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+
         title: const Text('새 동향 추가'),
         content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: '동향 제목',
-                  hintText: '예: 부산 동구 골목상권 활성화 사업',
-                  border: OutlineInputBorder(),
+          child: Container(
+            width: 660,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: '동향 제목',
+                    hintText: '예: 부산 동구 골목상권 활성화 사업',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: detailController,
-                decoration: const InputDecoration(
-                  labelText: '상세 내용',
-                  hintText: '동향에 대한 상세 설명을 입력하세요',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: detailController,
+                  decoration: const InputDecoration(
+                    labelText: '상세 내용',
+                    hintText: '동향에 대한 상세 설명을 입력하세요',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
                 ),
-                maxLines: 3,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         actions: [
@@ -808,9 +812,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             child: const Text('추가'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: SeoguColors.primary,
-            ),
           ),
         ],
       ),

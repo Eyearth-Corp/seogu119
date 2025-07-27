@@ -124,8 +124,10 @@ class _MainDashboardState extends State<MainDashboard> {
               // 민원 TOP 3 키워드
               _buildComplaintKeywords(),
               const SizedBox(height: 20),
-              _buildComplaintPerformance(),
-              const SizedBox(height: 20),
+              // 민원 처리 실적
+              // 안보이게 처리
+              // _buildComplaintPerformance(),
+              // const SizedBox(height: 20),
               _buildComplaintCases(context),
               const SizedBox(height: 20),
               _buildOtherOrganizationTrends(context),
