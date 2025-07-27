@@ -735,7 +735,7 @@ class _MainDashboardState extends State<MainDashboard> {
           ),
           child: Container(
             padding: const EdgeInsets.all(24),
-            constraints: const BoxConstraints(maxWidth: 1000),
+            constraints: const BoxConstraints(maxWidth: 800),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -851,7 +851,7 @@ class _MainDashboardState extends State<MainDashboard> {
           ),
           child: Container(
             padding: const EdgeInsets.all(24),
-            constraints: const BoxConstraints(maxWidth: 400),
+            constraints: const BoxConstraints(maxWidth: 800),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,

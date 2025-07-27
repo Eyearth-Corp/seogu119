@@ -501,40 +501,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               keyboardType: TextInputType.number,
                             ),
                           ),
-                          // if (controllers.length > 1)
-                          //   IconButton(
-                          //     icon: const Icon(Icons.delete_outline),
-                          //     color: Colors.red,
-                          //     onPressed: () {
-                          //       Navigator.pop(context);
-                          //       chartDataList.removeAt(index);
-                          //       _updateChartData(chartDataList);
-                          //       _showChartEditDialog();
-                          //     },
-                          //   ),
                         ],
                       ),
                     );
                   },
                 ),
               ),
-              // Row(
-              //   children: [
-              //     TextButton.icon(
-              //       onPressed: () {
-              //         Navigator.pop(context);
-              //         final newX = chartDataList.isNotEmpty
-              //             ? (chartDataList.last['x'] as num) + 1
-              //             : 0;
-              //         chartDataList.add({'x': newX, 'y': 85});
-              //         _updateChartData(chartDataList);
-              //         _showChartEditDialog();
-              //       },
-              //       icon: const Icon(Icons.add),
-              //       label: const Text('포인트 추가'),
-              //     ),
-              //   ],
-              // ),
             ],
           ),
         ),
