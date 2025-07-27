@@ -115,10 +115,13 @@ class _MainDashboardState extends State<MainDashboard> {
               // 하단 주요 성과
               _buildWeeklyAchievements(),
               const SizedBox(height: 20),
+              // 온누리 가맹점 추이
               _buildOnNuriTrendChart(),
               const SizedBox(height: 20),
+              //동별 가맹률 현황
               _buildDongMembershipStatus(),
               const SizedBox(height: 20),
+              // 민원 TOP 3 키워드
               _buildComplaintKeywords(),
               const SizedBox(height: 20),
               _buildComplaintPerformance(),
@@ -295,7 +298,7 @@ class _MainDashboardState extends State<MainDashboard> {
     final maxY = chartData.map((e) => e.y).reduce((a, b) => a > b ? a : b) + 5;
     
     return Container(
-      height: 200,
+      height: 320,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: SeoguColors.surface,
@@ -626,9 +629,11 @@ class _MainDashboardState extends State<MainDashboard> {
     if (casesData.isEmpty) {
       return _buildEmptyDataMessage();
     }
-    
+
+    double height = 88.0 + (42 * casesData.length);
+
     return Container(
-      height: 170,
+      height: height,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: SeoguColors.surface,
@@ -657,11 +662,14 @@ class _MainDashboardState extends State<MainDashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: casesData.map((caseData) {
-                return _buildCaseItem(
-                  context,
-                  caseData.title,
-                  caseData.status,
-                  caseData.detail,
+                return Container(
+                  height: 42,
+                  child: _buildCaseItem(
+                    context,
+                    caseData.title,
+                    caseData.status,
+                    caseData.detail,
+                  ),
                 );
               }).toList(),
             ),
@@ -934,7 +942,7 @@ class _MainDashboardState extends State<MainDashboard> {
   // 6. 민원처리 실적
   Widget _buildComplaintPerformance() {
     final complaintPerformance = _dashboardData?.complaintPerformance;
-    
+
     return Container(
       height: 160,
       padding: const EdgeInsets.all(20),
@@ -1029,9 +1037,10 @@ class _MainDashboardState extends State<MainDashboard> {
     if (trendsData.isEmpty) {
       return _buildEmptyDataMessage();
     }
-    
+
+    double height = 88.0 + (42 * trendsData.length);
     return Container(
-      height: 140,
+      height: height,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: SeoguColors.surface,
@@ -1060,10 +1069,13 @@ class _MainDashboardState extends State<MainDashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: trendsData.map((trendData) {
-                return _buildTrendItem(
-                  context,
-                  trendData.title,
-                  trendData.detail,
+                return Container(
+                  height: 42,
+                  child: _buildTrendItem(
+                    context,
+                    trendData.title,
+                    trendData.detail,
+                  ),
                 );
               }).toList(),
             ),
