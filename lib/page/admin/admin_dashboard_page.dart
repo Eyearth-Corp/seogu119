@@ -770,6 +770,84 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     }
   }
 
+  /// 민원 사례 수정 다이얼로그
+  Future<void> _showComplaintCaseEditDialog(String editKeyPrefix, String currentTitle, String currentStatus, String currentDetail, int index) async {
+    final titleController = TextEditingController(text: currentTitle);
+    final statusController = TextEditingController(text: currentStatus);
+    final detailController = TextEditingController(text: currentDetail);
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('민원 사례 수정'),
+        content: SingleChildScrollView(
+          child: Container(
+            width: 660,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: '제목',
+                    hintText: '예: 동천동 주차장 확장',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: statusController.text.isEmpty ? '진행중' : statusController.text,
+                  decoration: const InputDecoration(
+                    labelText: '상태',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: '해결', child: Text('해결')),
+                    DropdownMenuItem(value: '진행중', child: Text('진행중')),
+                  ],
+                  onChanged: (value) {
+                    statusController.text = value ?? '진행중';
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: detailController,
+                  decoration: const InputDecoration(
+                    labelText: '상세 내용',
+                    hintText: '민원 해결 과정에 대한 설명을 입력하세요',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('저장'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      setState(() {
+        _updateNestedValue('$editKeyPrefix.title', titleController.text);
+        _updateNestedValue('$editKeyPrefix.status', statusController.text);
+        _updateNestedValue('$editKeyPrefix.detail', detailController.text);
+      });
+    }
+  }
+
   /// 민원 사례 삭제
   void _deleteComplaintCase(int index) {
     setState(() {
@@ -798,6 +876,67 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         (_editedData['organizationTrends'] as Map<String, dynamic>)['data'] = trends;
       }
     });
+  }
+
+  /// 타 기관 동향 수정 다이얼로그
+  Future<void> _showTrendEditDialog(String editKeyPrefix, String currentTitle, String currentDetail, int index) async {
+    final titleController = TextEditingController(text: currentTitle);
+    final detailController = TextEditingController(text: currentDetail);
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('동향 수정'),
+        content: SingleChildScrollView(
+          child: Container(
+            width: 660,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: '동향 제목',
+                    hintText: '예: 부산 동구 골목상권 활성화 사업',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: detailController,
+                  decoration: const InputDecoration(
+                    labelText: '상세 내용',
+                    hintText: '동향에 대한 상세 설명을 입력하세요',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('저장'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SeoguColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      setState(() {
+        _updateNestedValue('$editKeyPrefix.title', titleController.text);
+        _updateNestedValue('$editKeyPrefix.detail', detailController.text);
+      });
+    }
   }
 
   /// 새로운 타 기관 동향 추가
@@ -1550,22 +1689,23 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   ),
                 ),
               ),
+              SizedBox(width: 12),
               // 위로 올리기 버튼
               IconButton(
-                icon: const Icon(Icons.keyboard_arrow_up, size: 20),
+                icon: const Icon(Icons.arrow_upward, size: 20),
                 color: isFirst ? Colors.grey.shade300 : SeoguColors.primary,
                 onPressed: isFirst ? null : () => _moveDongMembershipUp(index),
                 tooltip: '위로 이동',
               ),
               // 아래로 내리기 버튼
               IconButton(
-                icon: const Icon(Icons.keyboard_arrow_down, size: 20),
+                icon: const Icon(Icons.arrow_downward, size: 20),
                 color: isLast ? Colors.grey.shade300 : SeoguColors.primary,
                 onPressed: isLast ? null : () => _moveDongMembershipDown(index),
                 tooltip: '아래로 이동',
               ),
               IconButton(
-                icon: const Icon(Icons.delete_outline, size: 18),
+                icon: const Icon(Icons.delete_outline, size: 20),
                 color: Colors.red.shade400,
                 onPressed: () => _showDeleteConfirmationDialog(
                   dongName,
@@ -1681,7 +1821,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               ),
               const SizedBox(width: 4),
               IconButton(
-                icon: const Icon(Icons.delete_outline, size: 16),
+                icon: const Icon(Icons.delete_outline, size: 20),
                 color: Colors.red.shade400,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -1819,8 +1959,18 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               ),
             ),
           ),
+          const SizedBox(width: 8),
           IconButton(
-            icon: const Icon(Icons.delete_outline, size: 16),
+            icon: const Icon(Icons.edit, size: 20),
+            color: SeoguColors.primary,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            onPressed: () => _showComplaintCaseEditDialog(editKeyPrefix, title, status, detail, index),
+            tooltip: '수정',
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, size: 20),
             color: Colors.red.shade400,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
@@ -2009,18 +2159,31 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 19,
-                color: SeoguColors.textPrimary,
+            child: InkWell(
+              onTap: () => _showTrendEditDialog(editKeyPrefix, title, detail, index),
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 19,
+                  color: SeoguColors.textPrimary,
+                  decoration: TextDecoration.underline,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline, size: 16),
+            icon: const Icon(Icons.edit, size: 20),
+            color: SeoguColors.primary,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            onPressed: () => _showTrendEditDialog(editKeyPrefix, title, detail, index),
+            tooltip: '수정',
+          ),
+          SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, size: 20),
             color: Colors.red.shade400,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
@@ -2136,7 +2299,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.delete_outline, size: 16),
+                icon: const Icon(Icons.delete_outline, size: 20),
                 color: Colors.red.shade400,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
