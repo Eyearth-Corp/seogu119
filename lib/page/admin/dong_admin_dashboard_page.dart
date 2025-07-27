@@ -267,9 +267,9 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
                     children: [
                       _buildDistrictSummary(),
                       const SizedBox(height: 20),
-                      _buildMerchantsSection(),
-                      const SizedBox(height: 20),
                       _buildNoticesSection(),
+                      const SizedBox(height: 20),
+                      _buildMerchantsSection(),
                     ],
                   ),
                 ),
@@ -435,7 +435,14 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
 
   /// 상인회 아이템
   Widget _buildMerchantItem(Map<String, dynamic> merchant) {
-    final membershipRate = _parseToDouble(merchant['membership_rate']) * 100;
+    //소수점 2자리
+    double membership_rate = double.parse(merchant['membership_rate']) * 100;
+    var membershipRate = membership_rate.toStringAsFixed(2);
+
+    //소수점을 제거한다.
+    double _member_store_count = double.parse(merchant['member_store_count']);
+    int memberStoreCount = _member_store_count.toInt();
+
     
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 8),
@@ -455,7 +462,7 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
             Text('회장: ${merchant['president']}'),
           ],
           const SizedBox(height: 4),
-          Text('점포: ${merchant['store_count']}개 | 가맹: ${merchant['member_store_count']}개'),
+          Text('점포: ${merchant['store_count']}개 | 가맹: ${memberStoreCount}개'),
         ],
       ),
       trailing: Row(
@@ -464,18 +471,18 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: _getMembershipRateColor(membershipRate).withOpacity(0.1),
+              color: _getMembershipRateColor(membership_rate).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: _getMembershipRateColor(membershipRate).withOpacity(0.3),
+                color: _getMembershipRateColor(membership_rate).withOpacity(0.3),
               ),
             ),
             child: Text(
-              '${membershipRate.toStringAsFixed(1)}%',
+              '${membership_rate.toStringAsFixed(2)}%',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: _getMembershipRateColor(membershipRate),
+                color: _getMembershipRateColor(membership_rate),
               ),
             ),
           ),

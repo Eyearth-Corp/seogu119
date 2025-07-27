@@ -121,56 +121,12 @@ class _HomePageState extends State<HomePage> {
   /// 대시보드 헤더 (동 선택시 표시)
   Widget _buildDashboardHeader() {
     return Container(
-      margin: const EdgeInsets.all(12.0),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: SeoguColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.location_city,
-              color: SeoguColors.primary,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${_selectedDong!.name} 대시보드',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: SeoguColors.textPrimary,
-                  ),
-                ),
-                Text(
-                  '상인회 ${_selectedDong!.merchantList.length}개 지역',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: SeoguColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
           TextButton.icon(
             onPressed: _goToMainDashboard,
             icon: const Icon(
