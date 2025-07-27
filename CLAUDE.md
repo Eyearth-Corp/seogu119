@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Flutter web application called "서구 골목" (Seogu Alley) that displays an interactive map dashboard for tracking merchant statistics in Seogu District. The app shows 119 designated merchant areas with 11,426 stores across 18 administrative districts (dong).
+This is a Flutter web application called "서구 골목" (Seogu Alley) - an interactive dashboard for tracking merchant statistics in Seogu District. The app displays 119 designated merchant areas with 11,426 stores across 18 administrative districts (dong), featuring both public viewing and admin management capabilities.
 
 ## Development Commands
 
 ### Core Flutter Commands
 - `flutter run -d chrome` - Run the app in Chrome (web platform)
-- `flutter build web` - Build for web deployment
+- `flutter build web` - Build for web deployment  
 - `flutter test` - Run all tests
 - `flutter analyze` - Run static analysis using rules from analysis_options.yaml
 
@@ -22,72 +22,132 @@ This is a Flutter web application called "서구 골목" (Seogu Alley) that disp
 
 ## Architecture
 
-### File Structure
-```
-lib/
-├── app.dart                    # Main app widget with MaterialApp setup
-├── main.dart                   # Entry point
-└── page/
-    ├── home_page.dart          # Main page with dashboard and map layout
-    ├── data/
-    │   ├── dong_list.dart      # Static data for districts and merchants
-    │   └── map_assets.dart     # Map asset configurations
-    └── widget/
-        ├── chart_widget.dart        # Dashboard charts
-        ├── dashboard_widget.dart    # Left panel with statistics
-        ├── floating_action_buttons.dart  # Map controls
-        ├── map_widget.dart         # Interactive map component
-        └── merchant_list_dialog.dart  # Merchant selection dialog
-```
+### Multi-layer Application Structure
+
+The application follows a layered architecture with clear separation of concerns:
+
+1. **Presentation Layer**: UI widgets and pages
+2. **Service Layer**: API communication and data management
+3. **Data Layer**: Models and static data structures
+4. **Core Layer**: Utilities, constants, and configurations
 
 ### Key Components
 
-1. **HomePage (lib/page/home_page.dart:9)**: Main layout with responsive design showing dashboard and map side-by-side with toggle functionality
+#### **HomePage (lib/page/home_page.dart:13)**
+Main application layout with:
+- Responsive dashboard/map toggle functionality
+- Fixed 2560x1440 canvas wrapped in FittedBox for consistent scaling
+- State management for map positioning and fullscreen modes
+- Screenshot capture capabilities
 
-2. **MapWidget (lib/page/widget/map_widget.dart:9)**: Interactive map using InteractiveViewer with:
-   - Layered PNG images for base map, terrain, and labels
-   - Merchant location markers with tooltips
-   - Coordinate copying functionality on tap
-   - Legend controls for layer visibility
+#### **Admin System**
+Complete JWT authentication system with:
+- **AdminService (lib/page/data/admin_service.dart)**: Comprehensive API client with token management
+- **AdminGuard**: Route protection for admin-only pages
+- **AdminDashboardPage**: Full CRUD operations for dashboard data management
+- Auto-logout on token expiration
 
-3. **DashboardWidget (lib/page/widget/dashboard_widget.dart:4)**: Statistics panel showing merchant area completion status
+#### **Interactive Map System (lib/page/widget/map/)**
+Advanced map implementation featuring:
+- Multi-layered rendering (base map, terrain, district overlays, labels)
+- Coordinate-based merchant markers with tooltips
+- District selection with dynamic highlighting
+- Touch interaction with coordinate copying
+- Legend controls for layer visibility
 
-4. **DongList (lib/page/data/dong_list.dart:28)**: Static data structure containing 18 districts with:
-   - 119 total merchant areas
-   - Color-coded regions
-   - Merchant coordinates and names
-   - Area boundaries and assets
+#### **Dashboard System (lib/page/widget/dashboard/)**
+Dynamic data visualization with:
+- Real-time metrics from REST API
+- Chart widgets using fl_chart package
+- Date-based data switching
+- District-specific detailed views
 
-### Data Model
-- **Dong**: Represents administrative district with color, merchant list, area boundaries, and asset paths
-- **Merchant**: Individual merchant with ID, name, and map coordinates (x, y)
+### API Integration
+
+**Dual Environment Setup:**
+- Production: `https://seogu119-api.eyearth.net/api`
+- Development: `http://localhost:8000` (debug mode)
+
+**Service Architecture:**
+- `lib/core/api_service.dart` - Main dashboard data fetching
+- `lib/page/data/admin_service.dart` - Complete admin API operations
+- JWT token management with automatic refresh
+- Error handling with user-friendly feedback
 
 ## Key Dependencies
 
-- `flutter_svg: ^2.0.10+1` - SVG rendering
-- `fl_chart: ^1.0.0` - Chart widgets
-- `fluttertoast: ^8.2.6` - Toast notifications
-- `hawk_fab_menu: ^1.2.0` - Floating action button menu
+### Core Functionality
+- `http: ^1.1.0` - HTTP client for API communication
+- `shared_preferences: ^2.2.2` - Local storage for tokens/settings
+- `jwt_decoder: ^2.0.1` - JWT token parsing and validation
+
+### UI Components
+- `flutter_svg: ^2.0.10+1` - SVG rendering for region overlays
+- `fl_chart: ^1.0.0` - Interactive charts and graphs
+- `glass_kit: ^4.0.1` - Glass morphism UI effects
+- `cached_network_image: ^3.3.1` - Optimized image caching
+- `speech_balloon: ^0.0.3` - Speech bubble tooltips
+
+### Drawing & Screenshots
+- `flutter_drawing_board: ^0.9.8` - Drawing functionality
+- `screenshot: ^3.0.0` - Screenshot capture capabilities
+
+## Data Models
+
+### Core Data Structures
+- **Dong**: Administrative district with merchant lists, boundaries, and assets
+- **Merchant**: Individual merchant with ID, name, and precise map coordinates
+- **DashboardData**: Dynamic metrics fetched from API
+- **AdminUser**: Authentication and session management
+
+### Static vs Dynamic Data
+- **Static**: District boundaries, merchant locations, asset paths (dong_list.dart)
+- **Dynamic**: Dashboard metrics, charts, statistics (API-driven)
 
 ## Asset Management
 
-The app uses extensive image assets organized in:
-- `assets/map/` - Base map images, district overlays, and tags
-- `assets/svg/` - SVG region files (region1.svg to region18.svg)
-- `assets/images/` - General images
-- `assets/temp/` - Temporary files
+**Organized Asset Structure:**
+- `assets/map/` - Base map layers and district-specific overlays
+- `assets/images/` - UI icons and general imagery
+- WebP images for optimal web performance
+- SVG files for scalable region overlays
 
-All assets are declared in pubspec.yaml and loaded via AssetImage.
+**Font Configuration:**
+- Primary: NotoSans (Korean text support)
+- Weights: Regular (400), Bold (700)
+- Proper fallback font handling
 
-## Code Style
+## Routing & Authentication
 
-- Uses standard Flutter/Dart conventions
-- Follows flutter_lints rules from analysis_options.yaml
-- Korean language strings for UI text
-- Responsive design with LayoutBuilder for tablet/desktop layouts
+**Route Structure:**
+- `/` - Public homepage (FittedBox-wrapped for consistent scaling)
+- `/admin` - Admin login page
+- `/admin/dashboard` - Protected admin dashboard
+- `/admin/dong/{dongName}` - District-specific admin views
+
+**Authentication Flow:**
+- JWT token storage in SharedPreferences
+- Automatic token validation on protected routes
+- Graceful fallback to login on auth failure
+
+## Deployment
+
+**AWS Integration:**
+- Automated deployment via CodeBuild (buildspec.yml)
+- S3 hosting with CloudFront CDN
+- Cache invalidation for updated content
+- Environment-specific API endpoint configuration
+
+## Code Style & Standards
+
+- Flutter/Dart conventions with flutter_lints
+- Korean language strings for user-facing text
+- Consistent error handling with try-catch blocks
+- StatefulWidget pattern for component state management
+- Responsive design using LayoutBuilder for different screen sizes
 
 ## Testing
 
-- Single widget test file: `test/widget_test.dart`
-- Run tests with `flutter test`
-- Use `flutter analyze` for static analysis
+- Widget test file: `test/widget_test.dart`
+- Run with `flutter test`
+- Static analysis: `flutter analyze`

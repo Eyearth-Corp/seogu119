@@ -54,7 +54,6 @@ mysql -u admin -p -h 127.0.0.1 -P 23307 < sql/create_database.sql
 
 # 테이블 생성 및 샘플 데이터 삽입
 mysql -u admin -p -h 127.0.0.1 -P 23307 seogu119 < sql/main_data_table.sql
-mysql -u admin -p -h 127.0.0.1 -P 23307 seogu119 < sql/dong_data_table.sql
 ```
 
 ### 3. 관리자 계정 생성
@@ -215,141 +214,6 @@ Content-Type: application/json
 }
 ```
 
-#### 4. 동별 대시보드 데이터 조회 (인증 불필요)
-```http
-GET /api/dong-dashboard/dong/동천동/2025-07-25  # 특정 동의 특정 날짜 데이터
-```
-
-**동별 데이터 구조:**
-```json
-{
-  "success": true,
-  "message": "동천동 대시보드 데이터를 성공적으로 조회했습니다.",
-  "data": {
-    "dongMetrics": [
-      {"title": "🏪 총 상인회", "value": "5", "unit": "개"},
-      {"title": "✨ 가맹률", "value": "92.1", "unit": "%"}
-    ],
-    "complaints": [
-      {"keyword": "주차 문제", "count": 8},
-      {"keyword": "소음 방해", "count": 5}
-    ],
-    "businessTypes": [
-      {"type": "음식점", "count": 2, "percentage": 40.0},
-      {"type": "소매점", "count": 2, "percentage": 30.0}
-    ],
-    "availableDates": ["2025-07-25"],
-    "availableDongs": ["양3동", "광천동", "동천동", "유덕동", "치평동", "풍암동", "금고1동", "금고2동", "농성1동", "농성2동", "상무1동", "상무2동", "화정1동", "화정2동", "화정3동", "화정4동", "서창(마륵)동", "서창(매월)동"]
-  }
-}
-```
-
-#### 5. 동별 대시보드 데이터 생성 (인증 필요)
-```http
-POST /api/dong-dashboard
-Authorization: Bearer {access_token}
-Content-Type: application/json
-
-{
-  "data_date": "2025-07-26",
-  "data_json": {
-    "동천동": {
-      "dongMetrics": [
-        {"title": "🏪 총 상인회", "value": "6", "unit": "개"},
-        {"title": "✨ 가맹률", "value": "94.5", "unit": "%"}
-      ],
-      "weeklyAchievements": [
-        {"title": "신규 가맹", "value": "3개"},
-        {"title": "매출 증가", "value": "12%"}
-      ],
-      "complaints": [
-        {"keyword": "주차 문제", "count": 5},
-        {"keyword": "소음 방해", "count": 3}
-      ],
-      "businessTypes": [
-        {"type": "음식점", "count": 25, "percentage": 45.0},
-        {"type": "소매점", "count": 20, "percentage": 35.0}
-      ]
-    },
-    "유촌동": {
-      "dongMetrics": [
-        {"title": "🏪 총 상인회", "value": "4", "unit": "개"},
-        {"title": "✨ 가맹률", "value": "88.7", "unit": "%"}
-      ],
-      "weeklyAchievements": [
-        {"title": "신규 가맹", "value": "2개"},
-        {"title": "매출 증가", "value": "8%"}
-      ],
-      "complaints": [
-        {"keyword": "배달 문제", "count": 4},
-        {"keyword": "접근성", "count": 2}
-      ],
-      "businessTypes": [
-        {"type": "음식점", "count": 18, "percentage": 40.0},
-        {"type": "서비스업", "count": 15, "percentage": 30.0}
-      ]
-    }
-  }
-}
-```
-
-**응답 예시:**
-```json
-{
-  "success": true,
-  "message": "동별 대시보드 데이터가 성공적으로 생성되었습니다.",
-  "data": {
-    "data_date": "2025-07-26",
-    "created_at": "2025-07-25T17:20:25",
-    "created_by": "admin",
-    "dong_count": 2
-  }
-}
-```
-
-#### 6. 동별 대시보드 데이터 수정 (인증 필요)
-```http
-PUT /api/dong-dashboard/2025-07-26
-Authorization: Bearer {access_token}
-Content-Type: application/json
-
-{
-  "data_json": {
-    "동천동": {
-      "dongMetrics": [
-        {"title": "🏪 총 상인회", "value": "7", "unit": "개"},
-        {"title": "✨ 가맹률", "value": "96.2", "unit": "%"}
-      ],
-      "weeklyAchievements": [
-        {"title": "신규 가맹", "value": "5개"},
-        {"title": "매출 증가", "value": "15%"}
-      ],
-      "complaints": [
-        {"keyword": "주차 문제", "count": 3},
-        {"keyword": "소음 방해", "count": 2}
-      ],
-      "businessTypes": [
-        {"type": "음식점", "count": 28, "percentage": 50.0},
-        {"type": "소매점", "count": 18, "percentage": 32.0}
-      ]
-    }
-  }
-}
-```
-
-**응답 예시:**
-```json
-{
-  "success": true,
-  "message": "동별 대시보드 데이터가 성공적으로 수정되었습니다.",
-  "data": {
-    "data_date": "2025-07-26",
-    "updated_at": "2025-07-25T17:25:30",
-    "updated_by": "admin",
-    "dong_count": 1
-  }
-}
-```
 
 ### 관리자 정보 API
 
@@ -379,13 +243,11 @@ Authorization: Bearer {access_token}
 - `PUT /api/admin/change-password` - 비밀번호 변경
 - `POST /api/main-dashboard` - 메인 데이터 생성
 - `PUT /api/main-dashboard/{date}` - 메인 데이터 수정
-- `PUT /api/dong-dashboard/dong/{dong_name}/{date}` - 특정 동 데이터 수정
 
 ### 인증이 불필요한 엔드포인트
 - `GET /` - Health Check
 - `GET /api/main-dashboard` - 메인 대시보드 데이터 조회
 - `GET /api/main-dashboard/{date}` - 특정 날짜 메인 데이터 조회
-- `GET /api/dong-dashboard/dong/{dong_name}/{date}` - 특정 동의 특정 날짜 데이터 조회
 
 ### 에러 응답
 ```json
@@ -404,15 +266,12 @@ Authorization: Bearer {access_token}
 
 ### 주요 테이블
 - **main_data**: 메인 대시보드 데이터 (JSON 형태)
-- **dong_data**: 동별 대시보드 데이터 (JSON 형태)
 - **admins**: 관리자 계정 정보
 
 ### 데이터 구조
 - **main_data**: Primary Key: `data_date` (DATE 타입)
-- **dong_data**: Primary Key: `(dong, data_date)` (복합키)
 - JSON 컬럼을 사용한 유연한 데이터 저장
 - 날짜별 데이터 버전 관리
-- 동별 개별 레코드 관리
 
 ## 🔧 기술 스택
 
@@ -432,10 +291,9 @@ Authorization: Bearer {access_token}
    - POST/PUT/DELETE 엔드포인트: JWT 토큰 인증 필요
 2. **날짜별 데이터 관리**: 각 수집일별로 독립적인 데이터 관리
 3. **메인 대시보드**: 서구 전체 가맹점 현황 및 통계
-4. **동별 대시보드**: 각 동별 상세 현황 및 분석
-5. **완전한 CRUD API**: 데이터 생성, 조회, 수정 지원
-6. **실시간 API**: RESTful API를 통한 데이터 제공
-7. **관리자 관리**: 비밀번호 변경 및 계정 정보 관리
+4. **완전한 CRUD API**: 데이터 생성, 조회, 수정 지원
+5. **실시간 API**: RESTful API를 통한 데이터 제공
+6. **관리자 관리**: 비밀번호 변경 및 계정 정보 관리
 
 ## 🚀 배포 가이드
 
@@ -517,7 +375,6 @@ mysql -u admin -p -h 127.0.0.1 -P 23307 < sql/create_database.sql
 
 # 테이블 생성 및 샘플 데이터 삽입
 mysql -u admin -p -h 127.0.0.1 -P 23307 seogu119 < sql/main_data_table.sql
-mysql -u admin -p -h 127.0.0.1 -P 23307 seogu119 < sql/dong_data_table.sql
 ```
 
 ### 3. 관리자 계정 생성
@@ -678,141 +535,6 @@ Content-Type: application/json
 }
 ```
 
-#### 4. 동별 대시보드 데이터 조회 (인증 불필요)
-```http
-GET /api/dong-dashboard/dong/동천동/2025-07-25  # 특정 동의 특정 날짜 데이터
-```
-
-**동별 데이터 구조:**
-```json
-{
-  "success": true,
-  "message": "동천동 대시보드 데이터를 성공적으로 조회했습니다.",
-  "data": {
-    "dongMetrics": [
-      {"title": "🏪 총 상인회", "value": "5", "unit": "개"},
-      {"title": "✨ 가맹률", "value": "92.1", "unit": "%"}
-    ],
-    "complaints": [
-      {"keyword": "주차 문제", "count": 8},
-      {"keyword": "소음 방해", "count": 5}
-    ],
-    "businessTypes": [
-      {"type": "음식점", "count": 2, "percentage": 40.0},
-      {"type": "소매점", "count": 2, "percentage": 30.0}
-    ],
-    "availableDates": ["2025-07-25"],
-    "availableDongs": ["양3동", "광천동", "동천동", "유덕동", "치평동", "풍암동", "금고1동", "금고2동", "농성1동", "농성2동", "상무1동", "상무2동", "화정1동", "화정2동", "화정3동", "화정4동", "서창(마륵)동", "서창(매월)동"]
-  }
-}
-```
-
-#### 5. 동별 대시보드 데이터 생성 (인증 필요)
-```http
-POST /api/dong-dashboard
-Authorization: Bearer {access_token}
-Content-Type: application/json
-
-{
-  "data_date": "2025-07-26",
-  "data_json": {
-    "동천동": {
-      "dongMetrics": [
-        {"title": "🏪 총 상인회", "value": "6", "unit": "개"},
-        {"title": "✨ 가맹률", "value": "94.5", "unit": "%"}
-      ],
-      "weeklyAchievements": [
-        {"title": "신규 가맹", "value": "3개"},
-        {"title": "매출 증가", "value": "12%"}
-      ],
-      "complaints": [
-        {"keyword": "주차 문제", "count": 5},
-        {"keyword": "소음 방해", "count": 3}
-      ],
-      "businessTypes": [
-        {"type": "음식점", "count": 25, "percentage": 45.0},
-        {"type": "소매점", "count": 20, "percentage": 35.0}
-      ]
-    },
-    "유촌동": {
-      "dongMetrics": [
-        {"title": "🏪 총 상인회", "value": "4", "unit": "개"},
-        {"title": "✨ 가맹률", "value": "88.7", "unit": "%"}
-      ],
-      "weeklyAchievements": [
-        {"title": "신규 가맹", "value": "2개"},
-        {"title": "매출 증가", "value": "8%"}
-      ],
-      "complaints": [
-        {"keyword": "배달 문제", "count": 4},
-        {"keyword": "접근성", "count": 2}
-      ],
-      "businessTypes": [
-        {"type": "음식점", "count": 18, "percentage": 40.0},
-        {"type": "서비스업", "count": 15, "percentage": 30.0}
-      ]
-    }
-  }
-}
-```
-
-**응답 예시:**
-```json
-{
-  "success": true,
-  "message": "동별 대시보드 데이터가 성공적으로 생성되었습니다.",
-  "data": {
-    "data_date": "2025-07-26",
-    "created_at": "2025-07-25T17:20:25",
-    "created_by": "admin",
-    "dong_count": 2
-  }
-}
-```
-
-#### 6. 동별 대시보드 데이터 수정 (인증 필요)
-```http
-PUT /api/dong-dashboard/2025-07-26
-Authorization: Bearer {access_token}
-Content-Type: application/json
-
-{
-  "data_json": {
-    "동천동": {
-      "dongMetrics": [
-        {"title": "🏪 총 상인회", "value": "7", "unit": "개"},
-        {"title": "✨ 가맹률", "value": "96.2", "unit": "%"}
-      ],
-      "weeklyAchievements": [
-        {"title": "신규 가맹", "value": "5개"},
-        {"title": "매출 증가", "value": "15%"}
-      ],
-      "complaints": [
-        {"keyword": "주차 문제", "count": 3},
-        {"keyword": "소음 방해", "count": 2}
-      ],
-      "businessTypes": [
-        {"type": "음식점", "count": 28, "percentage": 50.0},
-        {"type": "소매점", "count": 18, "percentage": 32.0}
-      ]
-    }
-  }
-}
-```
-
-**응답 예시:**
-```json
-{
-  "success": true,
-  "message": "동별 대시보드 데이터가 성공적으로 수정되었습니다.",
-  "data": {
-    "data_date": "2025-07-26",
-    "updated_at": "2025-07-25T17:25:30",
-    "updated_by": "admin",
-    "dong_count": 1
-  }
-}
-```
 
 ### 관리자 정보 API
 
@@ -842,13 +564,11 @@ Authorization: Bearer {access_token}
 - `PUT /api/admin/change-password` - 비밀번호 변경
 - `POST /api/main-dashboard` - 메인 데이터 생성
 - `PUT /api/main-dashboard/{date}` - 메인 데이터 수정
-- `PUT /api/dong-dashboard/dong/{dong_name}/{date}` - 특정 동 데이터 수정
 
 ### 인증이 불필요한 엔드포인트
 - `GET /` - Health Check
 - `GET /api/main-dashboard` - 메인 대시보드 데이터 조회
 - `GET /api/main-dashboard/{date}` - 특정 날짜 메인 데이터 조회
-- `GET /api/dong-dashboard/dong/{dong_name}/{date}` - 특정 동의 특정 날짜 데이터 조회
 
 ### 에러 응답
 ```json
@@ -867,15 +587,12 @@ Authorization: Bearer {access_token}
 
 ### 주요 테이블
 - **main_data**: 메인 대시보드 데이터 (JSON 형태)
-- **dong_data**: 동별 대시보드 데이터 (JSON 형태)
 - **admins**: 관리자 계정 정보
 
 ### 데이터 구조
 - **main_data**: Primary Key: `data_date` (DATE 타입)
-- **dong_data**: Primary Key: `(dong, data_date)` (복합키)
 - JSON 컬럼을 사용한 유연한 데이터 저장
 - 날짜별 데이터 버전 관리
-- 동별 개별 레코드 관리
 
 ## 🔧 기술 스택
 
@@ -895,10 +612,9 @@ Authorization: Bearer {access_token}
    - POST/PUT/DELETE 엔드포인트: JWT 토큰 인증 필요
 2. **날짜별 데이터 관리**: 각 수집일별로 독립적인 데이터 관리
 3. **메인 대시보드**: 서구 전체 가맹점 현황 및 통계
-4. **동별 대시보드**: 각 동별 상세 현황 및 분석
-5. **완전한 CRUD API**: 데이터 생성, 조회, 수정 지원
-6. **실시간 API**: RESTful API를 통한 데이터 제공
-7. **관리자 관리**: 비밀번호 변경 및 계정 정보 관리
+4. **완전한 CRUD API**: 데이터 생성, 조회, 수정 지원
+5. **실시간 API**: RESTful API를 통한 데이터 제공
+6. **관리자 관리**: 비밀번호 변경 및 계정 정보 관리
 
 ## 🚀 배포 가이드
 

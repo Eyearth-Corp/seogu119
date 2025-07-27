@@ -6,7 +6,6 @@ import 'dart:html' as html;
 import 'widget/floating_action_buttons.dart';
 import 'widget/map_widget.dart';
 import 'widget/dashboard/main_dashboard.dart';
-import 'widget/dashboard/dong_dashboard.dart';
 import 'data/dong_list.dart';
 import '../core/colors.dart';
 
@@ -93,15 +92,6 @@ class _HomePageState extends State<HomePage> {
 
   /// 대시보드 공간 - 8개 섹션으로 구성
   Widget _buildDashboardSpace() {
-    if (_selectedDong != null) {
-      return DongDashboard(
-        key: ValueKey('dong_dashboard_${_selectedDong!.name}'),
-        onBackPressed: () => _onDongSelected(null),
-        onMerchantSelected: _navigateToMerchant,
-        dong: _selectedDong!,
-      );
-    }
-
     return const MainDashboard(key: ValueKey('main_dashboard'));
   }
 
