@@ -675,36 +675,50 @@ class _DongDashboardState extends State<DongDashboard> {
   Widget _buildNoticeItem(NoticeInfo notice) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: SeoguColors.primary,
-              borderRadius: BorderRadius.circular(3),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              notice.title,
-              style: const TextStyle(
-                fontSize: 19,
-                color: SeoguColors.textPrimary,
+      child: InkWell(
+        onTap: () => _showNoticeDetailDialog(notice),
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          child: Row(
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: SeoguColors.primary,
+                  borderRadius: BorderRadius.circular(3),
+                ),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  notice.title,
+                  style: const TextStyle(
+                    fontSize: 19,
+                    color: SeoguColors.textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.arrow_forward_ios,
+                size: 12,
+                color: SeoguColors.textSecondary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _formatDate(notice.createdAt),
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: SeoguColors.textSecondary,
+                ),
+              ),
+            ],
           ),
-          Text(
-            _formatDate(notice.createdAt),
-            style: const TextStyle(
-              fontSize: 13,
-              color: SeoguColors.textSecondary,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -751,6 +765,164 @@ class _DongDashboardState extends State<DongDashboard> {
       return '${date.month}/${date.day}';
     } catch (e) {
       return '';
+    }
+  }
+
+  /// 공지사항 상세보기 다이얼로그
+  void _showNoticeDetailDialog(NoticeInfo notice) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            constraints: BoxConstraints(
+              maxWidth: 600,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 헤더
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: SeoguColors.primary.withOpacity(0.1),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: SeoguColors.primary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.campaign,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '공지사항 상세보기',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: SeoguColors.primary,
+                              ),
+                            ),
+                            Text(
+                              _formatDetailDate(notice.createdAt),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: SeoguColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(
+                          Icons.close,
+                          color: SeoguColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // 내용
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 제목
+                        Text(
+                          notice.title,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: SeoguColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Divider(),
+                        const SizedBox(height: 16),
+                        // 내용
+                        Text(
+                          notice.content.isNotEmpty ? notice.content : '내용이 없습니다.',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: SeoguColors.textPrimary,
+                            height: 1.6,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // 하단 버튼
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(16),
+                      bottomRight: Radius.circular(16),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          backgroundColor: SeoguColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          '닫기',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// 상세 날짜 포맷팅
+  String _formatDetailDate(String dateString) {
+    try {
+      final date = DateTime.parse(dateString);
+      return '${date.year}년 ${date.month}월 ${date.day}일';
+    } catch (e) {
+      return dateString;
     }
   }
 }
