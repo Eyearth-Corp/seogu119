@@ -844,43 +844,46 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       builder: (context) => AlertDialog(
         title: const Text('새 민원 사례 추가'),
         content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: '제목',
-                  hintText: '예: 동천동 주차장 확장',
-                  border: OutlineInputBorder(),
+          child: Container(
+            width: 660,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: '제목',
+                    hintText: '예: 동천동 주차장 확장',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: statusController.text,
-                decoration: const InputDecoration(
-                  labelText: '상태',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: statusController.text,
+                  decoration: const InputDecoration(
+                    labelText: '상태',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: '해결', child: Text('해결')),
+                    DropdownMenuItem(value: '진행중', child: Text('진행중')),
+                  ],
+                  onChanged: (value) {
+                    statusController.text = value ?? '진행중';
+                  },
                 ),
-                items: const [
-                  DropdownMenuItem(value: '해결', child: Text('해결')),
-                  DropdownMenuItem(value: '진행중', child: Text('진행중')),
-                ],
-                onChanged: (value) {
-                  statusController.text = value ?? '진행중';
-                },
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: detailController,
-                decoration: const InputDecoration(
-                  labelText: '상세 내용',
-                  hintText: '민원 해결 과정에 대한 설명을 입력하세요',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: detailController,
+                  decoration: const InputDecoration(
+                    labelText: '상세 내용',
+                    hintText: '민원 해결 과정에 대한 설명을 입력하세요',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
                 ),
-                maxLines: 3,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         actions: [
@@ -891,9 +894,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             child: const Text('추가'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: SeoguColors.primary,
-            ),
           ),
         ],
       ),
@@ -1138,11 +1138,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                           const SizedBox(height: 20),
                           _buildComplaintKeywords(),
                           const SizedBox(height: 20),
-                          _buildComplaintPerformance(),
-                          const SizedBox(height: 20),
                           _buildComplaintCases(),
                           const SizedBox(height: 20),
                           _buildOtherOrganizationTrends(),
+                          const SizedBox(height: 20),
+                          _buildComplaintPerformance(),
                           const SizedBox(height: 80), // 버튼 공간 확보
                         ],
                       ),
@@ -1723,64 +1723,60 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   Widget _buildEditableCaseItem(String title, String status, String detail, String editKeyPrefix, int index) {
     final isCompleted = status == '해결';
     return Expanded(
-      child: InkWell(
-        onTap: () => _showEditDialog('$editKeyPrefix.title', '사례 제목', title),
-        child: Row(
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: isCompleted ? SeoguColors.success : SeoguColors.warning,
-                borderRadius: BorderRadius.circular(4),
-              ),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: isCompleted ? SeoguColors.success : SeoguColors.warning,
+              borderRadius: BorderRadius.circular(4),
             ),
-            const SizedBox(width: 10),
-            Expanded(
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 19,
+                color: SeoguColors.textPrimary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          InkWell(
+            onTap: () => _showEditDialog('$editKeyPrefix.status', '상태', status),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: isCompleted
+                    ? SeoguColors.success.withOpacity(0.1)
+                    : SeoguColors.warning.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 19,
-                  color: SeoguColors.textPrimary,
+                status,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: isCompleted ? SeoguColors.success : SeoguColors.warning,
                   decoration: TextDecoration.underline,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
-            InkWell(
-              onTap: () => _showEditDialog('$editKeyPrefix.status', '상태', status),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: isCompleted 
-                      ? SeoguColors.success.withOpacity(0.1)
-                      : SeoguColors.warning.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  status,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: isCompleted ? SeoguColors.success : SeoguColors.warning,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, size: 16),
+            color: Colors.red.shade400,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            onPressed: () => _showDeleteConfirmationDialog(
+              title,
+              () => _deleteComplaintCase(index),
             ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline, size: 16),
-              color: Colors.red.shade400,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              onPressed: () => _showDeleteConfirmationDialog(
-                title,
-                () => _deleteComplaintCase(index),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1788,96 +1784,99 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   Widget _buildComplaintPerformance() {
     final perfData = _editedData['complaintPerformance'] as Map<String, dynamic>? ?? {};
     
-    return Container(
-      height: 160,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            perfData['title'] ?? '📋 민원처리 실적',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
+    return Opacity(
+      opacity: 0.5,
+      child: Container(
+        height: 160,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: SeoguColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
-                      '처리됨',
-                      style: TextStyle(
-                        fontSize: 19,
-                        color: Color(0xFF64748B),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    InkWell(
-                      onTap: () => _showEditDialog('complaintPerformance.processed', '처리된 민원', perfData['processed']),
-                      child: Text(
-                        perfData['processed']?.toString() ?? '187건',
-                        style: const TextStyle(
-                          fontSize: 23,
-                          fontWeight: FontWeight.bold,
-                          color: SeoguColors.success,
-                          decoration: TextDecoration.underline,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              perfData['title'] ?? '📋 민원처리 실적',
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: SeoguColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text(
+                        '처리됨',
+                        style: TextStyle(
+                          fontSize: 19,
+                          color: Color(0xFF64748B),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 40,
-                color: const Color(0xFFE2E8F0),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
-                      '처리율',
-                      style: TextStyle(
-                        fontSize: 19,
-                        color: Color(0xFF64748B),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    InkWell(
-                      onTap: () => _showEditDialog('complaintPerformance.rate', '처리율', perfData['rate']),
-                      child: Text(
-                        perfData['rate']?.toString() ?? '94.2%',
-                        style: const TextStyle(
-                          fontSize: 23,
-                          fontWeight: FontWeight.bold,
-                          color: SeoguColors.info,
-                          decoration: TextDecoration.underline,
+                      const SizedBox(height: 6),
+                      InkWell(
+                        onTap: () => _showEditDialog('complaintPerformance.processed', '처리된 민원', perfData['processed']),
+                        child: Text(
+                          perfData['processed']?.toString() ?? '187건',
+                          style: const TextStyle(
+                            fontSize: 23,
+                            fontWeight: FontWeight.bold,
+                            color: SeoguColors.success,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                Container(
+                  width: 1,
+                  height: 40,
+                  color: const Color(0xFFE2E8F0),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text(
+                        '처리율',
+                        style: TextStyle(
+                          fontSize: 19,
+                          color: Color(0xFF64748B),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      InkWell(
+                        onTap: () => _showEditDialog('complaintPerformance.rate', '처리율', perfData['rate']),
+                        child: Text(
+                          perfData['rate']?.toString() ?? '94.2%',
+                          style: const TextStyle(
+                            fontSize: 23,
+                            fontWeight: FontWeight.bold,
+                            color: SeoguColors.info,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1945,43 +1944,39 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   Widget _buildEditableTrendItem(String title, String detail, String editKeyPrefix, int index) {
     return Expanded(
-      child: InkWell(
-        onTap: () => _showEditDialog('$editKeyPrefix.title', '동향 제목', title),
-        child: Row(
-          children: [
-            Container(
-              width: 4,
-              height: 4,
-              decoration: BoxDecoration(
-                color: const Color(0xFF64748B),
-                borderRadius: BorderRadius.circular(2),
-              ),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 4,
+            decoration: BoxDecoration(
+              color: const Color(0xFF64748B),
+              borderRadius: BorderRadius.circular(2),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 19,
-                  color: SeoguColors.textPrimary,
-                  decoration: TextDecoration.underline,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 19,
+                color: SeoguColors.textPrimary,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline, size: 16),
-              color: Colors.red.shade400,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              onPressed: () => _showDeleteConfirmationDialog(
-                title,
-                () => _deleteOrganizationTrend(index),
-              ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, size: 16),
+            color: Colors.red.shade400,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            onPressed: () => _showDeleteConfirmationDialog(
+              title,
+              () => _deleteOrganizationTrend(index),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
