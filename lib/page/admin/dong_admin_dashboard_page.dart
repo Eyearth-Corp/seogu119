@@ -332,7 +332,7 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
               Expanded(
                 child: _buildSummaryCard(
                   '전체 가맹률',
-                  '${_districtData!['overall_membership_rate'].toStringAsFixed(1)}%',
+                  '${_districtData!['overall_membership_rate']}%',
                   SeoguColors.info,
                 ),
               ),
@@ -435,7 +435,7 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
 
   /// 상인회 아이템
   Widget _buildMerchantItem(Map<String, dynamic> merchant) {
-    final membershipRate = (merchant['membership_rate'] * 100);
+    final membershipRate = _parseToDouble(merchant['membership_rate']) * 100;
     
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 8),
@@ -627,6 +627,21 @@ class _DongAdminDashboardPageState extends State<DongAdminDashboardPage> {
     } catch (e) {
       return dateString;
     }
+  }
+
+  /// String 또는 숫자를 안전하게 double로 변환
+  double _parseToDouble(dynamic value) {
+    if (value == null) return 0.0;
+    
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      // 반복된 값이 있는 경우 (예: "0.5920.5920.592...") 첫 번째 값만 사용
+      final cleanValue = value.replaceAll(RegExp(r'([0-9]*\.?[0-9]+).*'), r'$1');
+      return double.tryParse(cleanValue) ?? 0.0;
+    }
+    
+    return 0.0;
   }
 }
 
