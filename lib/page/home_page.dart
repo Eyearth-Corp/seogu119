@@ -180,7 +180,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const Spacer(),
             const Text(
-              '광주광역시 서구 골목경제 119 상황판',
+              '* 광주광역시 서구 골목경제 119 상황판',
               style: TextStyle(
                 fontSize: 34,
                 fontWeight: FontWeight.bold,
