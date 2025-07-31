@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/services.dart';
+import 'dart:convert';
 import '../../../core/colors.dart';
 import '../../data/main_data_parser.dart';
-import '../../../services/api_service.dart';
 
 class MainDashboard extends StatefulWidget {
   const MainDashboard({super.key});
@@ -23,8 +24,9 @@ class _MainDashboardState extends State<MainDashboard> {
 
   Future<void> _loadDashboardData() async {
     try {
-      final apiData = await ApiService.getMainDashboard();
-      final data = MainDashboardData.fromMap(apiData);
+      final String jsonString = await rootBundle.loadString('assets/data/main_temp.json');
+      final Map<String, dynamic> jsonData = json.decode(jsonString);
+      final data = MainDashboardData.fromMap(jsonData);
       if (mounted) {
         setState(() {
           _dashboardData = data;
