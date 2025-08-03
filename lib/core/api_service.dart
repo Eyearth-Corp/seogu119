@@ -33,30 +33,6 @@ class ApiService {
     }
   }
 
-  static Future<bool> updateMainDashboard(MainDashboardData data, String? token) async {
-    try {
-      final headers = <String, String>{
-        'Content-Type': 'application/json',
-      };
-      
-      if (token != null) {
-        headers['Authorization'] = 'Bearer $token';
-      }
-
-      final response = await http.post(
-        Uri.parse('$baseUrl/main-dashboard'),
-        headers: headers,
-        body: json.encode({
-          'data_json': _formatDashboardDataForAPI(data)
-        }),
-      );
-
-      return response.statusCode == 200;
-    } catch (e) {
-      print('Update API Error: $e');
-      return false;
-    }
-  }
 
   // 새로운 Districts API 메소드들
   static Future<List<District>> getAllDistricts() async {
@@ -138,65 +114,6 @@ class ApiService {
       print('Statistics API Error: $e');
       throw Exception('Network error: $e');
     }
-  }
-
-  /// API 요구사항에 맞는 형식으로 대시보드 데이터 변환
-  static Map<String, dynamic> _formatDashboardDataForAPI(MainDashboardData data) {
-    return {
-      'topMetrics': data.topMetrics.map((metric) => metric.toJson()).toList(),
-      'trendChart': {
-        'title': '📈 온누리 가맹점 추이',
-        'data': [
-          {'x': 0, 'y': 75},
-          {'x': 1, 'y': 78},
-          {'x': 2, 'y': 82},
-          {'x': 3, 'y': 80},
-          {'x': 4, 'y': 85},
-          {'x': 5, 'y': 87}
-        ]
-      },
-      'dongMembership': {
-        'title': '🗺️ 동별 가맹률 현황',
-        'data': [
-          {'name': '동천동', 'percentage': 92.1},
-          {'name': '유촌동', 'percentage': 88.3},
-          {'name': '치평동', 'percentage': 85.7}
-        ]
-      },
-      'complaintKeywords': {
-        'title': '🔥 민원 TOP 3 키워드',
-        'data': data.complaintKeywords.map((item) => {
-          'rank': item.rank,
-          'keyword': item.keyword,
-          'count': item.count
-        }).toList()
-      },
-      'complaintCases': {
-        'title': '✅ 민원 해결 사례',
-        'data': data.complaintCases.map((item) => {
-          'title': item.title,
-          'status': item.status,
-          'detail': item.detail
-        }).toList()
-      },
-      'complaintPerformance': {
-        'title': '📋 민원처리 실적',
-        'processed': data.processedComplaints,
-        'rate': '${data.processingRate}%'
-      },
-      'organizationTrends': {
-        'title': '🌐 타 기관·지자체 주요 동향',
-        'data': data.otherOrganizationTrends.map((item) => {
-          'title': item.title,
-          'detail': item.detail
-        }).toList()
-      },
-      'weeklyAchievements': [
-        {'title': '신규 가맹점', 'value': '${data.newMerchants}개'},
-        {'title': '민원 해결', 'value': '${data.resolvedComplaints}건'},
-        {'title': '지원 예산', 'value': '${data.supportBudget}억'}
-      ]
-    };
   }
 }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/services.dart';
-import 'dart:convert';
+import 'package:screenshot/screenshot.dart';
 import '../../../core/colors.dart';
 import '../../data/main_data_parser.dart';
 
@@ -13,7 +13,6 @@ class MainDashboard extends StatefulWidget {
 }
 
 class _MainDashboardState extends State<MainDashboard> {
-  MainDashboardData? _dashboardData;
   bool _isLoading = true;
 
   @override
@@ -23,23 +22,10 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   Future<void> _loadDashboardData() async {
-    try {
-      final String jsonString = await rootBundle.loadString('assets/data/main_temp.json');
-      final Map<String, dynamic> jsonData = json.decode(jsonString);
-      final data = MainDashboardData.fromMap(jsonData);
-      if (mounted) {
-        setState(() {
-          _dashboardData = data;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      print('Error loading dashboard data: $e');
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -65,25 +51,6 @@ class _MainDashboardState extends State<MainDashboard> {
       );
     }
 
-    if (_dashboardData == null) {
-      return Container(
-        margin: const EdgeInsets.all(12.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.blue.shade50,
-              Colors.indigo.shade100,
-            ],
-          ),
-        ),
-        child: const Center(
-          child: Text('데이터를 불러올 수 없습니다.'),
-        ),
-      );
-    }
     return Container(
       margin: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
@@ -111,29 +78,68 @@ class _MainDashboardState extends State<MainDashboard> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              // 상단 메트릭 카드들
-              _buildTopMetrics(),
+              // 타입 1
+              _buildType1(),
               const SizedBox(height: 20),
-              // // 하단 주요 성과
-              // _buildWeeklyAchievements(),
-              // const SizedBox(height: 20),
-              // 온누리 가맹점 추이
-              _buildOnNuriTrendChart(),
+
+              // 타입 2
+              _buildType2('🎯 타입 2'),
               const SizedBox(height: 20),
-              //동별 가맹률 현황
-              _buildDongMembershipStatus(),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: _buildType3('🔥 타입 3'),
+                  ),
+                  SizedBox(width: 20),
+                  Expanded(
+                    child: _buildType4('📋 타입 4', '1건', '10%')
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
-              // 민원 TOP 3 키워드
-              _buildComplaintKeywords(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: _buildBbs1('✅ BBS 1'),
+                  ),
+                  SizedBox(width: 20),
+                  Expanded(
+                    child: _buildBbs2('🌐 BBS 2'),
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
-              // 민원 처리 실적
-              // 안보이게 처리
-              // _buildComplaintPerformance(),
-              // const SizedBox(height: 20),
-              _buildComplaintCases(context),
+
+              // 타입 3
+              _buildType3('🔥 타입 3'),
               const SizedBox(height: 20),
-              _buildOtherOrganizationTrends(context),
+
+              //타입 4
+              _buildType4('📋 타입 4', '1건', '10%'),
               const SizedBox(height: 20),
+
+              //게시판 1
+              _buildBbs1('✅ BBS 1'),
+              const SizedBox(height: 20),
+
+              //게시판 2
+              _buildBbs2('🌐 BBS 2'),
+              const SizedBox(height: 20),
+
+              // 차트
+              _buildChart('🔥 차트'),
+              const SizedBox(height: 20),
+
+              // 동별 가맹률 현황
+              _buildPercent('🗺️ 퍼센트'),
+              const SizedBox(height: 20),
+
+
             ],
           ),
         ),
@@ -169,10 +175,43 @@ class _MainDashboardState extends State<MainDashboard> {
     );
   }
 
-  /// 상단 메트릭 카드들을 생성합니다.
-  /// JSON 데이터에서 로드된 메트릭 정보를 표시합니다.
-  Widget _buildTopMetrics() {
-    final metrics = _dashboardData?.topMetrics ?? [];
+  Widget baseView({required Widget child}) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  // 타입 1
+  Widget _buildType1() {
+    List<Type1Data> metrics  = [
+      Type1Data(
+        title: '제목 1',
+        value: '1',
+        unit: '건',
+      ),
+      Type1Data(
+        title: '제목 2',
+        value: '2',
+        unit: '건',
+      ),
+      Type1Data(
+        title: '제목 3',
+        value: '3',
+        unit: '건',
+      )
+    ];
     
     if (metrics.isEmpty) {
       return _buildEmptyDataMessage();
@@ -184,7 +223,7 @@ class _MainDashboardState extends State<MainDashboard> {
     for (int i = 0; i < metrics.length; i++) {
       list.add(
         Expanded(
-          child: _buildMetricCard(
+          child: _buildType1Item(
             metrics[i].title,
             metrics[i].value,
             metrics[i].unit,
@@ -201,13 +240,7 @@ class _MainDashboardState extends State<MainDashboard> {
       ],
     );
   }
-
-  /// 개별 메트릭 카드를 생성합니다.
-  /// [title]: 카드 제목 (예: '전체 가맹점')  
-  /// [value]: 수치 값 (예: '11,426')
-  /// [unit]: 단위 (예: '개', '%')
-  /// [color]: 강조색 (주로 서구 브랜드 컬러)
-  Widget _buildMetricCard(String title, String value, String unit, Color color) {
+  Widget _buildType1Item(String title, String value, String unit, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -263,9 +296,348 @@ class _MainDashboardState extends State<MainDashboard> {
     );
   }
 
-  // 2. 온누리 가맹점 추이
-  Widget _buildOnNuriTrendChart() {
-    final trendChart = _dashboardData?.trendChart;
+  // 타입 2
+  Widget _buildType2(String title) {
+    final achievements = [
+      Type2Data(
+        title: '1',
+        value: '1',
+      ),
+      Type2Data(
+        title: '2',
+        value: '2',
+      ),
+      Type2Data(
+        title: '3',
+        value: '3',
+      ),
+    ];
+
+    if (achievements.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+
+    final colors = [SeoguColors.secondary, SeoguColors.primary, SeoguColors.accent];
+
+    List<Widget> list = [];
+
+    for (int i = 0; i < achievements.length; i++) {
+      list.add(
+          Expanded(
+            child: _buildType2Item(
+              achievements[i].title,
+              achievements[i].value,
+              i < colors.length ? colors[i] : SeoguColors.primary,
+            ),
+          )
+      );
+      if (i < achievements.length - 1) list.add(const SizedBox(width: 16));
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
+              color: SeoguColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              ...list
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+  Widget _buildType2Item(String title, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 19,
+              color: Color(0xFF64748B),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 타입 3
+  Widget _buildType3(String title) {
+    final type3Data = Type3Data(
+        title: '1위 타이틀',
+        data: [
+          Type3ItemData(
+              rank: '1',
+              keyword: '1위',
+              count: 1
+          ),
+          Type3ItemData(
+              rank: '2',
+              keyword: '2위',
+              count: 2
+          )
+        ]
+    );
+    final keywordData = type3Data.data ?? [];
+
+    if (keywordData.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+
+    // 순위별 색상 지정 (1=highlight, 2=warning, 3=primary)
+    Color getColorByRank(String rank) {
+      switch (rank) {
+        case '1':
+          return SeoguColors.highlight;
+        case '2':
+          return SeoguColors.warning;
+        case '3':
+          return SeoguColors.primary;
+        default:
+          return SeoguColors.primary;
+      }
+    }
+
+    return Container(
+      height: 160,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
+              color: SeoguColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: Row(
+              children: keywordData.map((data) {
+                return _buildType3Item(
+                  data.rank,
+                  data.keyword,
+                  data.count,
+                  getColorByRank(data.rank),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  Widget _buildType3Item(String rank, String keyword, int count, Color color) {
+    return Expanded(
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    rank,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: SeoguColors.surface,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                keyword,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: SeoguColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '$count건',
+            style: const TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF64748B),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 타입 4
+  Widget _buildType4(String title, processed, rate) {
+    final complaintPerformance = Type4Data(
+        title: title,
+        processed: processed,
+        rate: rate
+    );
+
+    return Container(
+      height: 160,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
+              color: SeoguColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text(
+                      '처리됨',
+                      style: TextStyle(
+                        fontSize: 19,
+                        color: Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      complaintPerformance?.processed ?? '0건',
+                      style: const TextStyle(
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                        color: SeoguColors.success,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 1,
+                height: 40,
+                color: const Color(0xFFE2E8F0),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text(
+                      '처리율',
+                      style: TextStyle(
+                        fontSize: 19,
+                        color: Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      complaintPerformance?.rate ?? '0%',
+                      style: const TextStyle(
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                        color: SeoguColors.info,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 차트
+  Widget _buildChart(String title) {
+    final trendChart = ChartData(
+      title: title,
+      data: [
+        ChartDataPoint(
+          x: 1, y: 10
+        ),
+        ChartDataPoint(
+            x: 2, y: 20
+        )
+      ],
+    );
     final chartData = trendChart?.data ?? [];
     
     if (chartData.isEmpty) {
@@ -383,9 +755,19 @@ class _MainDashboardState extends State<MainDashboard> {
     );
   }
 
-  // 3. 동별 가맹률 현황
-  Widget _buildDongMembershipStatus() {
-    final dongMembership = _dashboardData?.dongMembership;
+  // 퍼센트
+  Widget _buildPercent(String title) {
+    final dongMembership = PercentData(
+        title: '퍼센트',
+        data: [
+          PercentItemData(
+              name: '1번', percentage: 10
+          ),
+          PercentItemData(
+              name: '2번', percentage: 20
+          )
+        ]
+    );
     final membershipData = dongMembership?.data ?? [];
     
     if (membershipData.isEmpty) {
@@ -411,7 +793,7 @@ class _MainDashboardState extends State<MainDashboard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            dongMembership?.title ?? '🗺️ 동별 가맹률 현황',
+            title,
             style: const TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.bold,
@@ -423,14 +805,13 @@ class _MainDashboardState extends State<MainDashboard> {
             final index = entry.key;
             final data = entry.value;
             final color = index < colors.length ? colors[index] : SeoguColors.primary;
-            return _buildDongStatusItem(data.name, data.percentage, color);
+            return _buildPercentItem(data.name, data.percentage, color);
           }).toList(),
         ],
       ),
     );
   }
-
-  Widget _buildDongStatusItem(String dongName, double percentage, Color color) {
+  Widget _buildPercentItem(String dongName, double percentage, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
@@ -495,129 +876,17 @@ class _MainDashboardState extends State<MainDashboard> {
     );
   }
 
-  // 4. 민원 TOP 3 키워드
-  Widget _buildComplaintKeywords() {
-    final complaintKeywords = _dashboardData?.complaintKeywords;
-    final keywordData = complaintKeywords?.data ?? [];
-    
-    if (keywordData.isEmpty) {
-      return _buildEmptyDataMessage();
-    }
-    
-    // 순위별 색상 지정 (1=highlight, 2=warning, 3=primary)
-    Color getColorByRank(String rank) {
-      switch (rank) {
-        case '1':
-          return SeoguColors.highlight;
-        case '2':
-          return SeoguColors.warning;
-        case '3':
-          return SeoguColors.primary;
-        default:
-          return SeoguColors.primary;
-      }
-    }
-    
-    return Container(
-      height: 140,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            complaintKeywords?.title ?? '🔥 민원 TOP 3 키워드',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: Row(
-              children: keywordData.map((data) {
-                return _buildKeywordItem(
-                  data.rank,
-                  data.keyword,
-                  data.count,
-                  getColorByRank(data.rank),
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildKeywordItem(String rank, String keyword, int count, Color color) {
-    return Expanded(
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    rank,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: SeoguColors.surface,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                keyword,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: SeoguColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '$count건',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF64748B),
-            ),
-          ),
-        ],
-      ),
+  // 게시판 1
+  Widget _buildBbs1(String title) {
+    final bbs1Type = Bbs1Data(
+      title: '해결',
+      data: [
+        Bbs1ItemData(title: '제목1', status: '해결', detail: '해결 내용'),
+        Bbs1ItemData(title: '제목2', status: '진행', detail: '진행 내용')
+      ]
     );
-  }
-
-  // 5. 민원 해결 사례
-  /// 민원 해결 사례 섹션을 생성합니다.
-  /// 터치 가능한 사례 목록을 표시하며, 각 항목을 터치하면 상세 정보 다이얼로그가 표시됩니다.
-  /// [context]: 다이얼로그 표시를 위한 BuildContext
-  Widget _buildComplaintCases(BuildContext context) {
-    final complaintCases = _dashboardData?.complaintCases;
-    final casesData = complaintCases?.data ?? [];
+    final casesData = bbs1Type.data ?? [];
     
     if (casesData.isEmpty) {
       return _buildEmptyDataMessage();
@@ -643,7 +912,7 @@ class _MainDashboardState extends State<MainDashboard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            complaintCases?.title ?? '✅ 민원 해결 사례',
+            title,
             style: const TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.bold,
@@ -657,7 +926,7 @@ class _MainDashboardState extends State<MainDashboard> {
               children: casesData.map((caseData) {
                 return Container(
                   height: 42,
-                  child: _buildCaseItem(
+                  child: _buildBbs1Item(
                     context,
                     caseData.title,
                     caseData.status,
@@ -671,11 +940,10 @@ class _MainDashboardState extends State<MainDashboard> {
       ),
     );
   }
-
-  Widget _buildCaseItem(BuildContext context, String title, String status, String detail) {
+  Widget _buildBbs1Item(BuildContext context, String title, String status, String detail) {
     final isCompleted = status == '해결';
     return InkWell(
-      onTap: () => _showComplaintDetailDialog(context, title, status, detail),
+      onTap: () => _showBbs1DetailDialog(context, title, status, detail),
       child: Row(
         children: [
           Container(
@@ -719,13 +987,7 @@ class _MainDashboardState extends State<MainDashboard> {
       ),
     );
   }
-
-  /// 민원 사례 상세 정보 다이얼로그를 표시합니다.
-  /// [context]: 다이얼로그를 표시할 BuildContext
-  /// [title]: 민원 사례 제목
-  /// [status]: 처리 상태 ('해결' 또는 '진행중')
-  /// [detail]: 상세 설명 내용
-  void _showComplaintDetailDialog(BuildContext context, String title, String status, String detail) {
+  void _showBbs1DetailDialog(BuildContext context, String title, String status, String detail) {
     final isCompleted = status == '해결';
     
     showDialog(
@@ -839,11 +1101,99 @@ class _MainDashboardState extends State<MainDashboard> {
     );
   }
 
-  /// 타 기관 동향 상세 정보 다이얼로그를 표시합니다.
-  /// [context]: 다이얼로그를 표시할 BuildContext
-  /// [title]: 동향 제목
-  /// [detail]: 상세 설명 내용
-  void _showTrendDetailDialog(BuildContext context, String title, String detail) {
+
+
+  // BBS 2
+  Widget _buildBbs2(String title) {
+    final organizationTrends = Bbs2Data(
+      title: title,
+      data: [
+        Bbs2ItemData(
+            title: '제목', detail: '내용'
+        )
+      ]
+
+    );
+    final trendsData = organizationTrends?.data ?? [];
+    
+    if (trendsData.isEmpty) {
+      return _buildEmptyDataMessage();
+    }
+
+    double height = 88.0 + (42 * trendsData.length);
+    return Container(
+      height: height,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: SeoguColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            organizationTrends?.title ?? '🌐 타 기관·지자체 주요 동향',
+            style: const TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
+              color: SeoguColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: trendsData.map((trendData) {
+              return SizedBox(
+                height: 42,
+                child: _buildBbs2Item(
+                  context,
+                  trendData.title,
+                  trendData.detail,
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+  Widget _buildBbs2Item(BuildContext context, String title, String detail) {
+    return InkWell(
+      onTap: () => _showBbs2DetailDialog(context, title, detail),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 4,
+            decoration: BoxDecoration(
+              color: const Color(0xFF64748B),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 19,
+                color: SeoguColors.textPrimary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  void _showBbs2DetailDialog(BuildContext context, String title, String detail) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -930,271 +1280,5 @@ class _MainDashboardState extends State<MainDashboard> {
     );
   }
 
-  // 6. 민원처리 실적
-  Widget _buildComplaintPerformance() {
-    final complaintPerformance = _dashboardData?.complaintPerformance;
 
-    return Container(
-      height: 160,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            complaintPerformance?.title ?? '📋 민원처리 실적',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
-                      '처리됨',
-                      style: TextStyle(
-                        fontSize: 19,
-                        color: Color(0xFF64748B),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      complaintPerformance?.processed ?? '0건',
-                      style: const TextStyle(
-                        fontSize: 23,
-                        fontWeight: FontWeight.bold,
-                        color: SeoguColors.success,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 40,
-                color: const Color(0xFFE2E8F0),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
-                      '처리율',
-                      style: TextStyle(
-                        fontSize: 19,
-                        color: Color(0xFF64748B),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      complaintPerformance?.rate ?? '0%',
-                      style: const TextStyle(
-                        fontSize: 23,
-                        fontWeight: FontWeight.bold,
-                        color: SeoguColors.info,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 7. 타 기관·지자체 주요 동향
-  Widget _buildOtherOrganizationTrends(BuildContext context) {
-    final organizationTrends = _dashboardData?.organizationTrends;
-    final trendsData = organizationTrends?.data ?? [];
-    
-    if (trendsData.isEmpty) {
-      return _buildEmptyDataMessage();
-    }
-
-    double height = 88.0 + (42 * trendsData.length);
-    return Container(
-      height: height,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            organizationTrends?.title ?? '🌐 타 기관·지자체 주요 동향',
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: trendsData.map((trendData) {
-              return SizedBox(
-                height: 42,
-                child: _buildTrendItem(
-                  context,
-                  trendData.title,
-                  trendData.detail,
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTrendItem(BuildContext context, String title, String detail) {
-    return InkWell(
-      onTap: () => _showTrendDetailDialog(context, title, detail),
-      child: Row(
-        children: [
-          Container(
-            width: 4,
-            height: 4,
-            decoration: BoxDecoration(
-              color: const Color(0xFF64748B),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 19,
-                color: SeoguColors.textPrimary,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 8. 금주 주요 성과
-  Widget _buildWeeklyAchievements() {
-    final achievements = _dashboardData?.weeklyAchievements ?? [];
-    
-    if (achievements.isEmpty) {
-      return _buildEmptyDataMessage();
-    }
-    
-    final colors = [SeoguColors.secondary, SeoguColors.primary, SeoguColors.accent];
-
-    List<Widget> list = [];
-
-    for (int i = 0; i < achievements.length; i++) {
-      list.add(
-        Expanded(
-          child: _buildAchievementCard(
-            achievements[i].title,
-            achievements[i].value,
-            i < colors.length ? colors[i] : SeoguColors.primary,
-          ),
-        )
-      );
-      if (i < achievements.length - 1) list.add(const SizedBox(width: 16));
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '🎯 금주 주요 성과',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              ...list
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAchievementCard(String title, String value, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 19,
-              color: Color(0xFF64748B),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
