@@ -7,8 +7,7 @@ import '../../data/main_data_parser.dart';
 import 'dashboard_widget.dart';
 
 class DashBoardChartWidget extends StatefulWidget {
-  const DashBoardChartWidget({super.key, required this.title, required this.dashboardId});
-  final String title;
+  const DashBoardChartWidget({super.key, required this.dashboardId});
   final int dashboardId;
 
   @override
@@ -140,15 +139,6 @@ class _DashBoardChartWidgetState extends State<DashBoardChartWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.title,
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
           Expanded(
             child: LineChart(
               LineChartData(

@@ -6,8 +6,7 @@ import '../../data/main_data_parser.dart';
 import 'dashboard_widget.dart';
 
 class DashBoardBbs1Widget extends StatefulWidget {
-  const DashBoardBbs1Widget({super.key, required this.title, required this.dashboardId});
-  final String title;
+  const DashBoardBbs1Widget({super.key, required this.dashboardId});
   final int dashboardId;
 
   @override
@@ -118,14 +117,15 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.title,
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
+          if (_data.isNotEmpty)
+            Text(
+              _data.first.title,
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: SeoguColors.textPrimary,
+              ),
             ),
-          ),
           const SizedBox(height: 16),
           Expanded(
             child: Column(

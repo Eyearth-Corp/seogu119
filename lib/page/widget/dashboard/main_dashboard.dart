@@ -95,7 +95,6 @@ class _MainDashboardState extends State<MainDashboard> {
 
               // 타입 2
               DashBoardType2Widget(
-                title: 'DashBoardType2Widget',
                 dashboardId: 2,
               ),
               const SizedBox(height: 20),
@@ -106,14 +105,12 @@ class _MainDashboardState extends State<MainDashboard> {
                 children: [
                   Expanded(
                     child: DashBoardType3Widget(
-                      title: 'DashBoardType3Widget',
                       dashboardId: 3,
                     )
                   ),
                   SizedBox(width: 20),
                   Expanded(
                     child: DashBoardType4Widget(
-                      title: 'DashBoardType4Widget',
                       dashboardId: 4,
                     )
                   ),
@@ -126,14 +123,12 @@ class _MainDashboardState extends State<MainDashboard> {
                 children: [
                   Expanded(
                     child: DashBoardBbs1Widget(
-                      title: 'DashBoardBbs1Widget',
                       dashboardId: 1,
                     )
                   ),
                   SizedBox(width: 20),
                   Expanded(
                     child: DashBoardBbs2Widget(
-                      title: 'DashBoardBbs2Widget',
                       dashboardId: 2,
                     )
                   ),
@@ -143,14 +138,12 @@ class _MainDashboardState extends State<MainDashboard> {
 
               // 차트
               DashBoardChartWidget(
-                title: 'DashBoardChartWidget',
                 dashboardId: 3,
               ),
               const SizedBox(height: 20),
 
               // 동별 가맹률 현황
               DashBoardPercentWidget(
-                title: 'DashBoardPercentWidget',
                 dashboardId: 4,
               ),
               const SizedBox(height: 20),

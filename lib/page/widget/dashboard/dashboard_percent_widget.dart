@@ -6,8 +6,7 @@ import '../../data/main_data_parser.dart';
 import 'dashboard_widget.dart';
 
 class DashBoardPercentWidget extends StatefulWidget {
-  const DashBoardPercentWidget({super.key, required this.title, required this.dashboardId});
-  final String title;
+  const DashBoardPercentWidget({super.key, required this.dashboardId});
   final int dashboardId;
 
   @override
@@ -117,15 +116,6 @@ class _DashBoardPercentWidgetState extends State<DashBoardPercentWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.title,
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 12),
           ..._data.asMap().entries.map((entry) {
             final index = entry.key;
             final data = entry.value;

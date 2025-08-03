@@ -195,13 +195,20 @@ class ApiService {
           final List<dynamic> items = jsonData['data'];
           if (items.isNotEmpty) {
             return Type4Data.fromJson(items.first);
+          } else {
+            // Return default empty data when no items are returned
+            return Type4Data(
+              title: '',
+              processed: '0',
+              rate: '0%',
+            );
           }
         }
       }
       throw Exception('Failed to load DashBoardType4');
     } catch (e) {
       print('DashBoardType4 API Error: $e');
-      throw Exception('Network error: $e');
+      throw Exception('Failed to load DashBoardType4');
     }
   }
 
