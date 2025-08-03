@@ -5,6 +5,7 @@ import 'package:screenshot/screenshot.dart';
 import '../../../core/colors.dart';
 import '../../data/main_data_parser.dart';
 import 'dashboard_type1_widget.dart';
+import 'dashboard_type2_widget.dart';
 import 'dashboard_widget.dart';
 
 class MainDashboard extends StatefulWidget {
@@ -103,7 +104,19 @@ class _MainDashboardState extends State<MainDashboard> {
               const SizedBox(height: 20),
 
               // 타입 2
-              _buildType2('🎯 타입 2'),
+              DashBoardType2Widget(
+                title: '타이틀 1',
+                data: [
+                  Type2Data(
+                    title: '타입2 제목1',
+                    value: '10',
+                  ),
+                  Type2Data(
+                    title: '타입2 제목2',
+                    value: '20',
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
 
               Row(
