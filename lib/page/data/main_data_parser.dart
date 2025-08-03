@@ -38,23 +38,7 @@ class Type2Data {
   }
 }
 
-class Type3Data {
-  final String title;
-  final List<Type3ItemData> data;
 
-  Type3Data({
-    required this.title,
-    required this.data,
-  });
-
-  factory Type3Data.fromJson(Map<String, dynamic> json) {
-    var dataList = json['data'] as List? ?? [];
-    return Type3Data(
-      title: json['title'] ?? '',
-      data: dataList.map((item) => Type3ItemData.fromJson(item)).toList(),
-    );
-  }
-}
 class Type3ItemData {
   final String rank;
   final String keyword;
@@ -95,23 +79,7 @@ class Type4Data {
   }
 }
 
-class Bbs1Data {
-  final String title;
-  final List<Bbs1ItemData> data;
 
-  Bbs1Data({
-    required this.title,
-    required this.data,
-  });
-
-  factory Bbs1Data.fromJson(Map<String, dynamic> json) {
-    var dataList = json['data'] as List? ?? [];
-    return Bbs1Data(
-      title: json['title'] ?? '',
-      data: dataList.map((item) => Bbs1ItemData.fromJson(item)).toList(),
-    );
-  }
-}
 class Bbs1ItemData {
   final String title;
   final String status;
@@ -132,23 +100,6 @@ class Bbs1ItemData {
   }
 }
 
-class Bbs2Data {
-  final String title;
-  final List<Bbs2ItemData> data;
-
-  Bbs2Data({
-    required this.title,
-    required this.data,
-  });
-
-  factory Bbs2Data.fromJson(Map<String, dynamic> json) {
-    var dataList = json['data'] as List? ?? [];
-    return Bbs2Data(
-      title: json['title'] ?? '',
-      data: dataList.map((item) => Bbs2ItemData.fromJson(item)).toList(),
-    );
-  }
-}
 class Bbs2ItemData {
   final String title;
   final String detail;
@@ -162,24 +113,6 @@ class Bbs2ItemData {
     return Bbs2ItemData(
       title: json['title'] ?? '',
       detail: json['detail'] ?? '',
-    );
-  }
-}
-
-class ChartData {
-  final String title;
-  final List<ChartDataPoint> data;
-
-  ChartData({
-    required this.title,
-    required this.data,
-  });
-
-  factory ChartData.fromJson(Map<String, dynamic> json) {
-    var dataList = json['data'] as List? ?? [];
-    return ChartData(
-      title: json['title'] ?? '',
-      data: dataList.map((item) => ChartDataPoint.fromJson(item)).toList(),
     );
   }
 }
@@ -214,24 +147,6 @@ class PercentItemData {
     return PercentItemData(
       name: json['name'] ?? '',
       percentage: (json['percentage'] ?? 0).toDouble(),
-    );
-  }
-}
-
-class PercentData {
-  final String title;
-  final List<PercentItemData> data;
-
-  PercentData({
-    required this.title,
-    required this.data,
-  });
-
-  factory PercentData.fromJson(Map<String, dynamic> json) {
-    var dataList = json['data'] as List? ?? [];
-    return PercentData(
-      title: json['title'] ?? '',
-      data: dataList.map((item) => PercentItemData.fromJson(item)).toList(),
     );
   }
 }
