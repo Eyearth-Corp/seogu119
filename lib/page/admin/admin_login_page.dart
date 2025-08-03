@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/admin_service.dart';
-import 'admin_dashboard_page.dart';
+import 'new_admin_dashboard_page.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({super.key});
@@ -37,7 +37,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const AdminDashboardPage(),
+              builder: (context) => const NewAdminDashboardPage(),
             ),
           );
           return;
@@ -81,7 +81,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const AdminDashboardPage(),
+            builder: (context) => const NewAdminDashboardPage(),
           ),
         );
       } else {

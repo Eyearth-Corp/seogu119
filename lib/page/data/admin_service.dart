@@ -173,6 +173,7 @@ class AdminService {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          if (_authToken != null) 'Authorization': 'Bearer $_authToken',
         },
       );
 
@@ -590,9 +591,6 @@ class AdminService {
     return num.toString();
   }
 
-
-
-
   /// 다양한 타입을 List로 안전하게 변환
   static List<dynamic> _convertToList(dynamic value) {
     if (value == null) return [];
@@ -604,12 +602,6 @@ class AdminService {
     return [value]; // 단일 값을 리스트로 감싸기
   }
 
-
-
-
-
-
-
   /// 값을 int로 안전하게 변환
   static int _parseToInt(dynamic value) {
     if (value == null) return 0;
@@ -620,7 +612,6 @@ class AdminService {
     }
     return 0;
   }
-
 
   /// 에러 메시지 추출
   static String getErrorMessage(dynamic error) {

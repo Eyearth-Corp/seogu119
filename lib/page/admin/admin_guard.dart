@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/admin_service.dart';
 import 'admin_login_page.dart';
-import 'admin_dashboard_page.dart';
+import 'new_admin_dashboard_page.dart';
 
 class AdminGuard extends StatelessWidget {
   final Widget child;
@@ -32,7 +32,7 @@ class AdminRouteGuard {
       case '/admin/dashboard':
         return MaterialPageRoute(
           builder: (_) => const AdminGuard(
-            child: AdminDashboardPage(),
+            child: NewAdminDashboardPage(),
           ),
           settings: settings,
         );

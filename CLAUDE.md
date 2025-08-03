@@ -44,7 +44,7 @@ Main application layout with:
 Complete JWT authentication system with:
 - **AdminService (lib/page/data/admin_service.dart)**: Comprehensive API client with token management
 - **AdminGuard**: Route protection for admin-only pages
-- **AdminDashboardPage**: Full CRUD operations for dashboard data management
+- **NewAdminDashboardPage**: Modern admin dashboard with real-time data visualization
 - Auto-logout on token expiration
 
 #### **Interactive Map System (lib/page/widget/map/)**
