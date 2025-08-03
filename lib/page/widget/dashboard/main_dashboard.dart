@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:screenshot/screenshot.dart';
 import '../../../core/colors.dart';
 import '../../data/main_data_parser.dart';
+import 'dashboard_type1_widget.dart';
+import 'dashboard_widget.dart';
 
 class MainDashboard extends StatefulWidget {
   const MainDashboard({super.key});
@@ -79,7 +81,25 @@ class _MainDashboardState extends State<MainDashboard> {
           child: Column(
             children: [
               // 타입 1
-              _buildType1(),
+              DashBoardType1Widget(
+                data: [
+                  Type1Data(
+                    title: '제목 1',
+                    value: '1',
+                    unit: '건',
+                  ),
+                  Type1Data(
+                    title: '제목 2',
+                    value: '2',
+                    unit: '건',
+                  ),
+                  Type1Data(
+                    title: '제목 3',
+                    value: '3',
+                    unit: '건',
+                  )
+                ],
+              ),
               const SizedBox(height: 20),
 
               // 타입 2
@@ -148,32 +168,7 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   /// 빈 데이터 메시지를 표시하는 공통 위젯
-  Widget _buildEmptyDataMessage() {
-    return Container(
-      padding: const EdgeInsets.all(40),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: const Center(
-        child: Text(
-          '데이터가 없습니다.',
-          style: TextStyle(
-            fontSize: 19,
-            color: SeoguColors.textSecondary,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
+
 
   Widget baseView({required Widget child}) {
     return Container(
@@ -194,107 +189,7 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   // 타입 1
-  Widget _buildType1() {
-    List<Type1Data> metrics  = [
-      Type1Data(
-        title: '제목 1',
-        value: '1',
-        unit: '건',
-      ),
-      Type1Data(
-        title: '제목 2',
-        value: '2',
-        unit: '건',
-      ),
-      Type1Data(
-        title: '제목 3',
-        value: '3',
-        unit: '건',
-      )
-    ];
-    
-    if (metrics.isEmpty) {
-      return _buildEmptyDataMessage();
-    }
-    
-    final colors = [SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent];
 
-    List<Widget> list = [];
-    for (int i = 0; i < metrics.length; i++) {
-      list.add(
-        Expanded(
-          child: _buildType1Item(
-            metrics[i].title,
-            metrics[i].value,
-            metrics[i].unit,
-            i < colors.length ? colors[i] : SeoguColors.primary,
-          ),
-        )
-      );
-      if(i < metrics.length - 1) list.add(const SizedBox(width: 16));
-    }
-
-    return Row(
-      children: [
-        ...list
-      ],
-    );
-  }
-  Widget _buildType1Item(String title, String value, String unit, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 19,
-              color: SeoguColors.textSecondary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 2),
-                child: Text(
-                  unit,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: SeoguColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
   // 타입 2
   Widget _buildType2(String title) {
@@ -314,7 +209,7 @@ class _MainDashboardState extends State<MainDashboard> {
     ];
 
     if (achievements.isEmpty) {
-      return _buildEmptyDataMessage();
+      return emptyDataMessage();
     }
 
     final colors = [SeoguColors.secondary, SeoguColors.primary, SeoguColors.accent];
@@ -422,7 +317,7 @@ class _MainDashboardState extends State<MainDashboard> {
     final keywordData = type3Data.data ?? [];
 
     if (keywordData.isEmpty) {
-      return _buildEmptyDataMessage();
+      return emptyDataMessage();
     }
 
     // 순위별 색상 지정 (1=highlight, 2=warning, 3=primary)
@@ -771,7 +666,7 @@ class _MainDashboardState extends State<MainDashboard> {
     final membershipData = dongMembership?.data ?? [];
     
     if (membershipData.isEmpty) {
-      return _buildEmptyDataMessage();
+      return emptyDataMessage();
     }
     
     final colors = [SeoguColors.secondary, SeoguColors.primary, SeoguColors.accent, SeoguColors.warning, SeoguColors.info];
@@ -889,7 +784,7 @@ class _MainDashboardState extends State<MainDashboard> {
     final casesData = bbs1Type.data ?? [];
     
     if (casesData.isEmpty) {
-      return _buildEmptyDataMessage();
+      return emptyDataMessage();
     }
 
     double height = 88.0 + (42 * casesData.length);
@@ -1117,7 +1012,7 @@ class _MainDashboardState extends State<MainDashboard> {
     final trendsData = organizationTrends?.data ?? [];
     
     if (trendsData.isEmpty) {
-      return _buildEmptyDataMessage();
+      return emptyDataMessage();
     }
 
     double height = 88.0 + (42 * trendsData.length);
