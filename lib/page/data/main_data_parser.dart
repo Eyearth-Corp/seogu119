@@ -250,3 +250,63 @@ class Type4Response {
     );
   }
 }
+
+// Type1 Widget Response Model
+class Type1Response {
+  final String title;
+  final List<Type1Data> type1Data;
+
+  Type1Response({
+    required this.title,
+    required this.type1Data,
+  });
+
+  factory Type1Response.fromJson(Map<String, dynamic> json) {
+    return Type1Response(
+      title: json['title'] ?? '',
+      type1Data: (json['type1_data'] as List<dynamic>?)
+          ?.map((item) => Type1Data.fromJson(item))
+          .toList() ?? [],
+    );
+  }
+}
+
+// BBS1 Widget Response Model
+class Bbs1Response {
+  final String title;
+  final List<Bbs1ItemData> bbs1Data;
+
+  Bbs1Response({
+    required this.title,
+    required this.bbs1Data,
+  });
+
+  factory Bbs1Response.fromJson(Map<String, dynamic> json) {
+    return Bbs1Response(
+      title: json['title'] ?? '',
+      bbs1Data: (json['bbs1_data'] as List<dynamic>?)
+          ?.map((item) => Bbs1ItemData.fromJson(item))
+          .toList() ?? [],
+    );
+  }
+}
+
+// BBS2 Widget Response Model
+class Bbs2Response {
+  final String title;
+  final List<Bbs2ItemData> bbs2Data;
+
+  Bbs2Response({
+    required this.title,
+    required this.bbs2Data,
+  });
+
+  factory Bbs2Response.fromJson(Map<String, dynamic> json) {
+    return Bbs2Response(
+      title: json['title'] ?? '',
+      bbs2Data: (json['bbs2_data'] as List<dynamic>?)
+          ?.map((item) => Bbs2ItemData.fromJson(item))
+          .toList() ?? [],
+    );
+  }
+}

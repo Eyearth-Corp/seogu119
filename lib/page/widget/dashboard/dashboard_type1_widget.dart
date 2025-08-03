@@ -14,7 +14,7 @@ class DashBoardType1Widget extends StatefulWidget {
 }
 
 class _DashBoardType1WidgetState extends State<DashBoardType1Widget> {
-  List<Type1Data> _data = [];
+  Type1Response? _response;
   bool _isLoading = true;
   String? _error;
 
@@ -26,10 +26,10 @@ class _DashBoardType1WidgetState extends State<DashBoardType1Widget> {
 
   Future<void> _loadData() async {
     try {
-      final data = await ApiService.getDashBoardType1(widget.dashboardId);
+      final response = await ApiService.getDashBoardType1(widget.dashboardId);
       if (mounted) {
         setState(() {
-          _data = data;
+          _response = response;
           _isLoading = false;
         });
       }
@@ -94,30 +94,70 @@ class _DashBoardType1WidgetState extends State<DashBoardType1Widget> {
       );
     }
 
-    if (_data.isEmpty) {
+    if (_response == null || _response!.type1Data.isEmpty) {
       return emptyDataMessage();
     }
 
     final colors = [SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent];
 
     List<Widget> list = [];
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < _response!.type1Data.length; i++) {
       list.add(
           Expanded(
             child: _buildType1Item(
-              _data[i].title,
-              _data[i].value,
-              _data[i].unit,
+              _response!.type1Data[i].title,
+              _response!.type1Data[i].value,
+              _response!.type1Data[i].unit,
               i < colors.length ? colors[i] : SeoguColors.primary,
             ),
           )
       );
-      if(i < _data.length - 1) list.add(const SizedBox(width: 16));
+      if(i < _response!.type1Data.length - 1) list.add(const SizedBox(width: 16));
     }
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ...list
+        if (_response!.title.isNotEmpty)
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: SeoguColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _response!.title,
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                    color: SeoguColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    ...list
+                  ],
+                ),
+              ],
+            ),
+          ),
+        if (_response!.title.isEmpty)
+          Row(
+            children: [
+              ...list
+            ],
+          ),
       ],
     );
   }

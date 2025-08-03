@@ -14,7 +14,7 @@ class DashBoardBbs1Widget extends StatefulWidget {
 }
 
 class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
-  List<Bbs1ItemData> _data = [];
+  Bbs1Response? _response;
   bool _isLoading = true;
   String? _error;
 
@@ -26,10 +26,10 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
 
   Future<void> _loadData() async {
     try {
-      final data = await ApiService.getDashBoardBbs1(widget.dashboardId);
+      final response = await ApiService.getDashBoardBbs1(widget.dashboardId);
       if (mounted) {
         setState(() {
-          _data = data;
+          _response = response;
           _isLoading = false;
         });
       }
@@ -94,11 +94,11 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
       );
     }
     
-    if (_data.isEmpty) {
+    if (_response == null || _response!.bbs1Data.isEmpty) {
       return emptyDataMessage();
     }
 
-    double height = 88.0 + (42 * _data.length);
+    double height = 88.0 + (42 * _response!.bbs1Data.length);
 
     return Container(
       height: height,
@@ -117,9 +117,9 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (_data.isNotEmpty)
+          if (_response!.title.isNotEmpty)
             Text(
-              _data.first.title,
+              _response!.title,
               style: const TextStyle(
                 fontSize: 19,
                 fontWeight: FontWeight.bold,
@@ -130,7 +130,7 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: _data.map((caseData) {
+              children: _response!.bbs1Data.map((caseData) {
                 return Container(
                   height: 42,
                   child: _buildBbs1Item(

@@ -119,7 +119,7 @@ class ApiService {
   }
 
   // Dashboard API methods
-  static Future<List<Type1Data>> getDashBoardType1(int id) async {
+  static Future<Type1Response> getDashBoardType1(int id) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/DashBoardType1?id=$id'),
@@ -129,14 +129,13 @@ class ApiService {
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true && jsonData['data'] != null) {
-          final List<dynamic> items = jsonData['data'];
-          return items.map((item) => Type1Data.fromJson(item)).toList();
+          return Type1Response.fromJson(jsonData['data']);
         }
       }
       throw Exception('Failed to load DashBoardType1');
     } catch (e) {
       print('DashBoardType1 API Error: $e');
-      throw Exception('Network error: $e');
+      throw Exception('Failed to load DashBoardType1');
     }
   }
 
@@ -200,7 +199,7 @@ class ApiService {
     }
   }
 
-  static Future<List<Bbs1ItemData>> getDashBoardBbs1(int id) async {
+  static Future<Bbs1Response> getDashBoardBbs1(int id) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/DashBoardBbs1?id=$id'),
@@ -210,18 +209,17 @@ class ApiService {
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true && jsonData['data'] != null) {
-          final List<dynamic> items = jsonData['data'];
-          return items.map((item) => Bbs1ItemData.fromJson(item)).toList();
+          return Bbs1Response.fromJson(jsonData['data']);
         }
       }
       throw Exception('Failed to load DashBoardBbs1');
     } catch (e) {
       print('DashBoardBbs1 API Error: $e');
-      throw Exception('Network error: $e');
+      throw Exception('Failed to load DashBoardBbs1');
     }
   }
 
-  static Future<List<Bbs2ItemData>> getDashBoardBbs2(int id) async {
+  static Future<Bbs2Response> getDashBoardBbs2(int id) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/DashBoardBbs2?id=$id'),
@@ -231,14 +229,13 @@ class ApiService {
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true && jsonData['data'] != null) {
-          final List<dynamic> items = jsonData['data'];
-          return items.map((item) => Bbs2ItemData.fromJson(item)).toList();
+          return Bbs2Response.fromJson(jsonData['data']);
         }
       }
       throw Exception('Failed to load DashBoardBbs2');
     } catch (e) {
       print('DashBoardBbs2 API Error: $e');
-      throw Exception('Network error: $e');
+      throw Exception('Failed to load DashBoardBbs2');
     }
   }
 
