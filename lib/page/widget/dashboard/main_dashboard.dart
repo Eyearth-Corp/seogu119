@@ -89,39 +89,14 @@ class _MainDashboardState extends State<MainDashboard> {
             children: [
               // 타입 1
               DashBoardType1Widget(
-                data: [
-                  Type1Data(
-                    title: '제목 1',
-                    value: '1',
-                    unit: '건',
-                  ),
-                  Type1Data(
-                    title: '제목 2',
-                    value: '2',
-                    unit: '건',
-                  ),
-                  Type1Data(
-                    title: '제목 3',
-                    value: '3',
-                    unit: '건',
-                  )
-                ],
+                dashboardId: 1,
               ),
               const SizedBox(height: 20),
 
               // 타입 2
               DashBoardType2Widget(
                 title: 'DashBoardType2Widget',
-                data: [
-                  Type2Data(
-                    title: '타입2 제목1',
-                    value: '10',
-                  ),
-                  Type2Data(
-                    title: '타입2 제목2',
-                    value: '20',
-                  ),
-                ],
+                dashboardId: 2,
               ),
               const SizedBox(height: 20),
 
@@ -132,29 +107,14 @@ class _MainDashboardState extends State<MainDashboard> {
                   Expanded(
                     child: DashBoardType3Widget(
                       title: 'DashBoardType3Widget',
-                      data: [
-                        Type3ItemData(
-                            rank: '1',
-                            keyword: '1위',
-                            count: 1
-                        ),
-                        Type3ItemData(
-                            rank: '2',
-                            keyword: '2위',
-                            count: 2
-                        ),
-                      ]
+                      dashboardId: 3,
                     )
                   ),
                   SizedBox(width: 20),
                   Expanded(
                     child: DashBoardType4Widget(
                       title: 'DashBoardType4Widget',
-                      data: Type4Data(
-                        title: '타입4 제목',
-                        processed: '1건',
-                        rate: '10%'
-                      )
+                      dashboardId: 4,
                     )
                   ),
                 ],
@@ -167,34 +127,14 @@ class _MainDashboardState extends State<MainDashboard> {
                   Expanded(
                     child: DashBoardBbs1Widget(
                       title: 'DashBoardBbs1Widget',
-                      data: [
-                        Bbs1ItemData(
-                            title: '제목1',
-                            status: '해결',
-                            detail: '해결 내용'
-                        ),
-                        Bbs1ItemData(
-                            title: '제목2',
-                            status: '해결',
-                            detail: '해결 내용'
-                        ),
-                      ]
+                      dashboardId: 1,
                     )
                   ),
                   SizedBox(width: 20),
                   Expanded(
                     child: DashBoardBbs2Widget(
                       title: 'DashBoardBbs2Widget',
-                      data: [
-                        Bbs2ItemData(
-                            title: '제목1',
-                            detail: '내용'
-                        ),
-                        Bbs2ItemData(
-                            title: '제목2',
-                            detail: '내용'
-                        ),
-                      ]
+                      dashboardId: 2,
                     )
                   ),
                 ],
@@ -202,41 +142,16 @@ class _MainDashboardState extends State<MainDashboard> {
               const SizedBox(height: 20),
 
               // 차트
-              //_buildChart('🔥 차트'),
               DashBoardChartWidget(
                 title: 'DashBoardChartWidget',
-                data: [
-                  ChartDataPoint(
-                      x: 1, y: 10
-                  ),
-                  ChartDataPoint(
-                      x: 2, y: 20
-                  ),
-                  ChartDataPoint(
-                      x: 3, y: 33
-                  ),
-                ]
+                dashboardId: 3,
               ),
               const SizedBox(height: 20),
 
               // 동별 가맹률 현황
-              //_buildPercent('🗺️ 퍼센트'),
               DashBoardPercentWidget(
                 title: 'DashBoardPercentWidget',
-                data: [
-                  PercentItemData(
-                      name: '1번',
-                      percentage: 10
-                  ),
-                  PercentItemData(
-                      name: '2번',
-                      percentage: 20
-                  ),
-                  PercentItemData(
-                      name: '3번',
-                      percentage: 30
-                  ),
-                ]
+                dashboardId: 4,
               ),
               const SizedBox(height: 20),
 

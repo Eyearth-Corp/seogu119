@@ -6,7 +6,7 @@ import 'dart:html' as html;
 import 'widget/floating_action_buttons.dart';
 import 'widget/map_widget.dart';
 import 'widget/dashboard/main_dashboard.dart';
-import 'widget/dashboard/dong_dashboard.dart';
+import 'widget/dong_dashboard.dart';
 import 'data/dong_list.dart';
 import '../core/colors.dart';
 

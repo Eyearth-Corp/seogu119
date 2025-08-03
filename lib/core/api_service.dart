@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 
+import '../page/data/main_data_parser.dart';
+
 class ApiService {
   static const String _prodBaseUrl = 'https://seogu119-api.eyearth.net/api';
   static const String _devBaseUrl = 'http://localhost:8000';
@@ -112,6 +114,177 @@ class ApiService {
       throw Exception('Failed to load statistics summary');
     } catch (e) {
       print('Statistics API Error: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  // Dashboard API methods
+  static Future<List<Type1Data>> getDashBoardType1(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardType1?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          final List<dynamic> items = jsonData['data'];
+          return items.map((item) => Type1Data.fromJson(item)).toList();
+        }
+      }
+      throw Exception('Failed to load DashBoardType1');
+    } catch (e) {
+      print('DashBoardType1 API Error: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  static Future<List<Type2Data>> getDashBoardType2(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardType2?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          final List<dynamic> items = jsonData['data'];
+          return items.map((item) => Type2Data.fromJson(item)).toList();
+        }
+      }
+      throw Exception('Failed to load DashBoardType2');
+    } catch (e) {
+      print('DashBoardType2 API Error: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  static Future<List<Type3ItemData>> getDashBoardType3(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardType3?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          final List<dynamic> items = jsonData['data'];
+          return items.map((item) => Type3ItemData.fromJson(item)).toList();
+        }
+      }
+      throw Exception('Failed to load DashBoardType3');
+    } catch (e) {
+      print('DashBoardType3 API Error: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  static Future<Type4Data> getDashBoardType4(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardType4?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          final List<dynamic> items = jsonData['data'];
+          if (items.isNotEmpty) {
+            return Type4Data.fromJson(items.first);
+          }
+        }
+      }
+      throw Exception('Failed to load DashBoardType4');
+    } catch (e) {
+      print('DashBoardType4 API Error: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  static Future<List<Bbs1ItemData>> getDashBoardBbs1(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardBbs1?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          final List<dynamic> items = jsonData['data'];
+          return items.map((item) => Bbs1ItemData.fromJson(item)).toList();
+        }
+      }
+      throw Exception('Failed to load DashBoardBbs1');
+    } catch (e) {
+      print('DashBoardBbs1 API Error: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  static Future<List<Bbs2ItemData>> getDashBoardBbs2(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardBbs2?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          final List<dynamic> items = jsonData['data'];
+          return items.map((item) => Bbs2ItemData.fromJson(item)).toList();
+        }
+      }
+      throw Exception('Failed to load DashBoardBbs2');
+    } catch (e) {
+      print('DashBoardBbs2 API Error: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  static Future<List<ChartDataPoint>> getDashBoardChart(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardChart?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          final List<dynamic> items = jsonData['data'];
+          return items.map((item) => ChartDataPoint.fromJson(item)).toList();
+        }
+      }
+      throw Exception('Failed to load DashBoardChart');
+    } catch (e) {
+      print('DashBoardChart API Error: $e');
+      throw Exception('Network error: $e');
+    }
+  }
+
+  static Future<List<PercentItemData>> getDashBoardPercent(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardPercent?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          final List<dynamic> items = jsonData['data'];
+          return items.map((item) => PercentItemData.fromJson(item)).toList();
+        }
+      }
+      throw Exception('Failed to load DashBoardPercent');
+    } catch (e) {
+      print('DashBoardPercent API Error: $e');
       throw Exception('Network error: $e');
     }
   }
