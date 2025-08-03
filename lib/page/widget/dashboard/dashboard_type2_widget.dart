@@ -14,7 +14,7 @@ class DashBoardType2Widget extends StatefulWidget {
 }
 
 class _DashBoardType2WidgetState extends State<DashBoardType2Widget> {
-  List<Type2Data> _data = [];
+  Type2Response? _response;
   bool _isLoading = true;
   String? _error;
 
@@ -26,10 +26,10 @@ class _DashBoardType2WidgetState extends State<DashBoardType2Widget> {
 
   Future<void> _loadData() async {
     try {
-      final data = await ApiService.getDashBoardType2(widget.dashboardId);
+      final response = await ApiService.getDashBoardType2(widget.dashboardId);
       if (mounted) {
         setState(() {
-          _data = data;
+          _response = response;
           _isLoading = false;
         });
       }
@@ -93,7 +93,7 @@ class _DashBoardType2WidgetState extends State<DashBoardType2Widget> {
         ),
       );
     }
-    if (_data.isEmpty) {
+    if (_response == null || _response!.type2Data.isEmpty) {
       return emptyDataMessage();
     }
 
@@ -101,17 +101,17 @@ class _DashBoardType2WidgetState extends State<DashBoardType2Widget> {
 
     List<Widget> list = [];
 
-    for (int i = 0; i < _data.length; i++) {
+    for (int i = 0; i < _response!.type2Data.length; i++) {
       list.add(
           Expanded(
             child: _buildType2Item(
-              _data[i].title,
-              _data[i].value,
+              _response!.type2Data[i].title,
+              _response!.type2Data[i].value,
               i < colors.length ? colors[i] : SeoguColors.primary,
             ),
           )
       );
-      if (i < _data.length - 1) list.add(const SizedBox(width: 16));
+      if (i < _response!.type2Data.length - 1) list.add(const SizedBox(width: 16));
     }
 
     return Container(
@@ -130,6 +130,17 @@ class _DashBoardType2WidgetState extends State<DashBoardType2Widget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (_response!.title.isNotEmpty)
+            Text(
+              _response!.title,
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: SeoguColors.textPrimary,
+              ),
+            ),
+          if (_response!.title.isNotEmpty)
+            const SizedBox(height: 16),
           Row(
             children: [
               ...list

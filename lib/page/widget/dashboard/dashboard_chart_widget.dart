@@ -15,7 +15,7 @@ class DashBoardChartWidget extends StatefulWidget {
 }
 
 class _DashBoardChartWidgetState extends State<DashBoardChartWidget> {
-  List<ChartDataPoint> _data = [];
+  ChartResponse? _response;
   bool _isLoading = true;
   String? _error;
 
@@ -27,10 +27,10 @@ class _DashBoardChartWidgetState extends State<DashBoardChartWidget> {
 
   Future<void> _loadData() async {
     try {
-      final data = await ApiService.getDashBoardChart(widget.dashboardId);
+      final response = await ApiService.getDashBoardChart(widget.dashboardId);
       if (mounted) {
         setState(() {
-          _data = data;
+          _response = response;
           _isLoading = false;
         });
       }
@@ -95,7 +95,7 @@ class _DashBoardChartWidgetState extends State<DashBoardChartWidget> {
       );
     }
 
-    if (_data.isEmpty) {
+    if (_response == null || _response!.chartData.isEmpty) {
       return Container(
         height: 200,
         padding: const EdgeInsets.all(20),
@@ -139,6 +139,17 @@ class _DashBoardChartWidgetState extends State<DashBoardChartWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (_response!.title.isNotEmpty)
+            Text(
+              _response!.title,
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: SeoguColors.textPrimary,
+              ),
+            ),
+          if (_response!.title.isNotEmpty)
+            const SizedBox(height: 16),
           Expanded(
             child: LineChart(
               LineChartData(
@@ -178,7 +189,7 @@ class _DashBoardChartWidgetState extends State<DashBoardChartWidget> {
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: _data.map((point) => FlSpot(point.x, point.y)).toList(),
+                    spots: _response!.chartData.map((point) => FlSpot(point.x, point.y)).toList(),
                     isCurved: true,
                     color: SeoguColors.primary,
                     barWidth: 3,

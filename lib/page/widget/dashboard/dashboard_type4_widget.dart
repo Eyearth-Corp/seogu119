@@ -14,7 +14,7 @@ class DashBoardType4Widget extends StatefulWidget {
 }
 
 class _DashBoardType4WidgetState extends State<DashBoardType4Widget> {
-  Type4Data? _data;
+  Type4Response? _response;
   bool _isLoading = true;
   String? _error;
 
@@ -26,10 +26,10 @@ class _DashBoardType4WidgetState extends State<DashBoardType4Widget> {
 
   Future<void> _loadData() async {
     try {
-      final data = await ApiService.getDashBoardType4(widget.dashboardId);
+      final response = await ApiService.getDashBoardType4(widget.dashboardId);
       if (mounted) {
         setState(() {
-          _data = data;
+          _response = response;
           _isLoading = false;
         });
       }
@@ -94,9 +94,11 @@ class _DashBoardType4WidgetState extends State<DashBoardType4Widget> {
       );
     }
 
-    if (_data == null) {
+    if (_response == null || _response!.type4Data.isEmpty) {
       return emptyDataMessage();
     }
+
+    final data = _response!.type4Data.first;
 
     return Container(
       height: 160,
@@ -115,6 +117,17 @@ class _DashBoardType4WidgetState extends State<DashBoardType4Widget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (_response!.title.isNotEmpty)
+            Text(
+              _response!.title,
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: SeoguColors.textPrimary,
+              ),
+            ),
+          if (_response!.title.isNotEmpty)
+            const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
@@ -130,7 +143,7 @@ class _DashBoardType4WidgetState extends State<DashBoardType4Widget> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      _data!.processed ?? '0건',
+                      data.processed,
                       style: const TextStyle(
                         fontSize: 23,
                         fontWeight: FontWeight.bold,
@@ -158,7 +171,7 @@ class _DashBoardType4WidgetState extends State<DashBoardType4Widget> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      _data!.rate ?? '0%',
+                      data.rate,
                       style: const TextStyle(
                         fontSize: 23,
                         fontWeight: FontWeight.bold,

@@ -14,7 +14,7 @@ class DashBoardType3Widget extends StatefulWidget {
 }
 
 class _DashBoardType3WidgetState extends State<DashBoardType3Widget> {
-  List<Type3ItemData> _data = [];
+  Type3Response? _response;
   bool _isLoading = true;
   String? _error;
 
@@ -26,10 +26,10 @@ class _DashBoardType3WidgetState extends State<DashBoardType3Widget> {
 
   Future<void> _loadData() async {
     try {
-      final data = await ApiService.getDashBoardType3(widget.dashboardId);
+      final response = await ApiService.getDashBoardType3(widget.dashboardId);
       if (mounted) {
         setState(() {
-          _data = data;
+          _response = response;
           _isLoading = false;
         });
       }
@@ -94,7 +94,7 @@ class _DashBoardType3WidgetState extends State<DashBoardType3Widget> {
       );
     }
 
-    if (_data.isEmpty) {
+    if (_response == null || _response!.type3Data.isEmpty) {
       return emptyDataMessage();
     }
 
@@ -129,9 +129,20 @@ class _DashBoardType3WidgetState extends State<DashBoardType3Widget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (_response!.title.isNotEmpty)
+            Text(
+              _response!.title,
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: SeoguColors.textPrimary,
+              ),
+            ),
+          if (_response!.title.isNotEmpty)
+            const SizedBox(height: 16),
           Expanded(
             child: Row(
-              children: _data.map((data) {
+              children: _response!.type3Data.map((data) {
                 return _buildType3Item(
                   data.rank,
                   data.keyword,

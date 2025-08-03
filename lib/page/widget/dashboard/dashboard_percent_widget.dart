@@ -14,7 +14,7 @@ class DashBoardPercentWidget extends StatefulWidget {
 }
 
 class _DashBoardPercentWidgetState extends State<DashBoardPercentWidget> {
-  List<PercentItemData> _data = [];
+  PercentResponse? _response;
   bool _isLoading = true;
   String? _error;
 
@@ -26,10 +26,10 @@ class _DashBoardPercentWidgetState extends State<DashBoardPercentWidget> {
 
   Future<void> _loadData() async {
     try {
-      final data = await ApiService.getDashBoardPercent(widget.dashboardId);
+      final response = await ApiService.getDashBoardPercent(widget.dashboardId);
       if (mounted) {
         setState(() {
-          _data = data;
+          _response = response;
           _isLoading = false;
         });
       }
@@ -94,7 +94,7 @@ class _DashBoardPercentWidgetState extends State<DashBoardPercentWidget> {
       );
     }
     
-    if (_data.isEmpty) {
+    if (_response == null || _response!.percentData.isEmpty) {
       return emptyDataMessage();
     }
     
@@ -116,7 +116,18 @@ class _DashBoardPercentWidgetState extends State<DashBoardPercentWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ..._data.asMap().entries.map((entry) {
+          if (_response!.title.isNotEmpty)
+            Text(
+              _response!.title,
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: SeoguColors.textPrimary,
+              ),
+            ),
+          if (_response!.title.isNotEmpty)
+            const SizedBox(height: 12),
+          ..._response!.percentData.asMap().entries.map((entry) {
             final index = entry.key;
             final data = entry.value;
             final color = index < colors.length ? colors[index] : SeoguColors.primary;

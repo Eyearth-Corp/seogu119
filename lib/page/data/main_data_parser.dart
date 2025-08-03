@@ -150,3 +150,103 @@ class PercentItemData {
     );
   }
 }
+
+// Chart Widget Response Model
+class ChartResponse {
+  final String title;
+  final List<ChartDataPoint> chartData;
+
+  ChartResponse({
+    required this.title,
+    required this.chartData,
+  });
+
+  factory ChartResponse.fromJson(Map<String, dynamic> json) {
+    return ChartResponse(
+      title: json['title'] ?? '',
+      chartData: (json['chart_data'] as List<dynamic>?)
+          ?.map((item) => ChartDataPoint.fromJson(item))
+          .toList() ?? [],
+    );
+  }
+}
+
+// Percent Widget Response Model
+class PercentResponse {
+  final String title;
+  final List<PercentItemData> percentData;
+
+  PercentResponse({
+    required this.title,
+    required this.percentData,
+  });
+
+  factory PercentResponse.fromJson(Map<String, dynamic> json) {
+    return PercentResponse(
+      title: json['title'] ?? '',
+      percentData: (json['percent_data'] as List<dynamic>?)
+          ?.map((item) => PercentItemData.fromJson(item))
+          .toList() ?? [],
+    );
+  }
+}
+
+// Type2 Widget Response Model
+class Type2Response {
+  final String title;
+  final List<Type2Data> type2Data;
+
+  Type2Response({
+    required this.title,
+    required this.type2Data,
+  });
+
+  factory Type2Response.fromJson(Map<String, dynamic> json) {
+    return Type2Response(
+      title: json['title'] ?? '',
+      type2Data: (json['type2_data'] as List<dynamic>?)
+          ?.map((item) => Type2Data.fromJson(item))
+          .toList() ?? [],
+    );
+  }
+}
+
+// Type3 Widget Response Model
+class Type3Response {
+  final String title;
+  final List<Type3ItemData> type3Data;
+
+  Type3Response({
+    required this.title,
+    required this.type3Data,
+  });
+
+  factory Type3Response.fromJson(Map<String, dynamic> json) {
+    return Type3Response(
+      title: json['title'] ?? '',
+      type3Data: (json['type3_data'] as List<dynamic>?)
+          ?.map((item) => Type3ItemData.fromJson(item))
+          .toList() ?? [],
+    );
+  }
+}
+
+// Type4 Widget Response Model
+class Type4Response {
+  final String title;
+  final List<Type4Data> type4Data;
+
+  Type4Response({
+    required this.title,
+    required this.type4Data,
+  });
+
+  factory Type4Response.fromJson(Map<String, dynamic> json) {
+    return Type4Response(
+      title: json['title'] ?? '',
+      type4Data: (json['type4_data'] as List<dynamic>?)
+          ?.map((item) => Type4Data.fromJson(item))
+          .toList() ?? [],
+    );
+  }
+}
