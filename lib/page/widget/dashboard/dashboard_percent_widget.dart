@@ -120,7 +120,7 @@ class _DashBoardPercentWidgetState extends State<DashBoardPercentWidget> {
             Text(
               _response!.title,
               style: const TextStyle(
-                fontSize: 19,
+                fontSize: 23,
                 fontWeight: FontWeight.bold,
                 color: SeoguColors.textPrimary,
               ),
@@ -159,7 +159,7 @@ class _DashBoardPercentWidgetState extends State<DashBoardPercentWidget> {
                 child: Text(
                   dongName,
                   style: const TextStyle(
-                    fontSize: 19,
+                    fontSize: 21,
                     color: Color(0xFF64748B),
                   ),
                 ),
@@ -190,7 +190,7 @@ class _DashBoardPercentWidgetState extends State<DashBoardPercentWidget> {
                 child: Text(
                   '${percentage.toStringAsFixed(1)}%',
                   style: const TextStyle(
-                    fontSize: 19,
+                    fontSize: 21,
                     fontWeight: FontWeight.w600,
                     color: SeoguColors.textPrimary,
                   ),

@@ -138,7 +138,7 @@ class _DashBoardType1WidgetState extends State<DashBoardType1Widget> {
                 Text(
                   _response!.title,
                   style: const TextStyle(
-                    fontSize: 19,
+                    fontSize: 23,
                     fontWeight: FontWeight.bold,
                     color: SeoguColors.textPrimary,
                   ),
@@ -182,7 +182,7 @@ class _DashBoardType1WidgetState extends State<DashBoardType1Widget> {
           Text(
             title,
             style: const TextStyle(
-              fontSize: 19,
+              fontSize: 21,
               color: SeoguColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
@@ -194,7 +194,7 @@ class _DashBoardType1WidgetState extends State<DashBoardType1Widget> {
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: 28,
+                  fontSize: 31,
                   fontWeight: FontWeight.bold,
                   color: color,
                 ),
@@ -205,7 +205,7 @@ class _DashBoardType1WidgetState extends State<DashBoardType1Widget> {
                 child: Text(
                   unit,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     color: SeoguColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),

@@ -133,7 +133,7 @@ class _DashBoardType3WidgetState extends State<DashBoardType3Widget> {
             Text(
               _response!.title,
               style: const TextStyle(
-                fontSize: 19,
+                fontSize: 23,
                 fontWeight: FontWeight.bold,
                 color: SeoguColors.textPrimary,
               ),
@@ -176,7 +176,7 @@ class _DashBoardType3WidgetState extends State<DashBoardType3Widget> {
                   child: Text(
                     rank,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: SeoguColors.surface,
                     ),
@@ -187,7 +187,7 @@ class _DashBoardType3WidgetState extends State<DashBoardType3Widget> {
               Text(
                 keyword,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   color: SeoguColors.textPrimary,
                 ),
               ),
@@ -197,7 +197,7 @@ class _DashBoardType3WidgetState extends State<DashBoardType3Widget> {
           Text(
             '$count건',
             style: const TextStyle(
-              fontSize: 19,
+              fontSize: 21,
               fontWeight: FontWeight.w600,
               color: Color(0xFF64748B),
             ),

@@ -123,7 +123,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
                 Text(
                   _response!.title,
                   style: const TextStyle(
-                    fontSize: 19,
+                    fontSize: 23,
                     fontWeight: FontWeight.bold,
                     color: SeoguColors.textPrimary,
                   ),
@@ -176,7 +176,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
             child: Text(
               title,
               style: const TextStyle(
-                fontSize: 19,
+                fontSize: 21,
                 color: SeoguColors.textPrimary,
               ),
               maxLines: 1,
@@ -237,7 +237,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
                       child: Text(
                         title,
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: SeoguColors.textPrimary,
                         ),
@@ -251,7 +251,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
                 const Text(
                   '상세 내용',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF64748B),
                   ),
@@ -260,7 +260,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
                 Text(
                   detail,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     height: 1.5,
                     color: SeoguColors.textPrimary,
                   ),
@@ -274,7 +274,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
                       child: const Text(
                         '닫기',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF64748B),
                         ),
@@ -376,7 +376,7 @@ class _ExpandedBbs2View extends StatelessWidget {
                             child: Text(
                               response.title,
                               style: const TextStyle(
-                                fontSize: 44,
+                                fontSize: 53,
                                 fontWeight: FontWeight.bold,
                                 color: SeoguColors.textPrimary,
                               ),
@@ -465,7 +465,7 @@ class _ExpandedBbs2View extends StatelessWidget {
                     index.toString(),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 24,
+                      fontSize: 26,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -476,7 +476,7 @@ class _ExpandedBbs2View extends StatelessWidget {
                 child: Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 36,
+                    fontSize: 43,
                     fontWeight: FontWeight.bold,
                     color: SeoguColors.textPrimary,
                   ),
@@ -490,7 +490,7 @@ class _ExpandedBbs2View extends StatelessWidget {
           Text(
             detail,
             style: const TextStyle(
-              fontSize: 32,
+              fontSize: 35,
               height: 1.6,
               color: SeoguColors.textSecondary,
             ),

@@ -198,7 +198,7 @@ class _MainDashboardState extends State<MainDashboard> {
           Text(
             title,
             style: const TextStyle(
-              fontSize: 19,
+              fontSize: 23,
               fontWeight: FontWeight.bold,
               color: SeoguColors.textPrimary,
             ),
@@ -213,7 +213,7 @@ class _MainDashboardState extends State<MainDashboard> {
                     const Text(
                       '처리됨',
                       style: TextStyle(
-                        fontSize: 19,
+                        fontSize: 21,
                         color: Color(0xFF64748B),
                       ),
                     ),
@@ -221,7 +221,7 @@ class _MainDashboardState extends State<MainDashboard> {
                     Text(
                       complaintPerformance?.processed ?? '0건',
                       style: const TextStyle(
-                        fontSize: 23,
+                        fontSize: 25,
                         fontWeight: FontWeight.bold,
                         color: SeoguColors.success,
                       ),
@@ -241,7 +241,7 @@ class _MainDashboardState extends State<MainDashboard> {
                     const Text(
                       '처리율',
                       style: TextStyle(
-                        fontSize: 19,
+                        fontSize: 21,
                         color: Color(0xFF64748B),
                       ),
                     ),
@@ -249,7 +249,7 @@ class _MainDashboardState extends State<MainDashboard> {
                     Text(
                       complaintPerformance?.rate ?? '0%',
                       style: const TextStyle(
-                        fontSize: 23,
+                        fontSize: 25,
                         fontWeight: FontWeight.bold,
                         color: SeoguColors.info,
                       ),

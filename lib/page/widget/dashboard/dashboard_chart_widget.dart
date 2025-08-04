@@ -114,7 +114,7 @@ class _DashBoardChartWidgetState extends State<DashBoardChartWidget> {
           child: Text(
             '차트 데이터가 없습니다.',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               color: SeoguColors.textSecondary,
             ),
           ),
@@ -143,7 +143,7 @@ class _DashBoardChartWidgetState extends State<DashBoardChartWidget> {
             Text(
               _response!.title,
               style: const TextStyle(
-                fontSize: 19,
+                fontSize: 23,
                 fontWeight: FontWeight.bold,
                 color: SeoguColors.textPrimary,
               ),
@@ -170,7 +170,7 @@ class _DashBoardChartWidgetState extends State<DashBoardChartWidget> {
                       reservedSize: 35,
                       getTitlesWidget: (value, meta) => Text(
                         '${value.toInt()}%',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                        style: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
                       ),
                     ),
                   ),

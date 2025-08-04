@@ -120,7 +120,7 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
             Text(
               _response!.title,
               style: const TextStyle(
-                fontSize: 19,
+                fontSize: 23,
                 fontWeight: FontWeight.bold,
                 color: SeoguColors.textPrimary,
               ),
@@ -166,7 +166,7 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
             child: Text(
               title,
               style: const TextStyle(
-                fontSize: 19,
+                fontSize: 21,
                 color: SeoguColors.textPrimary,
               ),
               maxLines: 1,
@@ -184,7 +184,7 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
             child: Text(
               status,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: isCompleted ? SeoguColors.success : SeoguColors.warning,
               ),
@@ -236,7 +236,7 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
                           Text(
                             title,
                             style: const TextStyle(
-                              fontSize: 18,
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: SeoguColors.textPrimary,
                             ),
@@ -253,7 +253,7 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
                             child: Text(
                               status,
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w600,
                                 color: isCompleted ? SeoguColors.success : SeoguColors.warning,
                               ),
@@ -270,7 +270,7 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
                 const Text(
                   '상세 내용',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF64748B),
                   ),
@@ -279,7 +279,7 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
                 Text(
                   detail,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     height: 1.5,
                     color: SeoguColors.textPrimary,
                   ),
@@ -293,7 +293,7 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
                       child: const Text(
                         '닫기',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF64748B),
                         ),
