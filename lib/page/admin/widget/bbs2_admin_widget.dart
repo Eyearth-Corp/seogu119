@@ -103,6 +103,7 @@ class _Bbs2AdminWidgetState extends State<Bbs2AdminWidget> {
       }
     } catch (e) {
       _showErrorSnackBar('BBS2 아이템 삭제 실패: ${AdminService.getErrorMessage(e)}');
+      print(AdminService.getErrorMessage(e));
     }
   }
 
