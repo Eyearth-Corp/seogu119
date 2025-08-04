@@ -62,6 +62,7 @@ class _MainDashboardState extends State<MainDashboard> {
 
     return Container(
       margin: const EdgeInsets.all(12.0),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: LinearGradient(
@@ -89,13 +90,7 @@ class _MainDashboardState extends State<MainDashboard> {
               dashboardId: 1,
             ),
             const SizedBox(height: 20),
-        
-            // 타입 2
-            // DashBoardType2Widget(
-            //   dashboardId: 2,
-            // ),
-            // const SizedBox(height: 20),
-        
+            
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,

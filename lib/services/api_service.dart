@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 
 class ApiService {
   static const String _prodBaseUrl = 'http://seogu119-api.eyearth.net/api';
-  static const String _devBaseUrl = 'http://seogu119-api.eyearth.net/api';
+  static const String _devBaseUrl = 'http://seogu119-api.eyearth.net';
   
   static String get baseUrl => kDebugMode ? '$_devBaseUrl/api' : _prodBaseUrl;
   
