@@ -691,4 +691,78 @@ class AdminService {
     }
     return error.toString();
   }
+
+  // Dashboard Master CRUD Operations
+  
+  /// 대시보드 마스터 생성
+  static Future<Map<String, dynamic>?> createDashboardMaster({
+    required int id,
+    required String widgetType,
+    required String dashboardName,
+    String? dashboardDescription,
+  }) async {
+    try {
+      final response = await postToURL(
+        '$baseUrl/api/dashboard-master',
+        {
+          'id': id,
+          'widget_type': widgetType,
+          'dashboard_name': dashboardName,
+          'dashboard_description': dashboardDescription,
+        },
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// 대시보드 마스터 수정
+  static Future<Map<String, dynamic>?> updateDashboardMaster({
+    required int id,
+    required String widgetType,
+    String? dashboardName,
+    String? dashboardDescription,
+  }) async {
+    try {
+      final data = <String, dynamic>{};
+      if (dashboardName != null) data['dashboard_name'] = dashboardName;
+      if (dashboardDescription != null) data['dashboard_description'] = dashboardDescription;
+      
+      final response = await putToURL(
+        '$baseUrl/api/dashboard-master/$id/$widgetType',
+        data,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// 대시보드 마스터 삭제
+  static Future<Map<String, dynamic>?> deleteDashboardMaster({
+    required int id,
+    required String widgetType,
+  }) async {
+    try {
+      final response = await deleteFromURL(
+        '$baseUrl/api/dashboard-master/$id/$widgetType',
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// 위젯 타입 목록 조회
+  static Future<Map<String, dynamic>?> getWidgetTypes() async {
+    try {
+      final response = await fetchFromURL(
+        '$baseUrl/api/widget-types',
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
