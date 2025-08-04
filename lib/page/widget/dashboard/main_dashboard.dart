@@ -103,7 +103,7 @@ class _MainDashboardState extends State<MainDashboard> {
                   ),
                   SizedBox(width: 20),
                   Expanded(
-                      child: DashBoardBbs2Widget(
+                      child: DashBoardBbs1Widget(
                         dashboardId: 2,
                       )
                   ),
@@ -123,7 +123,7 @@ class _MainDashboardState extends State<MainDashboard> {
                   ),
                   SizedBox(width: 20),
                   Expanded(
-                    child: DashBoardBbs2Widget(
+                    child: DashBoardBbs1Widget(
                       dashboardId: 4,
                     )
                   ),
