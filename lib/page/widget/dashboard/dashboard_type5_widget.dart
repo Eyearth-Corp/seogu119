@@ -190,12 +190,14 @@ class _DashBoardType5WidgetState extends State<DashBoardType5Widget> {
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // 이모지와 인덱스 번호
                       Center(
                         child: Text(
                           data.emoji,
-                          style: const TextStyle(fontSize: 62),
+
+                          style: const TextStyle(fontSize: 62, color: Colors.white),
                         ),
                       ),
                       SizedBox(height: 12),
