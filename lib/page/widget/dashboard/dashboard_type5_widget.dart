@@ -98,94 +98,159 @@ class _DashBoardType5WidgetState extends State<DashBoardType5Widget> {
       return emptyDataMessage();
     }
 
-    final data = _response!.type5Data.first;
-
-    return Container(
-      height: 180,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_response!.title.isNotEmpty)
-            Text(
-              _response!.title,
-              style: const TextStyle(
-                fontSize: 23,
-                fontWeight: FontWeight.bold,
-                color: SeoguColors.textPrimary,
+    return Row(
+      children: _response!.type5Data.asMap().entries.map((entry) {
+        final index = entry.key;
+        final data = entry.value;
+        
+        // 블루 그라데이션 색상 배열 (왼쪽에서 오른쪽으로 갈수록 진해짐)
+        final gradientColors = [
+          [const Color(0xFF93C5FD), const Color(0xFF60A5FA)], // 가장 밝은 파랑
+          [const Color(0xFF60A5FA), const Color(0xFF3B82F6)], // 밝은 파랑
+          [const Color(0xFF3B82F6), const Color(0xFF2563EB)], // 중밝은 파랑
+          [const Color(0xFF2563EB), const Color(0xFF1D4ED8)], // 중간 파랑
+          [const Color(0xFF1D4ED8), const Color(0xFF1E40AF)], // 중진한 파랑
+          [const Color(0xFF1E40AF), const Color(0xFF1E3A8A)], // 진한 파랑
+          [const Color(0xFF1E3A8A), const Color(0xFF172554)], // 더 진한 파랑
+          [const Color(0xFF172554), const Color(0xFF0F172A)], // 매우 진한 파랑
+          [const Color(0xFF0F172A), const Color(0xFF020617)], // 거의 검은색에 가까운 파랑
+          [const Color(0xFF020617), const Color(0xFF000000)], // 가장 진한 색상
+        ];
+        
+        final colors = gradientColors[index % gradientColors.length];
+        
+        return Expanded(
+          child: Container(
+            height: 380,
+            margin: const EdgeInsets.only(right: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: colors,
               ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: colors[0].withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                  spreadRadius: 0,
+                ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          if (_response!.title.isNotEmpty)
-            const SizedBox(height: 16),
-          Row(
-            children: [
-              // 이모지 부분
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xFFE2E8F0),
-                    width: 1,
+            child: Stack(
+              children: [
+                // 배경 패턴
+                Positioned(
+                  top: -20,
+                  right: -20,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.1),
+                    ),
                   ),
                 ),
-                child: Center(
-                  child: Text(
-                    data.emoji,
-                    style: const TextStyle(fontSize: 28),
+                Positioned(
+                  bottom: -30,
+                  left: -30,
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.05),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              // 텍스트 내용 부분
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      data.title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: SeoguColors.textPrimary,
+                // 메인 컨텐츠
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // 이모지와 인덱스 번호
+                      Center(
+                        child: Text(
+                          data.emoji,
+                          style: const TextStyle(fontSize: 62),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      data.content1,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF64748B),
+                      SizedBox(height: 12),
+                      Container(
+                        width: 32,
+                        height: 32,
+                        child: Center(
+                          child: Text(
+                            '0${index + 1}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      data.content2,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF64748B),
+                      Container(
+                        width: 1,
+                        height: 20,
+                        margin: EdgeInsets.only(top: 8, bottom: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                        ),
                       ),
-                    ),
-                  ],
+                      // 제목
+                      Text(
+                        data.title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          height: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // 내용
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              data.content1,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              data.content2,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white60,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ],
-      ),
+        );
+      }).toList(),
     );
   }
 }
