@@ -30,3 +30,5 @@ phases:
       - echo Build completed on `date`
       - aws s3 sync ./build/web s3://seogu119.eyearth.net
       - aws cloudfront create-invalidation --distribution-id E142B7QLTB42CF --paths "/*"
+      - aws s3 sync ./build/web s3://seogu119.co.kr
+      - aws cloudfront create-invalidation --distribution-id E2PR39QA3F98S4 --paths "/*"
