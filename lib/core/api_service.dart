@@ -200,6 +200,26 @@ class ApiService {
     }
   }
 
+  static Future<Type5Response> getDashBoardType5(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardType5?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return Type5Response.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load DashBoardType5');
+    } catch (e) {
+      print('DashBoardType5 API Error: $e');
+      throw Exception('Failed to load DashBoardType5');
+    }
+  }
+
   static Future<Bbs1Response> getDashBoardBbs1(int id) async {
     try {
       final response = await http.get(

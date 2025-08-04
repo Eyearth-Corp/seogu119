@@ -251,6 +251,48 @@ class Type4Response {
   }
 }
 
+class Type5Data {
+  final String emoji;
+  final String title;
+  final String content1;
+  final String content2;
+
+  Type5Data({
+    required this.emoji,
+    required this.title,
+    required this.content1,
+    required this.content2,
+  });
+
+  factory Type5Data.fromJson(Map<String, dynamic> json) {
+    return Type5Data(
+      emoji: json['emoji'] ?? '',
+      title: json['title'] ?? '',
+      content1: json['content1'] ?? '',
+      content2: json['content2'] ?? '',
+    );
+  }
+}
+
+class Type5Response {
+  final String title;
+  final List<Type5Data> type5Data;
+
+  Type5Response({
+    required this.title,
+    required this.type5Data,
+  });
+
+  factory Type5Response.fromJson(Map<String, dynamic> json) {
+    return Type5Response(
+      title: json['title'] ?? '',
+      type5Data: (json['type5_data'] as List<dynamic>?)
+          ?.map((item) => Type5Data.fromJson(item))
+          .toList() ?? [],
+    );
+  }
+}
+
 // Type1 Widget Response Model
 class Type1Response {
   final String title;

@@ -12,6 +12,7 @@ import 'widget/percent_admin_widget.dart';
 import 'widget/type2_admin_widget.dart';
 import 'widget/type3_admin_widget.dart';
 import 'widget/type4_admin_widget.dart';
+import 'widget/type5_admin_widget.dart';
 import 'dong_admin_dashboard_page.dart';
 
 class NewAdminDashboardPage extends StatefulWidget {
@@ -672,6 +673,8 @@ class _WidgetDataManagerState extends State<WidgetDataManager> {
         return Type3AdminWidget(dashboardId: widget.dashboardId);
       case 'type4':
         return Type4AdminWidget(dashboardId: widget.dashboardId);
+      case 'type5':
+        return Type5AdminWidget(dashboardId: widget.dashboardId);
       default:
         return Center(
           child: Text('지원하지 않는 위젯 타입: ${widget.widgetType}'),
