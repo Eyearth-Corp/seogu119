@@ -189,6 +189,53 @@ class AdminService {
     }
   }
 
+  /// 특정 URL로 POST 요청을 보내는 범용 메서드
+  static Future<dynamic> postToURL(String url, Map<String, dynamic> data) async {
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          if (_authToken != null) 'Authorization': 'Bearer $_authToken',
+        },
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        return responseData;
+      } else {
+        throw Exception('HTTP ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// 특정 URL로 DELETE 요청을 보내는 범용 메서드
+  static Future<dynamic> deleteFromURL(String url) async {
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          if (_authToken != null) 'Authorization': 'Bearer $_authToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return responseData;
+      } else {
+        throw Exception('HTTP ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// 전체 동 목록 조회
   static Future<List<dynamic>?> getAllDistricts() async {
     try {

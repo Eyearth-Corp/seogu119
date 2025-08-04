@@ -1,10 +1,14 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
-import '../data/admin_service.dart';
-import '../data/dong_list.dart';
 import '../../core/colors.dart';
+import '../data/admin_service.dart';
+import '../widget/dashboard/dashboard_type1_widget.dart';
+import '../widget/dashboard/dashboard_type2_widget.dart';
+import '../widget/dashboard/dashboard_type3_widget.dart';
+import '../widget/dashboard/dashboard_type4_widget.dart';
+import '../widget/dashboard/dashboard_bbs1_widget.dart';
+import '../widget/dashboard/dashboard_bbs2_widget.dart';
+import '../widget/dashboard/dashboard_chart_widget.dart';
+import '../widget/dashboard/dashboard_percent_widget.dart';
 
 class NewAdminDashboardPage extends StatefulWidget {
   const NewAdminDashboardPage({super.key});
@@ -14,45 +18,44 @@ class NewAdminDashboardPage extends StatefulWidget {
 }
 
 class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
-  Map<String, dynamic>? _dashboardData;
+  List<DashboardLayoutItem> _layouts = [];
   bool _isLoading = false;
+  bool _isEditMode = false;
+
+  final Map<String, String> _widgetTypeNames = {
+    'type1': 'Type1 위젯 (메트릭 카드)',
+    'type2': 'Type2 위젯 (상태 카드)',
+    'type3': 'Type3 위젯 (순위)',
+    'type4': 'Type4 위젯 (처리 현황)',
+    'bbs1': 'BBS1 위젯 (공지사항)',
+    'bbs2': 'BBS2 위젯 (트렌드)',
+    'chart': '차트 위젯',
+    'percent': '퍼센트 위젯',
+  };
 
   @override
   void initState() {
     super.initState();
-    _loadDashboardData();
+    _loadLayouts();
   }
 
-  /// Load all dashboard data from multiple API endpoints
-  Future<void> _loadDashboardData() async {
+  Future<void> _loadLayouts() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Load data from multiple API endpoints
-      final summaryResponse = await AdminService.fetchFromURL(
-          '${AdminService.baseUrl}/api/admin/dashboard/summary');
-      final statsResponse = await AdminService.fetchFromURL(
-          '${AdminService.baseUrl}/api/admin/dashboard/statistics');
-
-      if (summaryResponse != null && statsResponse != null) {
+      final response = await AdminService.fetchFromURL(
+          '${AdminService.baseUrl}/api/dashboard-layout');
+      
+      if (response != null && response['success'] == true) {
+        final layouts = response['data']['layouts'] as List<dynamic>;
         setState(() {
-          _dashboardData = {
-            'summary': summaryResponse['data'],
-            'statistics': statsResponse['data'],
-          };
+          _layouts = layouts.map((item) => DashboardLayoutItem.fromJson(item)).toList();
         });
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('API 호출 실패: ${AdminService.getErrorMessage(e)}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      _showErrorSnackBar('레이아웃 로드 실패: ${AdminService.getErrorMessage(e)}');
     } finally {
       setState(() {
         _isLoading = false;
@@ -60,276 +63,126 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('관리자 대시보드'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 1,
-        actions: [
-          // 동별 관리 대시보드 버튼
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.location_city, color: SeoguColors.primary),
-            tooltip: '동별 대시보드',
-            onSelected: (dongName) {
-              Navigator.pushNamed(context, '/admin/dong/$dongName');
-            },
-            itemBuilder: (context) => DongList.all.map((dong) =>
-                PopupMenuItem<String>(
-                  value: dong.name,
-                  child: Text(dong.name),
-                )).toList(),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _dashboardData == null
-              ? const Center(child: Text('데이터가 없습니다'))
-              : Stack(
-                  children: [
-                    SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          // 동 목록 Wrap 위젯
-                          _buildDistrictList(),
-                          const SizedBox(height: 20),
-                          _buildSummaryMetrics(),
-                          const SizedBox(height: 20),
-                          _buildGlobalMetrics(),
-                          const SizedBox(height: 20),
-                          _buildTrendChart(),
-                          const SizedBox(height: 20),
-                          _buildLivingZones(),
-                          const SizedBox(height: 20),
-                          _buildRecentActivity(),
-                          const SizedBox(height: 80), // 버튼 공간 확보
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 20,
-                      right: 20,
-                      child: FloatingActionButton.extended(
-                        onPressed: _loadDashboardData,
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('새로고침'),
-                        backgroundColor: SeoguColors.primary,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-    );
+  Future<void> _addWidget(String widgetType, int dashboardId, String layoutType) async {
+    try {
+      final response = await AdminService.postToURL(
+        '${AdminService.baseUrl}/api/dashboard-layout',
+        {
+          'widget_type': widgetType,
+          'dashboard_id': dashboardId,
+          'layout_type': layoutType,
+        },
+      );
+
+      if (response != null && response['success'] == true) {
+        _showSuccessSnackBar('위젯이 성공적으로 추가되었습니다.');
+        _loadLayouts();
+      }
+    } catch (e) {
+      _showErrorSnackBar('위젯 추가 실패: ${AdminService.getErrorMessage(e)}');
+    }
   }
 
-  Widget _buildDistrictList() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '🗺️ 동별 관리 대시보드',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: DongList.all.map((dong) {
-              return InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, '/admin/dong/${dong.name}');
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: dong.color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: dong.color.withOpacity(0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: dong.color,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        dong.name,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: SeoguColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
+  Future<void> _deleteWidget(int layoutId) async {
+    try {
+      final response = await AdminService.deleteFromURL(
+          '${AdminService.baseUrl}/api/dashboard-layout/$layoutId');
+
+      if (response != null && response['success'] == true) {
+        _showSuccessSnackBar('위젯이 성공적으로 삭제되었습니다.');
+        _loadLayouts();
+      }
+    } catch (e) {
+      _showErrorSnackBar('위젯 삭제 실패: ${AdminService.getErrorMessage(e)}');
+    }
   }
 
-  Widget _buildSummaryMetrics() {
-    final summary = _dashboardData?['summary']?['summary'] as Map<String, dynamic>? ?? {};
-    
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '📊 주요 통계',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              _buildMetricCard(
-                '생활권',
-                summary['total_living_zones']?.toString() ?? '0',
-                '개',
-                SeoguColors.primary,
-              ),
-              const SizedBox(width: 16),
-              _buildMetricCard(
-                '행정동',
-                summary['total_districts']?.toString() ?? '0',
-                '개',
-                SeoguColors.secondary,
-              ),
-              const SizedBox(width: 16),
-              _buildMetricCard(
-                '상인회',
-                summary['total_merchants']?.toString() ?? '0',
-                '개',
-                SeoguColors.accent,
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              _buildMetricCard(
-                '총 점포',
-                summary['total_stores']?.toString() ?? '0',
-                '개',
-                SeoguColors.primary,
-              ),
-              const SizedBox(width: 16),
-              _buildMetricCard(
-                '가맹점포',
-                summary['total_member_stores']?.toString() ?? '0',
-                '개',
-                SeoguColors.secondary,
-              ),
-              const SizedBox(width: 16),
-              _buildMetricCard(
-                '전체 가맹률',
-                '${summary['overall_membership_rate']?.toString() ?? '0'}',
-                '%',
-                SeoguColors.accent,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMetricCard(String title, String value, String unit, Color color) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: SeoguColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: color.withOpacity(0.3),
-            width: 1,
-          ),
+  void _showErrorSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                color: SeoguColors.textSecondary,
-                fontWeight: FontWeight.w500,
+      );
+    }
+  }
+
+  void _showSuccessSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+  void _showAddWidgetDialog() {
+    String selectedWidgetType = 'type1';
+    int dashboardId = 1;
+    String layoutType = 'full';
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('위젯 추가'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedWidgetType,
+                decoration: const InputDecoration(labelText: '위젯 타입'),
+                items: _widgetTypeNames.entries.map((entry) {
+                  return DropdownMenuItem(
+                    value: entry.key,
+                    child: Text(entry.value),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setDialogState(() {
+                    selectedWidgetType = value!;
+                  });
+                },
               ),
+              const SizedBox(height: 16),
+              TextFormField(
+                initialValue: dashboardId.toString(),
+                decoration: const InputDecoration(labelText: '대시보드 ID'),
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  dashboardId = int.tryParse(value) ?? 1;
+                },
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: layoutType,
+                decoration: const InputDecoration(labelText: '레이아웃 타입'),
+                items: const [
+                  DropdownMenuItem(value: 'full', child: Text('전체 너비')),
+                  DropdownMenuItem(value: 'half', child: Text('절반 너비')),
+                ],
+                onChanged: (value) {
+                  setDialogState(() {
+                    layoutType = value!;
+                  });
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('취소'),
             ),
-            const SizedBox(height: 8),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  unit,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: SeoguColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _addWidget(selectedWidgetType, dashboardId, layoutType);
+              },
+              child: const Text('추가'),
             ),
           ],
         ),
@@ -337,375 +190,223 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
     );
   }
 
-  Widget _buildGlobalMetrics() {
-    final metrics = _dashboardData?['statistics']?['global_metrics'] as List<dynamic>? ?? [];
-    
-    if (metrics.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+  Widget _buildWidget(DashboardLayoutItem layout) {
+    switch (layout.widgetType) {
+      case 'type1':
+        return DashBoardType1Widget(dashboardId: layout.dashboardId);
+      case 'type2':
+        return DashBoardType2Widget(dashboardId: layout.dashboardId);
+      case 'type3':
+        return DashBoardType3Widget(dashboardId: layout.dashboardId);
+      case 'type4':
+        return DashBoardType4Widget(dashboardId: layout.dashboardId);
+      case 'bbs1':
+        return DashBoardBbs1Widget(dashboardId: layout.dashboardId);
+      case 'bbs2':
+        return DashBoardBbs2Widget(dashboardId: layout.dashboardId);
+      case 'chart':
+        return DashBoardChartWidget(dashboardId: layout.dashboardId);
+      case 'percent':
+        return DashBoardPercentWidget(dashboardId: layout.dashboardId);
+      default:
+        return Container(
+          height: 160,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: SeoguColors.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.red),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '📈 글로벌 메트릭',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Column(
-            children: metrics.map((metric) {
-              return _buildGlobalMetricItem(
-                metric['title'] ?? '',
-                metric['value'] ?? '',
-                metric['unit'] ?? '',
-                SeoguColors.chart1,
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGlobalMetricItem(String title, String value, String unit, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: SeoguColors.border,
-            width: 1,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
+          child: Center(
             child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                color: SeoguColors.textPrimary,
+              '알 수 없는 위젯 타입: ${layout.widgetType}',
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        );
+    }
+  }
+
+  Widget _buildLayoutItem(DashboardLayoutItem layout) {
+    final widget = _buildWidget(layout);
+    
+    return Stack(
+      children: [
+        widget,
+        if (_isEditMode)
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 18),
+                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                onPressed: () => _deleteWidget(layout.id),
               ),
             ),
           ),
-          Text(
-            '$value $unit',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 
-  Widget _buildTrendChart() {
-    final trends = _dashboardData?['statistics']?['recent_trends'] as List<dynamic>? ?? [];
+  List<Widget> _buildDashboardRows() {
+    final rows = <Widget>[];
+    final groupedLayouts = <int, List<DashboardLayoutItem>>{};
     
-    if (trends.isEmpty) {
-      return const SizedBox.shrink();
+    // 행별로 그룹화
+    for (final layout in _layouts) {
+      final rowGroup = layout.rowGroup ?? layout.positionOrder;
+      groupedLayouts.putIfAbsent(rowGroup, () => []).add(layout);
     }
+    
+    // 정렬된 행 키 순서대로 처리
+    final sortedRowKeys = groupedLayouts.keys.toList()..sort();
+    
+    for (final rowKey in sortedRowKeys) {
+      final rowLayouts = groupedLayouts[rowKey]!;
+      
+      if (rowLayouts.length == 1 && rowLayouts.first.layoutType == 'full') {
+        // 전체 너비 위젯
+        rows.add(_buildLayoutItem(rowLayouts.first));
+      } else {
+        // 행에 여러 위젯이 있거나 절반 너비 위젯들
+        final rowChildren = <Widget>[];
+        
+        for (int i = 0; i < rowLayouts.length; i++) {
+          rowChildren.add(
+            Expanded(child: _buildLayoutItem(rowLayouts[i])),
+          );
+          if (i < rowLayouts.length - 1) {
+            rowChildren.add(const SizedBox(width: 20));
+          }
+        }
+        
+        rows.add(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: rowChildren,
+          ),
+        );
+      }
+      
+      rows.add(const SizedBox(height: 20));
+    }
+    
+    return rows;
+  }
 
-    // Convert trend data to chart spots
-    final chartData = trends.reversed.toList().asMap().entries.map((entry) {
-      final index = entry.key;
-      final trend = entry.value;
-      return FlSpot(
-        index.toDouble(),
-        double.tryParse(trend['value'].toString()) ?? 0.0,
-      );
-    }).toList();
-
-    return Container(
-      height: 360,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('대시보드 관리'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 1,
+        actions: [
+          IconButton(
+            icon: Icon(_isEditMode ? Icons.done : Icons.edit),
+            onPressed: () {
+              setState(() {
+                _isEditMode = !_isEditMode;
+              });
+            },
+            tooltip: _isEditMode ? '편집 완료' : '편집 모드',
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _showAddWidgetDialog,
+            tooltip: '위젯 추가',
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadLayouts,
+            tooltip: '새로고침',
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '📈 최근 트렌드',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(
-                  show: true,
-                  drawHorizontalLine: true,
-                  horizontalInterval: 10,
-                  getDrawingHorizontalLine: (value) => FlLine(
-                    color: const Color(0xFFE2E8F0),
-                    strokeWidth: 1,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _layouts.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.dashboard,
+                        size: 64,
+                        color: SeoguColors.textSecondary,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        '위젯이 없습니다.',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: SeoguColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: _showAddWidgetDialog,
+                        icon: const Icon(Icons.add),
+                        label: const Text('위젯 추가'),
+                      ),
+                    ],
                   ),
-                  drawVerticalLine: false,
-                ),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 35,
-                      getTitlesWidget: (value, meta) => Text(
-                        '${value.toInt()}',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                )
+              : Container(
+                  color: const Color(0xFFF8FAFC),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        children: _buildDashboardRows(),
                       ),
                     ),
                   ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        final index = value.toInt();
-                        if (index >= 0 && index < trends.length) {
-                          final trend = trends.reversed.toList()[index];
-                          return Text(
-                            trend['period_label'] ?? '',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-                          );
-                        }
-                        return const Text('');
-                      },
-                    ),
-                  ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: chartData,
-                    isCurved: true,
-                    color: SeoguColors.primary,
-                    barWidth: 3,
-                    isStrokeCapRound: true,
-                    dotData: FlDotData(
-                      show: true,
-                      getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
-                        radius: 4,
-                        color: SeoguColors.primary,
-                        strokeWidth: 2,
-                        strokeColor: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
+}
 
-  Widget _buildLivingZones() {
-    final zones = _dashboardData?['statistics']?['living_zones'] as List<dynamic>? ?? [];
-    
-    if (zones.isEmpty) {
-      return const SizedBox.shrink();
-    }
+class DashboardLayoutItem {
+  final int id;
+  final String widgetType;
+  final int dashboardId;
+  final int positionOrder;
+  final String layoutType;
+  final int? rowGroup;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '🏘️ 생활권별 현황',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Column(
-            children: zones.map((zone) {
-              return _buildLivingZoneItem(
-                zone['zone_name'] ?? '',
-                zone['merchant_count'] ?? 0,
-                zone['total_stores'] ?? 0,
-                zone['member_stores'] ?? 0,
-                (zone['membership_rate'] ?? 0.0).toDouble(),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
+  DashboardLayoutItem({
+    required this.id,
+    required this.widgetType,
+    required this.dashboardId,
+    required this.positionOrder,
+    required this.layoutType,
+    this.rowGroup,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 
-  Widget _buildLivingZoneItem(String zoneName, int merchantCount, int totalStores, 
-      int memberStores, double membershipRate) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: SeoguColors.border,
-            width: 1,
-          ),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  zoneName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: SeoguColors.textPrimary,
-                  ),
-                ),
-              ),
-              Text(
-                '${membershipRate.toStringAsFixed(1)}%',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: membershipRate > 80 
-                      ? SeoguColors.success 
-                      : membershipRate > 60 
-                          ? SeoguColors.warning 
-                          : SeoguColors.error,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              _buildZoneMetric('상인회', merchantCount.toString(), SeoguColors.primary),
-              const SizedBox(width: 16),
-              _buildZoneMetric('총 점포', totalStores.toString(), SeoguColors.secondary),
-              const SizedBox(width: 16),
-              _buildZoneMetric('가맹점포', memberStores.toString(), SeoguColors.accent),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildZoneMetric(String label, String value, Color color) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: SeoguColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecentActivity() {
-    final summary = _dashboardData?['summary']?['summary'] as Map<String, dynamic>? ?? {};
-    
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: SeoguColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '🕒 최근 활동',
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: SeoguColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ListTile(
-            leading: const Icon(Icons.notifications, color: SeoguColors.primary),
-            title: const Text('최근 7일간 생성된 공지사항'),
-            subtitle: Text('${summary['recent_notices'] ?? 0}건'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.campaign, color: SeoguColors.secondary),
-            title: const Text('최근 7일간 생활권 공지사항'),
-            subtitle: Text('${summary['recent_zone_notices'] ?? 0}건'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.login, color: SeoguColors.accent),
-            title: const Text('최근 24시간 로그인한 관리자'),
-            subtitle: Text('${summary['recent_active_admins'] ?? 0}명'),
-          ),
-        ],
-      ),
+  factory DashboardLayoutItem.fromJson(Map<String, dynamic> json) {
+    return DashboardLayoutItem(
+      id: json['id'],
+      widgetType: json['widget_type'],
+      dashboardId: json['dashboard_id'],
+      positionOrder: json['position_order'],
+      layoutType: json['layout_type'],
+      rowGroup: json['row_group'],
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
     );
   }
 }
