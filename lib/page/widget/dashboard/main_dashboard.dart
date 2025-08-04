@@ -97,13 +97,13 @@ class _MainDashboardState extends State<MainDashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                      child: DashBoardBbs1Widget(
+                      child: DashBoardBbs2Widget(
                         dashboardId: 1,
                       )
                   ),
                   SizedBox(width: 20),
                   Expanded(
-                      child: DashBoardBbs1Widget(
+                      child: DashBoardBbs2Widget(
                         dashboardId: 2,
                       )
                   ),
@@ -117,13 +117,13 @@ class _MainDashboardState extends State<MainDashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: DashBoardBbs1Widget(
+                    child: DashBoardBbs2Widget(
                       dashboardId: 3,
                     )
                   ),
                   SizedBox(width: 20),
                   Expanded(
-                    child: DashBoardBbs1Widget(
+                    child: DashBoardBbs2Widget(
                       dashboardId: 4,
                     )
                   ),
