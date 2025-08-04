@@ -488,66 +488,59 @@ class DashboardMasterList extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                    if (isSelected)
-                                      Container(
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: const BoxDecoration(
-                                          color: Color(0xFF3B82F6),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.check,
-                                          size: 12,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    else
-                                      PopupMenuButton<String>(
-                                        onSelected: (value) {
-                                          switch (value) {
-                                            case 'edit':
-                                              _showEditDialog(context, dashboard);
-                                              break;
-                                            // case 'delete':
-                                            //   _showDeleteDialog(context, dashboard);
-                                            //   break;
-                                          }
-                                        },
-                                        itemBuilder: (context) => [
-                                          const PopupMenuItem(
-                                            value: 'edit',
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.edit, size: 16, color: Color(0xFF475569)),
-                                                SizedBox(width: 8),
-                                                Text('수정'),
-                                              ],
-                                            ),
-                                          ),
-                                          // const PopupMenuItem(
-                                          //   value: 'delete',
-                                          //   child: Row(
-                                          //     children: [
-                                          //       Icon(Icons.delete, size: 16, color: Color(0xFFEF4444)),
-                                          //       SizedBox(width: 8),
-                                          //       Text('삭제', style: TextStyle(color: Color(0xFFEF4444))),
-                                          //     ],
-                                          //   ),
-                                          // ),
-                                        ],
-                                        child: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.shade100,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Icon(
-                                            Icons.more_vert,
-                                            size: 16,
-                                            color: Color(0xFF64748B),
-                                          ),
-                                        ),
-                                      ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        _showEditDialog(context, dashboard);
+                                      },
+                                      child: Text('수정')
+                                    )
+                                    // PopupMenuButton<String>(
+                                    //   onSelected: (value) {
+                                    //     switch (value) {
+                                    //       case 'edit':
+                                    //         _showEditDialog(context, dashboard);
+                                    //         break;
+                                    //     // case 'delete':
+                                    //     //   _showDeleteDialog(context, dashboard);
+                                    //     //   break;
+                                    //     }
+                                    //   },
+                                    //   itemBuilder: (context) => [
+                                    //     const PopupMenuItem(
+                                    //       value: 'edit',
+                                    //       child: Row(
+                                    //         children: [
+                                    //           Icon(Icons.edit, size: 16, color: Color(0xFF475569)),
+                                    //           SizedBox(width: 8),
+                                    //           Text('수정'),
+                                    //         ],
+                                    //       ),
+                                    //     ),
+                                    //     // const PopupMenuItem(
+                                    //     //   value: 'delete',
+                                    //     //   child: Row(
+                                    //     //     children: [
+                                    //     //       Icon(Icons.delete, size: 16, color: Color(0xFFEF4444)),
+                                    //     //       SizedBox(width: 8),
+                                    //     //       Text('삭제', style: TextStyle(color: Color(0xFFEF4444))),
+                                    //     //     ],
+                                    //     //   ),
+                                    //     // ),
+                                    //   ],
+                                    //   child: Container(
+                                    //     padding: const EdgeInsets.all(4),
+                                    //     decoration: BoxDecoration(
+                                    //       color: Colors.grey.shade100,
+                                    //       shape: BoxShape.circle,
+                                    //     ),
+                                    //     child: const Icon(
+                                    //       Icons.more_vert,
+                                    //       size: 16,
+                                    //       color: Color(0xFF64748B),
+                                    //     ),
+                                    //   ),
+                                    // ),
+
                                   ],
                                 ),
                                 const SizedBox(height: 8),
