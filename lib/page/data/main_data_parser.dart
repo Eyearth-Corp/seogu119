@@ -262,9 +262,10 @@ class Type1Response {
   });
 
   factory Type1Response.fromJson(Map<String, dynamic> json) {
+    final data = json['data'] ?? json;
     return Type1Response(
-      title: json['title'] ?? '',
-      type1Data: (json['type1_data'] as List<dynamic>?)
+      title: data['title'] ?? '',
+      type1Data: (data['type1_data'] as List<dynamic>?)
           ?.map((item) => Type1Data.fromJson(item))
           .toList() ?? [],
     );
@@ -282,9 +283,10 @@ class Bbs1Response {
   });
 
   factory Bbs1Response.fromJson(Map<String, dynamic> json) {
+    final data = json['data'] ?? json;
     return Bbs1Response(
-      title: json['title'] ?? '',
-      bbs1Data: (json['bbs1_data'] as List<dynamic>?)
+      title: data['title'] ?? '',
+      bbs1Data: (data['bbs1_data'] as List<dynamic>?)
           ?.map((item) => Bbs1ItemData.fromJson(item))
           .toList() ?? [],
     );
@@ -302,9 +304,10 @@ class Bbs2Response {
   });
 
   factory Bbs2Response.fromJson(Map<String, dynamic> json) {
+    final data = json['data'] ?? json;
     return Bbs2Response(
-      title: json['title'] ?? '',
-      bbs2Data: (json['bbs2_data'] as List<dynamic>?)
+      title: data['title'] ?? '',
+      bbs2Data: (data['bbs2_data'] as List<dynamic>?)
           ?.map((item) => Bbs2ItemData.fromJson(item))
           .toList() ?? [],
     );
