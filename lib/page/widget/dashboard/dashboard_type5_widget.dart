@@ -104,19 +104,33 @@ class _DashBoardType5WidgetState extends State<DashBoardType5Widget> {
         final data = entry.value;
         
         // 블루 그라데이션 색상 배열 (왼쪽에서 오른쪽으로 갈수록 진해짐)
+        // final gradientColors = [
+        //   [const Color(0xFF93C5FD), const Color(0xFF60A5FA)], // 가장 밝은 파랑
+        //   [const Color(0xFF60A5FA), const Color(0xFF3B82F6)], // 밝은 파랑
+        //   [const Color(0xFF3B82F6), const Color(0xFF2563EB)], // 중밝은 파랑
+        //   [const Color(0xFF2563EB), const Color(0xFF1D4ED8)], // 중간 파랑
+        //   [const Color(0xFF1D4ED8), const Color(0xFF1E40AF)], // 중진한 파랑
+        //   [const Color(0xFF1E40AF), const Color(0xFF1E3A8A)], // 진한 파랑
+        //   [const Color(0xFF1E3A8A), const Color(0xFF172554)], // 더 진한 파랑
+        //   [const Color(0xFF172554), const Color(0xFF0F172A)], // 매우 진한 파랑
+        //   [const Color(0xFF0F172A), const Color(0xFF020617)], // 거의 검은색에 가까운 파랑
+        //   [const Color(0xFF020617), const Color(0xFF000000)], // 가장 진한 색상
+        // ];
+
         final gradientColors = [
-          [const Color(0xFF93C5FD), const Color(0xFF60A5FA)], // 가장 밝은 파랑
-          [const Color(0xFF60A5FA), const Color(0xFF3B82F6)], // 밝은 파랑
-          [const Color(0xFF3B82F6), const Color(0xFF2563EB)], // 중밝은 파랑
-          [const Color(0xFF2563EB), const Color(0xFF1D4ED8)], // 중간 파랑
-          [const Color(0xFF1D4ED8), const Color(0xFF1E40AF)], // 중진한 파랑
-          [const Color(0xFF1E40AF), const Color(0xFF1E3A8A)], // 진한 파랑
-          [const Color(0xFF1E3A8A), const Color(0xFF172554)], // 더 진한 파랑
-          [const Color(0xFF172554), const Color(0xFF0F172A)], // 매우 진한 파랑
-          [const Color(0xFF0F172A), const Color(0xFF020617)], // 거의 검은색에 가까운 파랑
-          [const Color(0xFF020617), const Color(0xFF000000)], // 가장 진한 색상
+          [const Color(0xFFA5C952), const Color(0xFF89C34B)], // 밝은 초록 → 연초록
+          [const Color(0xFF89C34B), const Color(0xFF5DAE4F)], // 연초록 → 중간 초록
+          [const Color(0xFF5DAE4F), const Color(0xFF3A8D74)], // 중초록 → 청록
+          [const Color(0xFF3A8D74), const Color(0xFF2A7AB3)], // 청록 → 하늘파랑
+          [const Color(0xFF2A7AB3), const Color(0xFF2767C9)], // 하늘파랑 → 진한파랑
+          [const Color(0xFF2767C9), const Color(0xFF1D4DB5)], // 진한파랑 → 짙은파랑
+          [const Color(0xFF1D4DB5), const Color(0xFF1A3D8F)], // 짙은파랑 → 남색
+          [const Color(0xFF1A3D8F), const Color(0xFF162F6D)], // 남색 → 어두운 남색
+          [const Color(0xFF162F6D), const Color(0xFF111F47)], // 어두운 남색 → 거의 검정
+          [const Color(0xFF111F47), const Color(0xFF0B122D)], // 거의 검정 → 검정 파랑
         ];
-        
+
+
         final colors = gradientColors[index % gradientColors.length];
         
         return Expanded(
