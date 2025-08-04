@@ -47,7 +47,6 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Container(
-        height: 160,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: SeoguColors.surface,
@@ -98,10 +97,10 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
       return emptyDataMessage();
     }
 
-    double height = 88.0 + (42 * _response!.bbs1Data.length);
+    //double height = 88.0 + (42 * _response!.bbs1Data.length);
 
     return Container(
-      height: height,
+      //height: height,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: SeoguColors.surface,

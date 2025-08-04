@@ -62,6 +62,7 @@ class _MainDashboardState extends State<MainDashboard> {
 
     return Container(
       margin: const EdgeInsets.all(12.0),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: LinearGradient(
@@ -82,42 +83,36 @@ class _MainDashboardState extends State<MainDashboard> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              // 타입 1
-              DashBoardType1Widget(
-                dashboardId: 1,
-              ),
-              const SizedBox(height: 20),
-
-              // 타입 2
-              DashBoardType2Widget(
-                dashboardId: 2,
-              ),
-              const SizedBox(height: 20),
-
-              Row(
+        child: Column(
+          children: [
+            // 타입 1
+            DashBoardType1Widget(
+              dashboardId: 1,
+            ),
+            const SizedBox(height: 20),
+            
+            Expanded(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: DashBoardType3Widget(
-                      dashboardId: 3,
-                    )
+                      child: DashBoardBbs1Widget(
+                        dashboardId: 1,
+                      )
                   ),
                   SizedBox(width: 20),
                   Expanded(
-                    child: DashBoardType4Widget(
-                      dashboardId: 4,
-                    )
+                      child: DashBoardBbs2Widget(
+                        dashboardId: 2,
+                      )
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              Row(
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -134,22 +129,22 @@ class _MainDashboardState extends State<MainDashboard> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-
-              // 차트
-              DashBoardChartWidget(
-                dashboardId: 3,
-              ),
-              const SizedBox(height: 20),
-
-              // 동별 가맹률 현황
-              DashBoardPercentWidget(
-                dashboardId: 4,
-              ),
-              const SizedBox(height: 20),
-
-            ],
-          ),
+            ),
+            // const SizedBox(height: 20),
+            //
+            // // 차트
+            // DashBoardChartWidget(
+            //   dashboardId: 3,
+            // ),
+            // const SizedBox(height: 20),
+            //
+            // // 동별 가맹률 현황
+            // DashBoardPercentWidget(
+            //   dashboardId: 4,
+            // ),
+            // const SizedBox(height: 20),
+        
+          ],
         ),
       ),
     );

@@ -98,9 +98,9 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
       return emptyDataMessage();
     }
 
-    double height = 88.0 + (42 * _response!.bbs2Data.length);
+    //double height = 88.0 + (42 * _response!.bbs2Data.length);
     return Container(
-      height: height,
+      //height: height,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: SeoguColors.surface,

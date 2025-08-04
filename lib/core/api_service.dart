@@ -5,8 +5,8 @@ import 'package:flutter/foundation.dart';
 import '../page/data/main_data_parser.dart';
 
 class ApiService {
-  static const String _prodBaseUrl = 'https://seogu119-api.eyearth.net/api';
-  static const String _devBaseUrl = 'http://localhost:8000';
+  static const String _prodBaseUrl = 'http://seogu119-api.eyearth.net/api';
+  static const String _devBaseUrl = 'http://seogu119-api.eyearth.net';
   
   static String get baseUrl => kDebugMode ? '$_devBaseUrl/api' : _prodBaseUrl;
   
@@ -125,6 +125,7 @@ class ApiService {
         Uri.parse('$baseUrl/DashBoardType1?id=$id'),
         headers: {'Content-Type': 'application/json'},
       );
+      print("$baseUrl/DashBoardType1?id=$id");
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);

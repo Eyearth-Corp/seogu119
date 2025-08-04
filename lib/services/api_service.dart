@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 
 class ApiService {
-  static const String _prodBaseUrl = 'https://seogu119-api.eyearth.net/api';
-  static const String _devBaseUrl = 'http://localhost:8000';
+  static const String _prodBaseUrl = 'http://seogu119-api.eyearth.net/api';
+  static const String _devBaseUrl = 'http://seogu119-api.eyearth.net';
   
   static String get baseUrl => kDebugMode ? '$_devBaseUrl/api' : _prodBaseUrl;
   

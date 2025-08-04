@@ -5,8 +5,8 @@ import '../page/data/dong_dashboard_data.dart';
 
 class DongApiService {
   static const String _baseUrl = kDebugMode 
-      ? 'http://localhost:8000/api'
-      : 'https://seogu119-api.eyearth.net/api';
+      ? 'http://seogu119-api.eyearth.net/api'
+      : 'http://seogu119-api.eyearth.net/api';
 
   /// 모든 동 목록을 조회합니다.
   static Future<Map<String, dynamic>> getAllDistricts() async {
