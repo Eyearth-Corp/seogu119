@@ -47,7 +47,6 @@ class _DashBoardBbs1WidgetState extends State<DashBoardBbs1Widget> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Container(
-        height: 160,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: SeoguColors.surface,
