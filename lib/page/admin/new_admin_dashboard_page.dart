@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../core/colors.dart';
 import '../data/admin_service.dart';
 import '../data/dong_list.dart';
@@ -256,7 +257,7 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
                       children: [
                         // 왼쪽: 대시보드 마스터 목록
                         Expanded(
-                          flex: 1,
+                          flex: 2,
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -280,7 +281,7 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
                         const SizedBox(width: 16),
                         // 오른쪽: 위젯 데이터 관리
                         Expanded(
-                          flex: 2,
+                          flex: 4,
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -321,6 +322,14 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
                                   ),
                           ),
                         ),
+                        const SizedBox(width: 16),
+                        // 오른쪽 끝 : 이모지를 누르면 자동으로 복사 된다.
+                        Expanded(
+                          flex: 1,
+                          child: ImageLibraryPanel(
+                            onCopy: _showSuccessSnackBar,
+                          ),
+                        )
                       ],
                     ),
                   ),
@@ -1211,6 +1220,367 @@ class _DashboardDeleteDialogState extends State<DashboardDeleteDialog> {
               : const Text('삭제'),
         ),
       ],
+    );
+  }
+}
+
+class ImageLibraryPanel extends StatelessWidget {
+  final Function(String) onCopy;
+
+  const ImageLibraryPanel({
+    super.key,
+    required this.onCopy,
+  });
+
+  static const List<Map<String, String>> _imageList = [
+    // 기본 상태/반응
+    {'title': '체크마크', 'image': '✅'},
+    {'title': '엑스마크', 'image': '❌'},
+    {'title': '느낌표', 'image': '❗'},
+    {'title': '물음표', 'image': '❓'},
+    {'title': '더블 느낌표', 'image': '‼️'},
+    {'title': '물음표 느낌표', 'image': '⁉️'},
+    {'title': '빨간 동그라미', 'image': '🔴'},
+    {'title': '노란 동그라미', 'image': '🟡'},
+    {'title': '초록 동그라미', 'image': '🟢'},
+    {'title': '파란 동그라미', 'image': '🔵'},
+    {'title': '보라 동그라미', 'image': '🟣'},
+    {'title': '검은 동그라미', 'image': '⚫'},
+    {'title': '흰 동그라미', 'image': '⚪'},
+    
+    // 화살표 및 방향
+    {'title': '화살표 위', 'image': '⬆️'},
+    {'title': '화살표 아래', 'image': '⬇️'},
+    {'title': '화살표 오른쪽', 'image': '➡️'},
+    {'title': '화살표 왼쪽', 'image': '⬅️'},
+    {'title': '화살표 북동', 'image': '↗️'},
+    {'title': '화살표 남동', 'image': '↘️'},
+    {'title': '화살표 남서', 'image': '↙️'},
+    {'title': '화살표 북서', 'image': '↖️'},
+    {'title': '위아래 화살표', 'image': '↕️'},
+    {'title': '좌우 화살표', 'image': '↔️'},
+    {'title': '새로고침', 'image': '🔄'},
+    {'title': '되돌리기', 'image': '↩️'},
+    {'title': '앞으로', 'image': '↪️'},
+    
+    // 감정 및 반응
+    {'title': '별', 'image': '⭐'},
+    {'title': '반짝이는 별', 'image': '✨'},
+    {'title': '하트', 'image': '❤️'},
+    {'title': '분홍 하트', 'image': '💖'},
+    {'title': '빨간 하트', 'image': '❤️‍🔥'},
+    {'title': '깨진 하트', 'image': '💔'},
+    {'title': '박수', 'image': '👏'},
+    {'title': '엄지척', 'image': '👍'},
+    {'title': '엄지척 내림', 'image': '👎'},
+    {'title': '좋아요', 'image': '👌'},
+    {'title': '브이', 'image': '✌️'},
+    {'title': '근육', 'image': '💪'},
+    {'title': '기도', 'image': '🙏'},
+    
+    // 특수 효과
+    {'title': '불', 'image': '🔥'},
+    {'title': '번개', 'image': '⚡'},
+    {'title': '폭발', 'image': '💥'},
+    {'title': '충돌', 'image': '💢'},
+    {'title': '회오리', 'image': '🌪️'},
+    {'title': '무지개', 'image': '🌈'},
+    {'title': '다이아몬드', 'image': '💎'},
+    {'title': '왕관', 'image': '👑'},
+    
+    // 아이디어 및 도구
+    {'title': '전구', 'image': '💡'},
+    {'title': '로켓', 'image': '🚀'},
+    {'title': '배터리', 'image': '🔋'},
+    {'title': '자석', 'image': '🧲'},
+    {'title': '망원경', 'image': '🔭'},
+    {'title': '현미경', 'image': '🔬'},
+    {'title': '실험관', 'image': '🧪'},
+    {'title': 'DNA', 'image': '🧬'},
+    
+    // 경고 및 주의
+    {'title': '경고', 'image': '⚠️'},
+    {'title': '금지', 'image': '🚫'},
+    {'title': '정지', 'image': '🛑'},
+    {'title': '방사능', 'image': '☢️'},
+    {'title': '바이오해저드', 'image': '☣️'},
+    {'title': '위험', 'image': '⚡'},
+    {'title': '독', 'image': '☠️'},
+    {'title': '온도계', 'image': '🌡️'},
+    
+    // 시간 및 날짜
+    {'title': '시계', 'image': '⏰'},
+    {'title': '모래시계', 'image': '⏳'},
+    {'title': '모래시계 완료', 'image': '⌛'},
+    {'title': '캘린더', 'image': '📅'},
+    {'title': '달력', 'image': '📆'},
+    {'title': '스톱워치', 'image': '⏱️'},
+    {'title': '타이머', 'image': '⏲️'},
+    {'title': '시계 12시', 'image': '🕐'},
+    
+    // 차트 및 데이터
+    {'title': '그래프', 'image': '📊'},
+    {'title': '트렌드 상승', 'image': '📈'},
+    {'title': '트렌드 하락', 'image': '📉'},
+    {'title': '원형 차트', 'image': '🗠'},
+    {'title': '계산기', 'image': '🧮'},
+    {'title': '통계', 'image': '📋'},
+    {'title': '클립보드', 'image': '📋'},
+    {'title': '체크리스트', 'image': '✅'},
+    
+    // 파일 및 문서
+    {'title': '폴더', 'image': '📁'},
+    {'title': '열린 폴더', 'image': '📂'},
+    {'title': '문서', 'image': '📄'},
+    {'title': '페이지', 'image': '📃'},
+    {'title': '메모', 'image': '📝'},
+    {'title': '책', 'image': '📚'},
+    {'title': '노트북', 'image': '📓'},
+    {'title': '신문', 'image': '📰'},
+    {'title': 'PDF', 'image': '📕'},
+    {'title': '스크롤', 'image': '📜'},
+    
+    // 검색 및 도구
+    {'title': '돋보기', 'image': '🔍'},
+    {'title': '돋보기 왼쪽', 'image': '🔎'},
+    {'title': '톱니바퀴', 'image': '⚙️'},
+    {'title': '렌치', 'image': '🔧'},
+    {'title': '망치', 'image': '🔨'},
+    {'title': '도구상자', 'image': '🧰'},
+    {'title': '펜치', 'image': '🔩'},
+    {'title': '자', 'image': '📏'},
+    {'title': '삼각자', 'image': '📐'},
+    
+    // 보안 및 키
+    {'title': '열쇠', 'image': '🔑'},
+    {'title': '금열쇠', 'image': '🗝️'},
+    {'title': '자물쇠', 'image': '🔒'},
+    {'title': '열린 자물쇠', 'image': '🔓'},
+    {'title': '방패', 'image': '🛡️'},
+    {'title': '검', 'image': '⚔️'},
+    {'title': 'ID카드', 'image': '🪪'},
+    {'title': '지문', 'image': '👆'},
+    
+    // 목표 및 성취
+    {'title': '목표', 'image': '🎯'},
+    {'title': '트로피', 'image': '🏆'},
+    {'title': '메달', 'image': '🏅'},
+    {'title': '1등 메달', 'image': '🥇'},
+    {'title': '2등 메달', 'image': '🥈'},
+    {'title': '3등 메달', 'image': '🥉'},
+    {'title': '리본', 'image': '🎀'},
+    {'title': '선물', 'image': '🎁'},
+    {'title': '파티', 'image': '🎉'},
+    {'title': '축하', 'image': '🎊'},
+    
+    // 통신 및 연결
+    {'title': '전화', 'image': '📞'},
+    {'title': '이메일', 'image': '✉️'},
+    {'title': '메시지', 'image': '💬'},
+    {'title': '채팅', 'image': '💭'},
+    {'title': '안테나', 'image': '📡'},
+    {'title': '위성', 'image': '🛰️'},
+    {'title': 'Wi-Fi', 'image': '📶'},
+    {'title': '링크', 'image': '🔗'},
+    
+    // 위치 및 이동
+    {'title': '핀', 'image': '📍'},
+    {'title': '위치', 'image': '📌'},
+    {'title': '지도', 'image': '🗺️'},
+    {'title': '나침반', 'image': '🧭'},
+    {'title': '자동차', 'image': '🚗'},
+    {'title': '비행기', 'image': '✈️'},
+    {'title': '배', 'image': '🚢'},
+    {'title': '기차', 'image': '🚂'},
+    
+    // 날씨 및 자연
+    {'title': '태양', 'image': '☀️'},
+    {'title': '구름', 'image': '☁️'},
+    {'title': '비', 'image': '🌧️'},
+    {'title': '눈', 'image': '❄️'},
+    {'title': '번개', 'image': '⛈️'},
+    {'title': '달', 'image': '🌙'},
+    {'title': '지구', 'image': '🌍'},
+    {'title': '산', 'image': '⛰️'},
+    
+    // 음식 및 음료
+    {'title': '커피', 'image': '☕'},
+    {'title': '차', 'image': '🍵'},
+    {'title': '케이크', 'image': '🎂'},
+    {'title': '피자', 'image': '🍕'},
+    {'title': '햄버거', 'image': '🍔'},
+    {'title': '사과', 'image': '🍎'},
+    {'title': '당근', 'image': '🥕'},
+    {'title': '빵', 'image': '🍞'},
+    
+    // 스포츠 및 활동
+    {'title': '축구공', 'image': '⚽'},
+    {'title': '농구공', 'image': '🏀'},
+    {'title': '테니스공', 'image': '🎾'},
+    {'title': '골프공', 'image': '⛳'},
+    {'title': '체스', 'image': '♟️'},
+    {'title': '주사위', 'image': '🎲'},
+    {'title': '카드놀이', 'image': '🃏'},
+    {'title': '조깅', 'image': '🏃'},
+    
+    // 얼굴 표정
+    {'title': '웃음', 'image': '😀'},
+    {'title': '크게 웃음', 'image': '😃'},
+    {'title': '윙크', 'image': '😉'},
+    {'title': '키스', 'image': '😘'},
+    {'title': '생각', 'image': '🤔'},
+    {'title': '화남', 'image': '😠'},
+    {'title': '슬픔', 'image': '😢'},
+    {'title': '놀람', 'image': '😱'},
+    {'title': '졸림', 'image': '😴'},
+    {'title': '안경', 'image': '🤓'},
+    
+    // 동물
+    {'title': '고양이', 'image': '🐱'},
+    {'title': '강아지', 'image': '🐶'},
+    {'title': '곰', 'image': '🐻'},
+    {'title': '토끼', 'image': '🐰'},
+    {'title': '여우', 'image': '🦊'},
+    {'title': '팬더', 'image': '🐼'},
+    {'title': '원숭이', 'image': '🐵'},
+    {'title': '사자', 'image': '🦁'},
+    
+    // 기술 및 디지털
+    {'title': '컴퓨터', 'image': '💻'},
+    {'title': '핸드폰', 'image': '📱'},
+    {'title': '태블릿', 'image': '📟'},
+    {'title': '키보드', 'image': '⌨️'},
+    {'title': '마우스', 'image': '🖱️'},
+    {'title': 'USB', 'image': '💾'},
+    {'title': 'CD', 'image': '💿'},
+    {'title': '프린터', 'image': '🖨️'},
+    {'title': '카메라', 'image': '📷'},
+    {'title': '비디오', 'image': '📹'},
+  ];
+
+  Future<void> _copyToClipboard(String image, String title) async {
+    try {
+      await Clipboard.setData(ClipboardData(text: image));
+      onCopy('$title 복사됨');
+    } catch (e) {
+      onCopy('복사 실패');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Color(0xFFE2E8F0),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.image_outlined, 
+                     color: Color(0xFF475569), size: 18),
+                const SizedBox(width: 8),
+                const Text(
+                  '이미지 라이브러리',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E293B),
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF6FF),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.2)),
+                  ),
+                  child: Text(
+                    '${_imageList.length}개',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF3B82F6),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1.2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: _imageList.length,
+                itemBuilder: (context, index) {
+                  final item = _imageList[index];
+                  return Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () => _copyToClipboard(item['image']!, item['title']!),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: const Color(0xFFE2E8F0),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              item['image']!,
+                              style: const TextStyle(fontSize: 24),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              item['title']!,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF64748B),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

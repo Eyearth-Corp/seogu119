@@ -6,7 +6,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 
 class AdminService {
   static const String baseUrl = kDebugMode 
-      ? 'http://localhost:8000' 
+      ? 'https://seogu119-api.eyearth.net'
       : 'https://seogu119-api.eyearth.net';
   
   static const String _tokenKey = 'admin_auth_token';
