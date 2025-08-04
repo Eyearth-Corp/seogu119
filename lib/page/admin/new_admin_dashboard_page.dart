@@ -377,9 +377,9 @@ class DashboardMasterList extends StatelessWidget {
                                             case 'edit':
                                               _showEditDialog(context, dashboard);
                                               break;
-                                            case 'delete':
-                                              _showDeleteDialog(context, dashboard);
-                                              break;
+                                            // case 'delete':
+                                            //   _showDeleteDialog(context, dashboard);
+                                            //   break;
                                           }
                                         },
                                         itemBuilder: (context) => [
@@ -393,16 +393,16 @@ class DashboardMasterList extends StatelessWidget {
                                               ],
                                             ),
                                           ),
-                                          const PopupMenuItem(
-                                            value: 'delete',
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.delete, size: 16, color: Color(0xFFEF4444)),
-                                                SizedBox(width: 8),
-                                                Text('삭제', style: TextStyle(color: Color(0xFFEF4444))),
-                                              ],
-                                            ),
-                                          ),
+                                          // const PopupMenuItem(
+                                          //   value: 'delete',
+                                          //   child: Row(
+                                          //     children: [
+                                          //       Icon(Icons.delete, size: 16, color: Color(0xFFEF4444)),
+                                          //       SizedBox(width: 8),
+                                          //       Text('삭제', style: TextStyle(color: Color(0xFFEF4444))),
+                                          //     ],
+                                          //   ),
+                                          // ),
                                         ],
                                         child: Container(
                                           padding: const EdgeInsets.all(4),
