@@ -17,6 +17,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
   Bbs2Response? _response;
   bool _isLoading = true;
   String? _error;
+  bool _isExpanded = false;
 
   @override
   void initState() {
@@ -54,7 +55,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -73,7 +74,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -107,7 +108,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -117,13 +118,26 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (_response!.title.isNotEmpty)
-            Text(
-              _response!.title,
-              style: const TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.bold,
-                color: SeoguColors.textPrimary,
-              ),
+            Row(
+              children: [
+                Text(
+                  _response!.title,
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                    color: SeoguColors.textPrimary,
+                  ),
+                ),
+                Spacer(),
+                IconButton(
+                  onPressed: _showExpandedView,
+                  tooltip: '전체화면으로 보기',
+                  icon: const Icon(
+                    Icons.zoom_out_map,
+                    color: Color(0xFF64748B),
+                  ),
+                )
+              ],
             ),
           const SizedBox(height: 16),
           Column(
@@ -174,6 +188,21 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
     );
   }
 
+  void _showExpandedView() {
+    if (_response == null) return;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return _ExpandedBbs2View(
+          response: _response!,
+          onClose: () => Navigator.of(context).pop(),
+        );
+      },
+    );
+  }
+
   void _showBbs2DetailDialog(BuildContext context, String title, String detail) {
     showDialog(
       context: context,
@@ -194,7 +223,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: SeoguColors.info.withOpacity(0.1),
+                        color: SeoguColors.info.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
@@ -258,6 +287,216 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
           ),
         );
       },
+    );
+  }
+}
+
+class _ExpandedBbs2View extends StatelessWidget {
+  final Bbs2Response response;
+  final VoidCallback onClose;
+
+  const _ExpandedBbs2View({
+    required this.response,
+    required this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    
+    return Material(
+      color: Colors.black.withValues(alpha: 0.5),
+      child: Stack(
+        children: [
+          // Background tap to close
+          GestureDetector(
+            onTap: onClose,
+            child: Container(
+              width: screenSize.width,
+              height: screenSize.height,
+              color: Colors.transparent,
+            ),
+          ),
+          // Expanded widget positioned on the right side
+          Positioned(
+            right: 0,
+            top: 0,
+            bottom: 0,
+            child: GestureDetector(
+              onTap: () {}, // Prevent closing when tapping on the content
+              child: Container(
+                width: screenSize.width * 0.6, // 60% of screen width
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 20,
+                      offset: Offset(-5, 0),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    // Header with title and close button
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                        ),
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Color(0xFFE2E8F0),
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: SeoguColors.info.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.trending_up,
+                              color: SeoguColors.info,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              response.title,
+                              style: const TextStyle(
+                                fontSize: 44,
+                                fontWeight: FontWeight.bold,
+                                color: SeoguColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: onClose,
+                            tooltip: '닫기',
+                            icon: const Icon(
+                              Icons.zoom_in_map,
+                              color: Color(0xFF64748B),
+                              size: 24,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: onClose,
+                            tooltip: '닫기',
+                            icon: const Icon(
+                              Icons.close,
+                              color: Color(0xFF64748B),
+                              size: 24,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Content
+                    Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(20),
+                        itemCount: response.bbs2Data.length,
+                        separatorBuilder: (context, index) => const SizedBox(height: 16),
+                        itemBuilder: (context, index) {
+                          final item = response.bbs2Data[index];
+                          return _buildExpandedBbs2Item(
+                            context,
+                            item.title,
+                            item.detail,
+                            index + 1,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExpandedBbs2Item(BuildContext context, String title, String detail, int index) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFE2E8F0),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: SeoguColors.info,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    index.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: SeoguColors.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Divider(color: Color(0xFFE2E8F0)),
+          const SizedBox(height: 16),
+          Text(
+            detail,
+            style: const TextStyle(
+              fontSize: 32,
+              height: 1.6,
+              color: SeoguColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
