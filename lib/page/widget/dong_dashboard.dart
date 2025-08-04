@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../../core/colors.dart';
-import '../../data/dong_dashboard_data.dart';
-import '../../../services/dong_api_service.dart';
+import '../../core/colors.dart';
+import '../data/dong_dashboard_data.dart';
+import '../../services/dong_api_service.dart';
 
 class DongDashboard extends StatefulWidget {
   final String dongName;

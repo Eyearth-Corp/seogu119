@@ -43,6 +43,7 @@ flutter:
   assets:
     - assets/images/
     - assets/map/
+    - assets/data/
     
   fonts:
     - family: NotoSans

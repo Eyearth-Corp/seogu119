@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 
+import '../page/data/main_data_parser.dart';
+
 class ApiService {
   static const String _prodBaseUrl = 'https://seogu119-api.eyearth.net/api';
   static const String _devBaseUrl = 'http://localhost:8000';
@@ -33,30 +35,6 @@ class ApiService {
     }
   }
 
-  static Future<bool> updateMainDashboard(MainDashboardData data, String? token) async {
-    try {
-      final headers = <String, String>{
-        'Content-Type': 'application/json',
-      };
-      
-      if (token != null) {
-        headers['Authorization'] = 'Bearer $token';
-      }
-
-      final response = await http.post(
-        Uri.parse('$baseUrl/main-dashboard'),
-        headers: headers,
-        body: json.encode({
-          'data_json': _formatDashboardDataForAPI(data)
-        }),
-      );
-
-      return response.statusCode == 200;
-    } catch (e) {
-      print('Update API Error: $e');
-      return false;
-    }
-  }
 
   // 새로운 Districts API 메소드들
   static Future<List<District>> getAllDistricts() async {
@@ -140,63 +118,165 @@ class ApiService {
     }
   }
 
-  /// API 요구사항에 맞는 형식으로 대시보드 데이터 변환
-  static Map<String, dynamic> _formatDashboardDataForAPI(MainDashboardData data) {
-    return {
-      'topMetrics': data.topMetrics.map((metric) => metric.toJson()).toList(),
-      'trendChart': {
-        'title': '📈 온누리 가맹점 추이',
-        'data': [
-          {'x': 0, 'y': 75},
-          {'x': 1, 'y': 78},
-          {'x': 2, 'y': 82},
-          {'x': 3, 'y': 80},
-          {'x': 4, 'y': 85},
-          {'x': 5, 'y': 87}
-        ]
-      },
-      'dongMembership': {
-        'title': '🗺️ 동별 가맹률 현황',
-        'data': [
-          {'name': '동천동', 'percentage': 92.1},
-          {'name': '유촌동', 'percentage': 88.3},
-          {'name': '치평동', 'percentage': 85.7}
-        ]
-      },
-      'complaintKeywords': {
-        'title': '🔥 민원 TOP 3 키워드',
-        'data': data.complaintKeywords.map((item) => {
-          'rank': item.rank,
-          'keyword': item.keyword,
-          'count': item.count
-        }).toList()
-      },
-      'complaintCases': {
-        'title': '✅ 민원 해결 사례',
-        'data': data.complaintCases.map((item) => {
-          'title': item.title,
-          'status': item.status,
-          'detail': item.detail
-        }).toList()
-      },
-      'complaintPerformance': {
-        'title': '📋 민원처리 실적',
-        'processed': data.processedComplaints,
-        'rate': '${data.processingRate}%'
-      },
-      'organizationTrends': {
-        'title': '🌐 타 기관·지자체 주요 동향',
-        'data': data.otherOrganizationTrends.map((item) => {
-          'title': item.title,
-          'detail': item.detail
-        }).toList()
-      },
-      'weeklyAchievements': [
-        {'title': '신규 가맹점', 'value': '${data.newMerchants}개'},
-        {'title': '민원 해결', 'value': '${data.resolvedComplaints}건'},
-        {'title': '지원 예산', 'value': '${data.supportBudget}억'}
-      ]
-    };
+  // Dashboard API methods
+  static Future<Type1Response> getDashBoardType1(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardType1?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return Type1Response.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load DashBoardType1');
+    } catch (e) {
+      print('DashBoardType1 API Error: $e');
+      throw Exception('Failed to load DashBoardType1');
+    }
+  }
+
+  static Future<Type2Response> getDashBoardType2(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardType2?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return Type2Response.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load DashBoardType2');
+    } catch (e) {
+      print('DashBoardType2 API Error: $e');
+      throw Exception('Failed to load DashBoardType2');
+    }
+  }
+
+  static Future<Type3Response> getDashBoardType3(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardType3?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return Type3Response.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load DashBoardType3');
+    } catch (e) {
+      print('DashBoardType3 API Error: $e');
+      throw Exception('Failed to load DashBoardType3');
+    }
+  }
+
+  static Future<Type4Response> getDashBoardType4(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardType4?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return Type4Response.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load DashBoardType4');
+    } catch (e) {
+      print('DashBoardType4 API Error: $e');
+      throw Exception('Failed to load DashBoardType4');
+    }
+  }
+
+  static Future<Bbs1Response> getDashBoardBbs1(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardBbs1?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return Bbs1Response.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load DashBoardBbs1');
+    } catch (e) {
+      print('DashBoardBbs1 API Error: $e');
+      throw Exception('Failed to load DashBoardBbs1');
+    }
+  }
+
+  static Future<Bbs2Response> getDashBoardBbs2(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardBbs2?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return Bbs2Response.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load DashBoardBbs2');
+    } catch (e) {
+      print('DashBoardBbs2 API Error: $e');
+      throw Exception('Failed to load DashBoardBbs2');
+    }
+  }
+
+  static Future<ChartResponse> getDashBoardChart(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardChart?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return ChartResponse.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load DashBoardChart');
+    } catch (e) {
+      print('DashBoardChart API Error: $e');
+      throw Exception('Failed to load DashBoardChart');
+    }
+  }
+
+  static Future<PercentResponse> getDashBoardPercent(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/DashBoardPercent?id=$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return PercentResponse.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load DashBoardPercent');
+    } catch (e) {
+      print('DashBoardPercent API Error: $e');
+      throw Exception('Failed to load DashBoardPercent');
+    }
   }
 }
 
