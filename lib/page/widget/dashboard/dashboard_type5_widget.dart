@@ -136,7 +136,7 @@ class _DashBoardType5WidgetState extends State<DashBoardType5Widget> {
         return Expanded(
           child: Container(
             height: 220,
-            margin: const EdgeInsets.only(right: 16),
+            margin: EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
