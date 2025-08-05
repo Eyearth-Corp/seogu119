@@ -72,8 +72,8 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       // 로딩 상태에서도 기본 그라데이션 적용
-      final topColor = _lightenColor(SeoguColors.surface, 0.05);
-      final bottomColor = _darkenColor(SeoguColors.surface, 0.05);
+      final topColor = _lightenColor(SeoguColors.surface, 0.1);
+      final bottomColor = _darkenColor(SeoguColors.surface, 0.1);
       
       return Container(
         height: 160,
@@ -99,8 +99,8 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
 
     if (_error != null) {
       // 에러 상태에서도 기본 그라데이션 적용
-      final topColor = _lightenColor(SeoguColors.surface, 0.02);
-      final bottomColor = _darkenColor(SeoguColors.surface, 0.02);
+      final topColor = _lightenColor(SeoguColors.surface, 0.1);
+      final bottomColor = _darkenColor(SeoguColors.surface, 0.1);
       
       return Container(
         height: 160,
@@ -149,8 +149,15 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
     backgroundColor = baseColor;
     
     // 그라데이션용 색상 생성 (위: 밝게, 아래: 어둡게)
-    final topColor = _lightenColor(baseColor, 0.02);  // 10% 밝게
-    final bottomColor = _darkenColor(baseColor, 0.02); // 10% 어둡게
+    var topColor = _lightenColor(baseColor, 0.1);  // 10% 밝게
+    var bottomColor = _darkenColor(baseColor, 0.1); // 10% 어둡게
+
+    // 흰색이면
+    // 그라데이션도 흰색
+    if(baseColor == Colors.white) {
+      topColor = Colors.white;
+      bottomColor = Colors.white;
+    }
     
     return Container(
       //height: height,
