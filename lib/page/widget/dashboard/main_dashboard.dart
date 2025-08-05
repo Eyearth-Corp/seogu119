@@ -87,7 +87,12 @@ class _MainDashboardState extends State<MainDashboard> {
         child: Column(
           children: [
             // 타입 1
-            DashBoardType1Widget(
+            // DashBoardType1Widget(
+            //   dashboardId: 1,
+            // ),
+            // const SizedBox(height: 20),
+
+            DashBoardType5Widget(
               dashboardId: 1,
             ),
             const SizedBox(height: 20),
@@ -131,12 +136,8 @@ class _MainDashboardState extends State<MainDashboard> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-            DashBoardType5Widget(
-              dashboardId: 1,
-            ),
             //
-            // // 차트
+            // 차트
             // DashBoardChartWidget(
             //   dashboardId: 3,
             // ),
