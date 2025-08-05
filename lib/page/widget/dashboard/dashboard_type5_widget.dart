@@ -118,16 +118,16 @@ class _DashBoardType5WidgetState extends State<DashBoardType5Widget> {
         // ];
 
         final gradientColors = [
-          [const Color(0xFFA5C952), const Color(0xFF89C34B)], // 밝은 초록 → 연초록
-          //[const Color(0xFF89C34B), const Color(0xFF5DAE4F)], // 연초록 → 중간 초록
-          [const Color(0xFF5DAE4F), const Color(0xFF3A8D74)], // 중초록 → 청록
-          //[const Color(0xFF3A8D74), const Color(0xFF2A7AB3)], // 청록 → 하늘파랑
-          [const Color(0xFF2A7AB3), const Color(0xFF2767C9)], // 하늘파랑 → 진한파랑
-          //[const Color(0xFF2767C9), const Color(0xFF1D4DB5)], // 진한파랑 → 짙은파랑
-          [const Color(0xFF1D4DB5), const Color(0xFF1A3D8F)], // 짙은파랑 → 남색
-          //[const Color(0xFF1A3D8F), const Color(0xFF162F6D)], // 남색 → 어두운 남색
-          [const Color(0xFF162F6D), const Color(0xFF111F47)], // 어두운 남색 → 거의 검정
-          [const Color(0xFF111F47), const Color(0xFF0B122D)], // 거의 검정 → 검정 파랑
+          //[const Color(0xAAA5C952), const Color(0xFF89C34B)], // 밝은 초록 → 연초록
+          [const Color(0xFFc5e89f), const Color(0xFF5DAE4F)], // 연초록 → 중간 초록
+          //[const Color(0xAA5DAE4F), const Color(0xFF3A8D74)], // 중초록 → 청록
+          [const Color(0xFF86d0ba), const Color(0xFF2A7AB3)], // 청록 → 하늘파랑
+          //[const Color(0xAA2A7AB3), const Color(0xFF2767C9)], // 하늘파랑 → 진한파랑
+          [const Color(0xFF70a0eb), const Color(0xFF1D4DB5)], // 진한파랑 → 짙은파랑
+          //[const Color(0xAA1D4DB5), const Color(0xFF1A3D8F)], // 짙은파랑 → 남색
+          [const Color(0xFF5377ca), const Color(0xFF162F6D)], // 남색 → 어두운 남색
+          //[const Color(0xFF162F6D), const Color(0xFF111F47)], // 어두운 남색 → 거의 검정
+          [const Color(0xFF445a9a), const Color(0xFF0B122D)], // 거의 검정 → 검정 파랑
         ];
 
 
@@ -139,8 +139,8 @@ class _DashBoardType5WidgetState extends State<DashBoardType5Widget> {
             margin: const EdgeInsets.only(right: 16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
                 colors: colors,
               ),
               borderRadius: BorderRadius.circular(20),
@@ -185,85 +185,64 @@ class _DashBoardType5WidgetState extends State<DashBoardType5Widget> {
                     ),
                   ),
                 ),
-                // 메인 컨텐츠
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // 이모지와 인덱스 번호
-                      Center(
-                        child: Text(
-                          data.emoji,
-                          style: const TextStyle(fontSize: 42, color: Colors.white),
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      // Container(
-                      //   width: 32,
-                      //   height: 32,
-                      //   child: Center(
-                      //     child: Text(
-                      //       '0${index + 1}',
-                      //       style: const TextStyle(
-                      //         color: Colors.white,
-                      //         fontSize: 16,
-                      //         fontWeight: FontWeight.bold,
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      // Container(
-                      //   width: 1,
-                      //   height: 20,
-                      //   margin: EdgeInsets.only(top: 8, bottom: 8),
-                      //   decoration: BoxDecoration(
-                      //     color: Colors.white24,
-                      //   ),
-                      // ),
-                      // 제목
-                      Text(
-                        data.title,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // 내용
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              data.content1,
-                              style: const TextStyle(
-                                fontSize: 28,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 3),
-                              child: Text(
-                                data.content2,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white60,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    child: Text(
+                      data.emoji,
+                      style: const TextStyle(fontSize: 42, color: Colors.white),
+                    ),
+
                   ),
+                ),
+                // 메인 컨텐츠
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 80),
+                    Text(
+                      data.title,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFd2ffe9),
+                        wordSpacing: 2.0,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // 내용
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          data.content1,
+                          style: const TextStyle(
+                            fontSize: 28,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 3),
+                          child: Text(
+                            data.content2,
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),
