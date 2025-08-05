@@ -338,10 +338,14 @@ class Bbs1Response {
 // BBS2 Widget Response Model
 class Bbs2Response {
   final String title;
+  final String? backgroundColor;
+  final String? titleColor;
   final List<Bbs2ItemData> bbs2Data;
 
   Bbs2Response({
     required this.title,
+    this.backgroundColor,
+    this.titleColor,
     required this.bbs2Data,
   });
 
@@ -349,6 +353,8 @@ class Bbs2Response {
     final data = json['data'] ?? json;
     return Bbs2Response(
       title: data['title'] ?? '',
+      backgroundColor: data['background_color'],
+      titleColor: data['title_color'],
       bbs2Data: (data['bbs2_data'] as List<dynamic>?)
           ?.map((item) => Bbs2ItemData.fromJson(item))
           .toList() ?? [],

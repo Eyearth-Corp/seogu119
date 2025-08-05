@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/colors.dart';
+import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
 import '../data/admin_service.dart';
 import '../data/dong_list.dart';
 import 'widget_managers.dart' show DashboardMaster;
@@ -915,6 +915,8 @@ class _DashboardEditDialogState extends State<DashboardEditDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
+  late final TextEditingController _titleColorController;
+  late final TextEditingController _backgroundColorController;
   bool _isLoading = false;
 
   @override
@@ -922,6 +924,8 @@ class _DashboardEditDialogState extends State<DashboardEditDialog> {
     super.initState();
     _nameController = TextEditingController(text: widget.dashboard.dashboardName);
     _descriptionController = TextEditingController(text: widget.dashboard.dashboardDescription);
+    _titleColorController = TextEditingController(text: widget.dashboard.titleColor ?? '000000');
+    _backgroundColorController = TextEditingController(text: widget.dashboard.backgroundColor ?? 'FFFFFF');
   }
 
   Future<void> _updateDashboard() async {
@@ -937,6 +941,8 @@ class _DashboardEditDialogState extends State<DashboardEditDialog> {
         dashboardDescription: _descriptionController.text.trim().isEmpty 
             ? null 
             : _descriptionController.text.trim(),
+        titleColor: _titleColorController.text.trim(),
+        backgroundColor: _backgroundColorController.text.trim(),
       );
 
       if (response != null && response['success'] == true) {
@@ -1036,6 +1042,26 @@ class _DashboardEditDialogState extends State<DashboardEditDialog> {
                 ),
                 maxLines: 3,
               ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildColorPicker(
+                      controller: _titleColorController,
+                      label: '타이틀 색상',
+                      defaultColor: '000000',
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildColorPicker(
+                      controller: _backgroundColorController,
+                      label: '배경 색상',
+                      defaultColor: 'FFFFFF',
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -1066,10 +1092,106 @@ class _DashboardEditDialogState extends State<DashboardEditDialog> {
     );
   }
 
+  Widget _buildColorPicker({
+    required TextEditingController controller,
+    required String label,
+    required String defaultColor,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF374151),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFD1D5DB)),
+          ),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => _showColorDialog(controller, defaultColor),
+                child: Container(
+                  width: 40,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Color(int.parse('FF${controller.text}', radix: 16)),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(7),
+                      bottomLeft: Radius.circular(7),
+                    ),
+                    border: Border.all(color: const Color(0xFFD1D5DB)),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: TextFormField(
+                  controller: controller,
+                  decoration: const InputDecoration(
+                    prefixText: '#',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9A-Fa-f]')),
+                    LengthLimitingTextInputFormatter(6),
+                  ],
+                  onChanged: (value) {
+                    if (value.length == 6) {
+                      setState(() {});
+                    }
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '색상을 입력해주세요';
+                    }
+                    if (value.length != 6) {
+                      return '6자리 헥스 코드를 입력해주세요';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showColorDialog(TextEditingController controller, String defaultColor) {
+    showDialog(
+      context: context,
+      builder: (context) => _ColorPickerDialog(
+        controller: controller,
+        defaultColor: defaultColor,
+        onColorSelected: () => setState(() {}),
+      ),
+    );
+  }
+
+  // 대비되는 텍스트 색상을 반환하는 헬퍼 함수
+  Color _getContrastColor(Color color) {
+    final red = (color.r * 255.0).round();
+    final green = (color.g * 255.0).round();
+    final blue = (color.b * 255.0).round();
+    final luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
+    return luminance > 0.5 ? Colors.black : Colors.white;
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
+    _titleColorController.dispose();
+    _backgroundColorController.dispose();
     super.dispose();
   }
 }
@@ -1577,6 +1699,181 @@ class ImageLibraryPanel extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ColorPickerDialog extends StatefulWidget {
+  final TextEditingController controller;
+  final String defaultColor;
+  final VoidCallback onColorSelected;
+
+  const _ColorPickerDialog({
+    required this.controller,
+    required this.defaultColor,
+    required this.onColorSelected,
+  });
+
+  @override
+  State<_ColorPickerDialog> createState() => _ColorPickerDialogState();
+}
+
+class _ColorPickerDialogState extends State<_ColorPickerDialog> {
+  late Color selectedColor;
+
+  @override
+  void initState() {
+    super.initState();
+    // 현재 선택된 색상으로 초기화
+    try {
+      selectedColor = Color(int.parse('FF${widget.controller.text}', radix: 16));
+    } catch (e) {
+      selectedColor = Color(int.parse('FF${widget.defaultColor}', radix: 16));
+    }
+  }
+
+  // 대비되는 텍스트 색상을 반환하는 헬퍼 함수
+  Color _getContrastColor(Color color) {
+    final red = (color.r * 255.0).round();
+    final green = (color.g * 255.0).round();
+    final blue = (color.b * 255.0).round();
+    final luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
+    return luminance > 0.5 ? Colors.black : Colors.white;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('색상 선택'),
+      contentPadding: const EdgeInsets.all(20),
+      content: SizedBox(
+        width: 400,
+        height: 550,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 현재 선택된 색상 미리보기
+              Container(
+                width: double.infinity,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: selectedColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Center(
+                  child: Text(
+                    '#${selectedColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
+                    style: TextStyle(
+                      color: _getContrastColor(selectedColor),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              // HSV 컬러 휠
+              ColorPicker(
+                color: selectedColor,
+                onChanged: (Color color) {
+                  setState(() {
+                    selectedColor = color;
+                  });
+                },
+              ),
+              
+              const SizedBox(height: 20),
+              
+              // 사전 정의된 색상 팔레트
+              const Text(
+                '추천 색상',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  // 기본 색상들
+                  ...['000000', 'FFFFFF', 'FF0000', '00FF00', '0000FF', 'FFFF00',
+                      'FF00FF', '00FFFF', '800000', '008000', '000080', '808000',
+                      '800080', '008080', 'C0C0C0', '808080'],
+                  // 추가 색상들
+                  ...['FFA500', 'FF4500', 'DC143C', 'B22222', '8B0000', 'FF1493',
+                      'FF69B4', 'FFB6C1', 'FFC0CB', 'DDA0DD', '9370DB', '8A2BE2',
+                      '4B0082', '6A5ACD', '7B68EE', '9400D3', '9932CC', 'BA55D3',
+                      'DA70D6', 'EE82EE', 'FF00FF', 'FF1493', 'C71585', 'DB7093'],
+                  // 그린 계열
+                  ...['00FF00', '32CD32', '98FB98', '90EE90', '00FA9A', '00FF7F',
+                      '7CFC00', '7FFF00', 'ADFF2F', '9AFF9A', '00FF00', '00EE00',
+                      '00CD00', '228B22', '008000', '006400', '8FBC8F', '20B2AA'],
+                  // 블루 계열
+                  ...['0000FF', '4169E1', '6495ED', '87CEEB', '87CEFA', '00BFFF',
+                      '1E90FF', '6495ED', '4682B4', '5F9EA0', '008B8B', '2F4F4F',
+                      '00CED1', '48D1CC', '40E0D0', '00FFFF', 'E0FFFF', 'B0E0E6'],
+                  // 오렌지/레드 계열  
+                  ...['FFE4B5', 'FFDEAD', 'F5DEB3', 'DEB887', 'D2B48C', 'BC8F8F',
+                      'F4A460', 'DAA520', 'B8860B', 'CD853F', 'D2691E', 'A0522D',
+                      '8B4513', 'A52A2A', '800000', 'B22222', 'DC143C', 'FF0000'],
+                  // 퍼플/바이올렛 계열
+                  ...['E6E6FA', 'DDA0DD', 'DA70D6', 'EE82EE', 'FF00FF', 'BA55D3',
+                      '9932CC', '9400D3', '8A2BE2', '9370DB', '6A5ACD', '483D8B',
+                      '4B0082', '663399', '800080', '4B0082', '9932CC', 'DA70D6'],
+                  // 브라운/베이지 계열
+                  ...['F5F5DC', 'FAEBD7', 'FFE4C4', 'FFDAB9', 'EEE8AA', 'F0E68C',
+                      'BDB76B', 'D2B48C', 'DEB887', 'BC8F8F', 'CD853F', 'D2691E',
+                      'A0522D', '8B4513', 'A52A2A', '800000', '654321', '3C1810'],
+                  // 그레이 계열
+                  ...['F8F8FF', 'F5F5F5', 'DCDCDC', 'D3D3D3', 'C0C0C0', 'A9A9A9',
+                      '808080', '696969', '778899', '708090', '2F4F4F', '000000'],
+                ].map((colorHex) => GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedColor = Color(int.parse('FF$colorHex', radix: 16));
+                    });
+                  },
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: Color(int.parse('FF$colorHex', radix: 16)),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(
+                        color: selectedColor == Color(int.parse('FF$colorHex', radix: 16)) 
+                            ? Colors.black 
+                            : Colors.grey.shade300,
+                        width: selectedColor == Color(int.parse('FF$colorHex', radix: 16)) ? 2 : 1,
+                      ),
+                    ),
+                  ),
+                )).toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('취소'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final hexColor = selectedColor.toARGB32().toRadixString(16).substring(2);
+            widget.controller.text = hexColor.toUpperCase();
+            widget.onColorSelected();
+            Navigator.of(context).pop();
+          },
+          child: const Text('선택'),
+        ),
+      ],
     );
   }
 }

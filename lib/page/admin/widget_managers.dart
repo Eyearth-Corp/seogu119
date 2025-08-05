@@ -767,6 +767,8 @@ class DashboardMaster {
   final String dashboardName;
   final String dashboardDescription;
   final String widgetType;
+  final String? titleColor;
+  final String? backgroundColor;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -775,6 +777,8 @@ class DashboardMaster {
     required this.dashboardName,
     required this.dashboardDescription,
     required this.widgetType,
+    this.titleColor,
+    this.backgroundColor,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -785,6 +789,8 @@ class DashboardMaster {
       dashboardName: json['dashboard_name'],
       dashboardDescription: json['dashboard_description'] ?? '',
       widgetType: json['widget_type'] ?? '',
+      titleColor: json['title_color'],
+      backgroundColor: json['background_color'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );

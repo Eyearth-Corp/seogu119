@@ -723,11 +723,15 @@ class AdminService {
     required String widgetType,
     String? dashboardName,
     String? dashboardDescription,
+    String? titleColor,
+    String? backgroundColor,
   }) async {
     try {
       final data = <String, dynamic>{};
       if (dashboardName != null) data['dashboard_name'] = dashboardName;
       if (dashboardDescription != null) data['dashboard_description'] = dashboardDescription;
+      if (titleColor != null) data['title_color'] = titleColor;
+      if (backgroundColor != null) data['background_color'] = backgroundColor;
       
       final response = await putToURL(
         '$baseUrl/api/dashboard-master/$id/$widgetType',

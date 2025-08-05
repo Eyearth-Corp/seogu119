@@ -17,7 +17,31 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
   Bbs2Response? _response;
   bool _isLoading = true;
   String? _error;
-  bool _isExpanded = false;
+  Color backgroundColor = Colors.white;
+
+  /// 색상을 밝게 만드는 헬퍼 함수
+  Color _lightenColor(Color color, double amount) {
+    final hsl = HSLColor.fromColor(color);
+    final lightened = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+    return lightened.toColor();
+  }
+
+  /// 색상을 어둡게 만드는 헬퍼 함수  
+  Color _darkenColor(Color color, double amount) {
+    final hsl = HSLColor.fromColor(color);
+    final darkened = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+    return darkened.toColor();
+  }
+
+  /// 색상이 어두운지 판단하는 헬퍼 함수
+  bool _isDarkColor(Color color) {
+    // 상대적 휘도(relative luminance) 계산
+    final red = (color.r * 255.0).round();
+    final green = (color.g * 255.0).round();
+    final blue = (color.b * 255.0).round();
+    final luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
+    return luminance < 0.5;
+  }
 
   @override
   void initState() {
@@ -47,11 +71,19 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
+      // 로딩 상태에서도 기본 그라데이션 적용
+      final topColor = _lightenColor(SeoguColors.surface, 0.05);
+      final bottomColor = _darkenColor(SeoguColors.surface, 0.05);
+      
       return Container(
         height: 160,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: SeoguColors.surface,
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [topColor, bottomColor],
+          ),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -66,11 +98,19 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
     }
 
     if (_error != null) {
+      // 에러 상태에서도 기본 그라데이션 적용
+      final topColor = _lightenColor(SeoguColors.surface, 0.02);
+      final bottomColor = _darkenColor(SeoguColors.surface, 0.02);
+      
       return Container(
         height: 160,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: SeoguColors.surface,
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [topColor, bottomColor],
+          ),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -100,11 +140,27 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
     }
 
     //double height = 88.0 + (42 * _response!.bbs2Data.length);
+    
+    // 배경색 결정
+    final baseColor = _response!.backgroundColor != null 
+        ? Color(int.parse('FF${_response!.backgroundColor}', radix: 16))
+        : SeoguColors.surface;
+
+    backgroundColor = baseColor;
+    
+    // 그라데이션용 색상 생성 (위: 밝게, 아래: 어둡게)
+    final topColor = _lightenColor(baseColor, 0.02);  // 10% 밝게
+    final bottomColor = _darkenColor(baseColor, 0.02); // 10% 어둡게
+    
     return Container(
       //height: height,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: SeoguColors.surface,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [topColor, bottomColor],
+        ),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -122,10 +178,12 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
               children: [
                 Text(
                   _response!.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 23,
                     fontWeight: FontWeight.bold,
-                    color: SeoguColors.textPrimary,
+                    color: _response!.titleColor != null 
+                        ? Color(int.parse('FF${_response!.titleColor}', radix: 16))
+                        : SeoguColors.textPrimary,
                   ),
                 ),
                 Spacer(),
@@ -158,6 +216,10 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
     );
   }
 
+
+
+
+
   Widget _buildBbs2Item(BuildContext context, String title, String detail) {
     return InkWell(
       onTap: () => _showBbs2DetailDialog(context, title, detail),
@@ -175,9 +237,9 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 21,
-                color: SeoguColors.textPrimary,
+                color: _isDarkColor(backgroundColor)?Colors.white:SeoguColors.textPrimary,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -303,7 +365,7 @@ class _ExpandedBbs2View extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    
+
     return Material(
       color: Colors.black.withValues(alpha: 0.5),
       child: Stack(
@@ -430,11 +492,19 @@ class _ExpandedBbs2View extends StatelessWidget {
     );
   }
 
+
+
   Widget _buildExpandedBbs2Item(BuildContext context, String title, String detail, int index) {
+
+        // 배경이 어두우면 흰색 텍스트, 밝으면 검은색 텍스트
+    final primaryTextColor =  SeoguColors.textPrimary;
+    final secondaryTextColor = SeoguColors.textSecondary;
+    final dividerColor = const Color(0xFFE2E8F0);
+
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: const Color(0xFFE2E8F0),
@@ -475,24 +545,24 @@ class _ExpandedBbs2View extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 43,
                     fontWeight: FontWeight.bold,
-                    color: SeoguColors.textPrimary,
+                    color: primaryTextColor,
                   ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          const Divider(color: Color(0xFFE2E8F0)),
+          Divider(color: dividerColor),
           const SizedBox(height: 16),
           Text(
             detail,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 35,
               height: 1.6,
-              color: SeoguColors.textSecondary,
+              color: secondaryTextColor,
             ),
           ),
         ],
