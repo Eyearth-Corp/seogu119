@@ -299,6 +299,26 @@ class ApiService {
       throw Exception('Failed to load DashBoardPercent');
     }
   }
+
+  static Future<DashboardTitleResponse> getDashboardTitle() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/dashboard-title'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData['success'] == true && jsonData['data'] != null) {
+          return DashboardTitleResponse.fromJson(jsonData['data']);
+        }
+      }
+      throw Exception('Failed to load dashboard title');
+    } catch (e) {
+      print('Dashboard Title API Error: $e');
+      throw Exception('Failed to load dashboard title');
+    }
+  }
 }
 
 class MainDashboardResponse {
@@ -746,6 +766,20 @@ class TopDistrict {
     return TopDistrict(
       dongName: json['dong_name'] ?? '',
       merchantCount: json['merchant_count'] ?? 0,
+    );
+  }
+}
+
+class DashboardTitleResponse {
+  final String title;
+
+  DashboardTitleResponse({
+    required this.title,
+  });
+
+  factory DashboardTitleResponse.fromJson(Map<String, dynamic> json) {
+    return DashboardTitleResponse(
+      title: json['title'] ?? '',
     );
   }
 }

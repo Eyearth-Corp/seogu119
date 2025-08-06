@@ -431,10 +431,28 @@ class DashboardMasterList extends StatelessWidget {
     required this.onRefresh,
   });
 
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+
+        // 대시보드 타이틀 수정 섹션
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              bottom: BorderSide(
+                color: Color(0xFFE2E8F0),
+                width: 1,
+              ),
+            ),
+          ),
+          child: DashboardTitleEditor(),
+        ),
+
         Container(
           padding: const EdgeInsets.all(20),
           decoration: const BoxDecoration(
@@ -1940,6 +1958,137 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
         ),
       ],
     );
+  }
+}
+
+class DashboardTitleEditor extends StatefulWidget {
+
+
+  const DashboardTitleEditor({
+    super.key
+  });
+
+  @override
+  State<DashboardTitleEditor> createState() => _DashboardTitleEditorState();
+}
+
+class _DashboardTitleEditorState extends State<DashboardTitleEditor> {
+  final _titleController = TextEditingController();
+  bool _isLoading = false;
+  String _currentTitle = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentTitle();
+  }
+
+  Future<void> _loadCurrentTitle() async {
+    setState(() => _isLoading = true);
+    try {
+      final response = await AdminService.getDashboardTitle();
+      if (response != null && response['success'] == true) {
+        final title = response['data']['title'];
+        setState(() {
+          _currentTitle = title;
+          _titleController.text = title;
+        });
+      }
+    } catch (e) {
+
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _updateTitle() async {
+    if (_titleController.text.trim().isEmpty) {
+      return;
+    }
+
+    if (_titleController.text.trim() == _currentTitle) {
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final response = await AdminService.updateDashboardTitle(
+        title: _titleController.text.trim(),
+      );
+      if (response != null && response['success'] == true) {
+        setState(() => _currentTitle = _titleController.text.trim());
+      }
+    } catch (e) {
+
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            _currentTitle,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF3B82F6),
+            ),
+          ),
+          SizedBox(width: 20),
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _titleController,
+                    decoration: const InputDecoration(
+                      hintText: '새로운 대시보드 타이틀을 입력하세요',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    ),
+                    enabled: !_isLoading,
+                    onSubmitted: (_) => _updateTitle(),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton.icon(
+                  onPressed: _isLoading ? null : _updateTitle,
+                  icon: const Icon(Icons.save, size: 18),
+                  label: const Text('수정'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3B82F6),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
   }
 }
 

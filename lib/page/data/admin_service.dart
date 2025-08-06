@@ -769,4 +769,33 @@ class AdminService {
       rethrow;
     }
   }
+
+  /// 대시보드 타이틀 수정
+  static Future<Map<String, dynamic>?> updateDashboardTitle({
+    required String title,
+  }) async {
+    try {
+      final response = await putToURL(
+        '$baseUrl/api/dashboard-title',
+        {
+          'title': title,
+        },
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// 대시보드 타이틀 조회
+  static Future<Map<String, dynamic>?> getDashboardTitle() async {
+    try {
+      final response = await fetchFromURL(
+        '$baseUrl/api/dashboard-title',
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

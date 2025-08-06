@@ -6,6 +6,7 @@ import 'package:seogu119/page/widget/dashboard/dashboard_percent_widget.dart';
 import 'package:seogu119/page/widget/dashboard/dashboard_type3_widget.dart';
 import 'package:seogu119/page/widget/dashboard/dashboard_type4_widget.dart';
 import '../../../core/colors.dart';
+import '../../../core/api_service.dart';
 import '../../data/main_data_parser.dart';
 import 'dashboard_bbs1_widget.dart';
 import 'dashboard_bbs2_widget.dart';
@@ -24,6 +25,7 @@ class MainDashboard extends StatefulWidget {
 
 class _MainDashboardState extends State<MainDashboard> {
   bool _isLoading = true;
+  String _dashboardTitle = '2025년 8월 6일';
 
   @override
   void initState() {
@@ -32,10 +34,23 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   Future<void> _loadDashboardData() async {
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
+    print("_loadDashboardData");
+    try {
+      final titleResponse = await ApiService.getDashboardTitle();
+      if (mounted) {
+        setState(() {
+          _dashboardTitle = titleResponse.title;
+          print("_loadDashboardData : $_loadDashboardData");
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading dashboard title: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -91,6 +106,17 @@ class _MainDashboardState extends State<MainDashboard> {
             //   dashboardId: 1,
             // ),
             // const SizedBox(height: 20),
+
+            Container(
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.only(right: 20, bottom: 16),
+              child: Text(_dashboardTitle,
+                style: TextStyle(
+                  fontSize: 22,
+                  color: Colors.black
+                ),
+              ),
+            ),
 
             DashBoardType5Widget(
               dashboardId: 1,
