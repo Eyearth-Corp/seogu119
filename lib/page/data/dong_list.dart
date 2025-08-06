@@ -144,16 +144,6 @@ class DongList {
           Merchant(id: 51, name: "발산마을상인회", x: 1794, y: 267),
         ]
     ),
-    // 52-53
-    Dong(name: '서창(마륵)동', color: Color(0xFFe6bb39),
-        area: Rect.fromLTWH(393, 1187, 586, 345),
-        dongTagArea: Rect.fromLTWH(724, 1325, 152, 52),
-        areaAsset: 'assets/map/dong_마륵.webp',
-        merchantList : [
-          Merchant(id: 52, name: "상무원마륵상인회", x: 475, y: 1421),
-          Merchant(id: 53, name: "마륵동상인회", x: 873, y: 1286),
-        ]
-    ),
     // 54-64
     Dong(name: '상무2동', color: Color(0xFF429bd5),
         area: Rect.fromLTWH(843, 774, 511, 496),
@@ -286,15 +276,26 @@ class DongList {
           Merchant(id: 117, name: "풍암신암상인회", x: 1951, y: 1533),
         ]
     ),
-    // 118-119
-    Dong(name: '서창(매월)동', color: Color(0xFFe7bc3a),
-        area: Rect.fromLTWH(1009, 1880, 458, 433),
-        dongTagArea: Rect.fromLTWH(1167, 2062, 152, 52),
-        areaAsset: 'assets/map/dong_매월.webp',
+    // 52-53
+    Dong(name: '서창동', color: Color(0xFFe6bb39),
+        area: Rect.fromLTWH(393, 1187, 1074, 1126),
+        dongTagArea: Rect.fromLTWH(724, 1325, 152, 52),
+        areaAsset: 'assets/map/dong_마륵.webp',
         merchantList : [
+          Merchant(id: 52, name: "상무원마륵상인회", x: 475, y: 1421),
+          Merchant(id: 53, name: "마륵동상인회", x: 873, y: 1286),
           Merchant(id: 118, name: "전평제상인회", x: 1119, y: 2160),
           Merchant(id: 119, name: "매월동상인회", x: 1273, y: 2157),
         ]
     ),
+    // // 118-119
+    // Dong(name: '서창(매월)동', color: Color(0xFFe7bc3a),
+    //     area: Rect.fromLTWH(1009, 1880, 458, 433),
+    //     dongTagArea: Rect.fromLTWH(1167, 2062, 152, 52),
+    //     areaAsset: 'assets/map/dong_매월.webp',
+    //     merchantList : [
+    //
+    //     ]
+    // ),
   ];
 }
