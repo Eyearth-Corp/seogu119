@@ -502,6 +502,8 @@ class _MapWidgetState extends State<MapWidget> {
   }
 
   Widget _buildDongSelectionPanel() {
+    final lifeAreaGroups = _groupDongsByLifeArea();
+    
     return Positioned(
       top: 24,
       left: widget.isMapLeft ? 24 : null,
@@ -509,7 +511,7 @@ class _MapWidgetState extends State<MapWidget> {
 
       child: GlassContainer(
         height: 832,
-        width: 140,
+        width: 160,
         padding: EdgeInsets.only(top: 6),
 
         gradient: LinearGradient(
@@ -528,20 +530,68 @@ class _MapWidgetState extends State<MapWidget> {
         child: Column(
           children: [
             Expanded(
-              child: ListView.builder(
-                itemCount: DongList.all.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return _buildDongSelectionItem(null, '전체');
-                  }
-                  final dong = DongList.all[index - 1];
-                  return _buildDongSelectionItem(dong, dong.name);
-                },
+              child: ListView(
+                children: [
+                  _buildDongSelectionItem(null, '전체'),
+                  const Divider(height: 1, color: Colors.white30),
+                  ...lifeAreaGroups.entries.map((entry) =>
+                    _buildLifeAreaGroup(entry.key, entry.value)
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Map<String, List<Dong>> _groupDongsByLifeArea() {
+    final Map<String, List<Dong>> groups = {};
+    
+    for (final dong in DongList.all) {
+      if (!groups.containsKey(dong.lifeArea)) {
+        groups[dong.lifeArea] = [];
+      }
+      groups[dong.lifeArea]!.add(dong);
+    }
+    
+    // Sort by a specific order for life areas
+    final orderedKeys = [
+      '함께하는 생활권',
+      '성장하는 생활권', 
+      '살기좋은 생활권',
+      '행복한 생활권'
+    ];
+    
+    final Map<String, List<Dong>> orderedGroups = {};
+    for (final key in orderedKeys) {
+      if (groups.containsKey(key)) {
+        orderedGroups[key] = groups[key]!;
+      }
+    }
+    
+    return orderedGroups;
+  }
+
+  Widget _buildLifeAreaGroup(String lifeArea, List<Dong> dongs) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Text(
+            lifeArea,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF5377ca),
+            ),
+          ),
+        ),
+        ...dongs.map((dong) => _buildDongSelectionItem(dong, dong.name)),
+        const SizedBox(height: 4),
+      ],
     );
   }
 

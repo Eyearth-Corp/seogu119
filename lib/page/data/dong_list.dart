@@ -8,10 +8,11 @@ class Dong {
   final Rect area;
   final String areaAsset;
   final Rect dongTagArea;
+  final String lifeArea;
 
   bool isShow = false;
 
-  Dong({required this.name, required this.color, required this.merchantList, required this.area, required this.areaAsset, required this.dongTagArea});
+  Dong({required this.name, required this.color, required this.merchantList, required this.area, required this.areaAsset, required this.dongTagArea, required this.lifeArea});
 }
 
 class Merchant {
@@ -31,6 +32,7 @@ class DongList {
         area: Rect.fromLTWH(178, 84, 944, 298),
         dongTagArea: Rect.fromLTWH(536, 286, 132, 52),
         areaAsset: 'assets/map/dong_동천.webp',
+        lifeArea: '성장하는 생활권',
         merchantList : [
           Merchant(id: 1, name: "하남대로가구의거리상인회", x: 360, y: 257),
           Merchant(id: 2, name: "동천동먹자골목1번가상인회", x: 764, y: 201),
@@ -44,6 +46,7 @@ class DongList {
         area: Rect.fromLTWH(630, 314, 454, 276),
         dongTagArea: Rect.fromLTWH(973, 345, 133, 52),
         areaAsset: 'assets/map/dong_유촌.webp',
+        lifeArea: '성장하는 생활권',
         merchantList : [
           Merchant(id: 6, name: "유촌마을상인회", x: 888, y: 349),
           Merchant(id: 7, name: "버들마을상인회", x: 794, y: 459),
@@ -55,6 +58,7 @@ class DongList {
         area: Rect.fromLTWH(1232, 115, 342, 274),
         dongTagArea: Rect.fromLTWH(1228, 101, 133, 52),
         areaAsset: 'assets/map/dong_광천.webp',
+        lifeArea: '살기좋은 생활권',
         merchantList : [
           Merchant(id: 9, name: "광천동상인회", x: 1389, y: 234),
         ]
@@ -64,6 +68,7 @@ class DongList {
         area: Rect.fromLTWH(420, 735, 501, 606),
         dongTagArea: Rect.fromLTWH(659, 749, 133, 52),
         areaAsset: 'assets/map/dong_치평.webp',
+        lifeArea: '살기좋은 생활권',
         merchantList : [
           Merchant(id: 10, name: "치평동1002상인회", x: 452, y: 780),
           Merchant(id: 11, name: "시청음식문화거리번영회", x: 520, y: 741),
@@ -90,6 +95,7 @@ class DongList {
         area: Rect.fromLTWH(773, 525, 437, 429),
         dongTagArea: Rect.fromLTWH(913, 763, 155, 52),
         areaAsset: 'assets/map/dong_상무1.webp',
+        lifeArea: '행복한 생활권',
         merchantList : [
           Merchant(id: 28, name: "계수마을상인회", x: 786, y: 582),
           Merchant(id: 29, name: "상무1동아파트상인회1", x: 884, y: 573),
@@ -112,6 +118,7 @@ class DongList {
         area: Rect.fromLTWH(1135, 428, 448, 343),
         dongTagArea: Rect.fromLTWH(1293, 557, 155, 52),
         areaAsset: 'assets/map/dong_화정1.webp',
+        lifeArea: '살기좋은 생활권',
         merchantList : [
           Merchant(id: 40, name: "늘해랑상인회", x: 1187, y: 570),
           Merchant(id: 41, name: "맛조이상인회", x: 1317, y: 509),
@@ -126,6 +133,7 @@ class DongList {
         area: Rect.fromLTWH(1516, 284, 399, 271),
         dongTagArea: Rect.fromLTWH(1542, 370, 155, 52),
         areaAsset: 'assets/map/dong_농성1.webp',
+        lifeArea: '함께하는 생활권',
         merchantList : [
           Merchant(id: 46, name: "신세계앞상인회", x: 1523, y: 328),
           Merchant(id: 47, name: "광주캠코앞상인회", x: 1609, y: 502),
@@ -140,6 +148,7 @@ class DongList {
         area: Rect.fromLTWH(1685, 244, 260, 136),
         dongTagArea: Rect.fromLTWH(1962, 320, 132, 52),
         areaAsset: 'assets/map/dong_양동.webp',
+        lifeArea: '행복한 생활권',
         merchantList : [
           Merchant(id: 51, name: "발산마을상인회", x: 1794, y: 267),
         ]
@@ -149,6 +158,7 @@ class DongList {
         area: Rect.fromLTWH(843, 774, 511, 496),
         dongTagArea: Rect.fromLTWH(1123, 861, 155, 52),
         areaAsset: 'assets/map/dong_상무2.webp',
+        lifeArea: '함께하는 생활권',
         merchantList : [
           Merchant(id: 54, name: "운천호수공원상인회", x: 854, y: 1092),
           Merchant(id: 55, name: "운천테라스길상인회", x: 938, y: 1004),
@@ -169,6 +179,7 @@ class DongList {
         area: Rect.fromLTWH(993, 1213, 332, 328),
         dongTagArea: Rect.fromLTWH(899, 1404, 155, 52),
         areaAsset: 'assets/map/dong_금호1.webp',
+        lifeArea: '함께하는 생활권',
         merchantList : [
           Merchant(id: 65, name: "금호운천로상인회", x: 1075, y: 1327),
           Merchant(id: 66, name: "금호1동상가번영회", x: 1127, y: 1396),
@@ -181,6 +192,7 @@ class DongList {
         area: Rect.fromLTWH(1321, 975, 264, 273),
         dongTagArea: Rect.fromLTWH(1275, 1133, 155, 52),
         areaAsset: 'assets/map/dong_화정4.webp',
+        lifeArea: '행복한 생활권',
         merchantList : [
           Merchant(id: 69, name: "화정로상가상인회", x: 1377, y: 972),
           Merchant(id: 70, name: "염주먹자골목B구역상인회", x: 1419, y: 998),
@@ -195,6 +207,7 @@ class DongList {
         area: Rect.fromLTWH(1354, 748, 324, 371),
         dongTagArea: Rect.fromLTWH(1362, 833, 155, 52),
         areaAsset: 'assets/map/dong_화정3.webp',
+        lifeArea: '살기좋은 생활권',
         merchantList : [
           Merchant(id: 75, name: "화정소담상인회", x: 1382, y: 774),
           Merchant(id: 76, name: "화정꽃마을상인회", x: 1455, y: 907),
@@ -207,6 +220,7 @@ class DongList {
         area: Rect.fromLTWH(1457, 629, 403, 415),
         dongTagArea: Rect.fromLTWH(1553, 784, 155, 52),
         areaAsset: 'assets/map/dong_화정2.webp',
+        lifeArea: '성장하는 생활권',
         merchantList : [
           Merchant(id: 79, name: "고은상인회", x: 1502, y: 742),
           Merchant(id: 80, name: "화운로상인회", x: 1495, y: 692),
@@ -223,6 +237,7 @@ class DongList {
         area: Rect.fromLTWH(1591, 551, 311, 185),
         dongTagArea: Rect.fromLTWH(1656, 611, 155, 52),
         areaAsset: 'assets/map/dong_농성2.webp',
+        lifeArea: '성장하는 생활권',
         merchantList : [
           Merchant(id: 87, name: "군분로꽁양상인회", x: 1626, y: 676),
           Merchant(id: 88, name: "상공회의소누리상인회", x: 1605, y: 606),
@@ -236,6 +251,7 @@ class DongList {
         area: Rect.fromLTWH(852, 1425, 517, 409),
         dongTagArea: Rect.fromLTWH(1211, 1591, 155, 52),
         areaAsset: 'assets/map/dong_금호2.webp',
+        lifeArea: '성장하는 생활권',
         merchantList : [
           Merchant(id: 92, name: "금호푸른상인회", x: 964, y: 1668),
           Merchant(id: 93, name: "금호아파트상인회", x: 1041, y: 1617),
@@ -255,6 +271,7 @@ class DongList {
         area: Rect.fromLTWH(1393, 1265, 648, 638),
         dongTagArea: Rect.fromLTWH(1623, 1388, 133, 52),
         areaAsset: 'assets/map/dong_풍암.webp',
+        lifeArea: '행복한 생활권',
         merchantList : [
           Merchant(id: 101, name: "풍암운리중상인회", x: 1422, y: 1765),
           Merchant(id: 102, name: "풍암새누리상인회", x: 1497, y: 1795),
@@ -281,6 +298,7 @@ class DongList {
         area: Rect.fromLTWH(393, 1187, 1074, 1126),
         dongTagArea: Rect.fromLTWH(724, 1325, 152, 52),
         areaAsset: 'assets/map/dong_마륵.webp',
+        lifeArea: '행복한 생활권',
         merchantList : [
           Merchant(id: 52, name: "상무원마륵상인회", x: 475, y: 1421),
           Merchant(id: 53, name: "마륵동상인회", x: 873, y: 1286),

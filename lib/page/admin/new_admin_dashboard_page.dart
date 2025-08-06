@@ -92,6 +92,140 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
            _selectedWidgetType == dashboard.widgetType;
   }
 
+  Map<String, List<Dong>> _groupDongsByLifeArea() {
+    final Map<String, List<Dong>> groups = {};
+    
+    for (final dong in DongList.all) {
+      if (!groups.containsKey(dong.lifeArea)) {
+        groups[dong.lifeArea] = [];
+      }
+      groups[dong.lifeArea]!.add(dong);
+    }
+    
+    // Sort by a specific order for life areas
+    final orderedKeys = [
+      '함께하는 생활권',
+      '성장하는 생활권', 
+      '살기좋은 생활권',
+      '행복한 생활권'
+    ];
+    
+    final Map<String, List<Dong>> orderedGroups = {};
+    for (final key in orderedKeys) {
+      if (groups.containsKey(key)) {
+        orderedGroups[key] = groups[key]!;
+      }
+    }
+    
+    return orderedGroups;
+  }
+
+  List<Widget> _buildLifeAreaGroups() {
+    final lifeAreaGroups = _groupDongsByLifeArea();
+    final List<Widget> widgets = [];
+
+    for (final entry in lifeAreaGroups.entries) {
+      final lifeArea = entry.key;
+      final dongs = entry.value;
+
+      widgets.add(
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 3,
+                    height: 16,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF3B82F6),
+                      borderRadius: BorderRadius.all(Radius.circular(2)),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    lifeArea,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1E293B),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(width: 12,),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: dongs.map((dong) =>
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => DongAdminDashboardPage(dongName: dong.name),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: const Color(0xFFE2E8F0),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: dong.color,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              dong.name,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF1E293B),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${dong.merchantList.length}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF64748B),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ).toList(),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return widgets;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -153,99 +287,40 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on_outlined, 
-                               color: Color(0xFF475569), size: 18),
-                          const SizedBox(width: 8),
-                          const Text(
-                            '동별 관리',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1E293B),
-                            ),
-                          ),
-                          const Spacer(),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFEFF6FF),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.2)),
-                            ),
-                            child: Text(
-                              '${DongList.all.length}개 지역',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF3B82F6),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: DongList.all.map((dong) => 
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(8),
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => DongAdminDashboardPage(dongName: dong.name),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF8FAFC),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: const Color(0xFFE2E8F0),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      width: 8,
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color: dong.color,
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      dong.name,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF1E293B),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '${dong.merchantList.length}',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Color(0xFF64748B),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ).toList(),
-                      ),
+                      // Row(
+                      //   children: [
+                      //     const Icon(Icons.location_on_outlined,
+                      //          color: Color(0xFF475569), size: 18),
+                      //     const SizedBox(width: 8),
+                      //     const Text(
+                      //       '동별 관리',
+                      //       style: TextStyle(
+                      //         fontSize: 16,
+                      //         fontWeight: FontWeight.w600,
+                      //         color: Color(0xFF1E293B),
+                      //       ),
+                      //     ),
+                      //     const Spacer(),
+                      //     Container(
+                      //       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      //       decoration: BoxDecoration(
+                      //         color: const Color(0xFFEFF6FF),
+                      //         borderRadius: BorderRadius.circular(20),
+                      //         border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.2)),
+                      //       ),
+                      //       child: Text(
+                      //         '${DongList.all.length}개 지역',
+                      //         style: const TextStyle(
+                      //           fontSize: 12,
+                      //           fontWeight: FontWeight.w500,
+                      //           color: Color(0xFF3B82F6),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      // const SizedBox(height: 12),
+                      ..._buildLifeAreaGroups(),
                     ],
                   ),
                 ),
