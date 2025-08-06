@@ -510,7 +510,7 @@ class _MapWidgetState extends State<MapWidget> {
       right: widget.isMapLeft ? null : 24,
 
       child: GlassContainer(
-        height: 832,
+        height: 1020,
         width: 160,
         padding: EdgeInsets.only(top: 6),
 
@@ -533,7 +533,6 @@ class _MapWidgetState extends State<MapWidget> {
               child: ListView(
                 children: [
                   _buildDongSelectionItem(null, '전체'),
-                  const Divider(height: 1, color: Colors.white30),
                   ...lifeAreaGroups.entries.map((entry) =>
                     _buildLifeAreaGroup(entry.key, entry.value)
                   ),
@@ -579,7 +578,8 @@ class _MapWidgetState extends State<MapWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          //padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: EdgeInsets.only(left: 12, right: 12, top: 20, bottom: 8),
           child: Text(
             lifeArea,
             style: const TextStyle(
