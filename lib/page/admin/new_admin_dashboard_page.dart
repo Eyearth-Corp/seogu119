@@ -400,8 +400,8 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
                         ),
                         const SizedBox(width: 16),
                         // 오른쪽 끝 : 이모지를 누르면 자동으로 복사 된다.
-                        Expanded(
-                          flex: 1,
+                        Container(
+                          width: 220,
                           child: ImageLibraryPanel(
                             onCopy: _showSuccessSnackBar,
                           ),
@@ -1692,7 +1692,7 @@ class ImageLibraryPanel extends StatelessWidget {
                      color: Color(0xFF475569), size: 18),
                 const SizedBox(width: 8),
                 const Text(
-                  '이미지 라이브러리',
+                  '이모지',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -1721,13 +1721,13 @@ class ImageLibraryPanel extends StatelessWidget {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 1.2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 0,
+                  mainAxisSpacing: 0,
                 ),
                 itemCount: _imageList.length,
                 itemBuilder: (context, index) {
@@ -1737,34 +1737,24 @@ class ImageLibraryPanel extends StatelessWidget {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(12),
                       onTap: () => _copyToClipboard(item['image']!, item['title']!),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: const Color(0xFFE2E8F0),
-                            width: 1,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            item['image']!,
+                            style: const TextStyle(fontSize: 24),
                           ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              item['image']!,
-                              style: const TextStyle(fontSize: 24),
+                          const SizedBox(height: 8),
+                          Text(
+                            item['title']!,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF64748B),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              item['title']!,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF64748B),
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
                   );
