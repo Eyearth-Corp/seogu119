@@ -27,6 +27,58 @@ class Merchant {
 
 class DongList {
   static final List<Dong> all = [
+    ///  함께하는 생활권
+    // 65-68
+    Dong(name: '금호1동', color: Color(0xFFe27c7a),
+        area: Rect.fromLTWH(993, 1213, 332, 328),
+        dongTagArea: Rect.fromLTWH(899, 1404, 155, 52),
+        areaAsset: 'assets/map/dong_금호1.webp',
+        lifeArea: '함께하는 생활권',
+        merchantList : [
+          Merchant(id: 65, name: "금호운천로상인회", x: 1075, y: 1327),
+          Merchant(id: 66, name: "금호1동상가번영회", x: 1127, y: 1396),
+          Merchant(id: 67, name: "금부로상인회", x: 1160, y: 1288),
+          Merchant(id: 68, name: "금화로상인회", x: 1202, y: 1363),
+        ]
+    ),
+    // 46-50
+    Dong(name: '농성1동', color: Color(0xFF626db2),
+        area: Rect.fromLTWH(1516, 284, 399, 271),
+        dongTagArea: Rect.fromLTWH(1542, 370, 155, 52),
+        areaAsset: 'assets/map/dong_농성1.webp',
+        lifeArea: '함께하는 생활권',
+        merchantList : [
+          Merchant(id: 46, name: "신세계앞상인회", x: 1523, y: 328),
+          Merchant(id: 47, name: "광주캠코앞상인회", x: 1609, y: 502),
+          Merchant(id: 48, name: "상록벚꽃상인회1", x: 1630, y: 443),
+          Merchant(id: 48, name: "상록벚꽃상인회2", x: 1803, y: 390),
+          Merchant(id: 49, name: "농성동벚꽃상인회", x: 1712, y: 389),
+          Merchant(id: 50, name: "월산로상인회", x: 1791, y: 474),
+        ]
+    ),
+    // 54-64
+    Dong(name: '상무2동', color: Color(0xFF429bd5),
+        area: Rect.fromLTWH(843, 774, 511, 496),
+        dongTagArea: Rect.fromLTWH(1123, 861, 155, 52),
+        areaAsset: 'assets/map/dong_상무2.webp',
+        lifeArea: '함께하는 생활권',
+        merchantList : [
+          Merchant(id: 54, name: "운천호수공원상인회", x: 854, y: 1092),
+          Merchant(id: 55, name: "운천테라스길상인회", x: 938, y: 1004),
+          Merchant(id: 56, name: "쌍촌명지상인회", x: 992, y: 1051),
+          Merchant(id: 57, name: "상무운천역상인회", x: 1062, y: 1017),
+          Merchant(id: 58, name: "운천상무시장상인회", x: 1062, y: 912),
+          Merchant(id: 59, name: "쌍촌로상인회", x: 1228, y: 923),
+          Merchant(id: 60, name: "상무쌍촌역상인회", x: 1264, y: 783),
+          Merchant(id: 61, name: "상무백운상인회", x: 983, y: 1180),
+          Merchant(id: 62, name: "상무중앙공원상인회1", x: 1049, y: 1151),
+          Merchant(id: 62, name: "상무중앙공원상인회2", x: 1090, y: 1066),
+          Merchant(id: 63, name: "상무운천로상인회", x: 1088, y: 1186),
+          Merchant(id: 64, name: "쌍학로상인회", x: 1188, y: 1015),
+        ]
+    ),
+
+    ///  성장하는 생활권
     // 1-5
     Dong(name: '동천동', color: const Color(0xFFd15382),
         area: Rect.fromLTWH(178, 84, 944, 298),
@@ -41,6 +93,20 @@ class DongList {
           Merchant(id: 5, name: "동천동벚꽃길상인회", x: 1061, y: 91),
         ]
     ),
+    // 87-91
+    Dong(name: '농성2동', color: Color(0xFFbfa37c),
+        area: Rect.fromLTWH(1591, 551, 311, 185),
+        dongTagArea: Rect.fromLTWH(1656, 611, 155, 52),
+        areaAsset: 'assets/map/dong_농성2.webp',
+        lifeArea: '성장하는 생활권',
+        merchantList : [
+          Merchant(id: 87, name: "군분로꽁양상인회", x: 1626, y: 676),
+          Merchant(id: 88, name: "상공회의소누리상인회", x: 1605, y: 606),
+          Merchant(id: 89, name: "농성누리상인회", x: 1743, y: 669),
+          Merchant(id: 90, name: "서구청먹자골목상인회", x: 1690, y: 563),
+          Merchant(id: 91, name: "농성세대공감상인회", x: 1818, y: 586),
+        ]
+    ),
     // 6-8
     Dong(name: '유덕동', color: Color(0xFFc38753),
         area: Rect.fromLTWH(630, 314, 454, 276),
@@ -53,16 +119,45 @@ class DongList {
           Merchant(id: 8, name: "유촌동상인회", x: 861, y: 432),
         ]
     ),
-    // 9
-    Dong(name: '광천동', color: Color(0xFFabcd6e),
-        area: Rect.fromLTWH(1232, 115, 342, 274),
-        dongTagArea: Rect.fromLTWH(1228, 101, 133, 52),
-        areaAsset: 'assets/map/dong_광천.webp',
-        lifeArea: '살기좋은 생활권',
+    // 79-86
+    Dong(name: '화정2동', color: Color(0xFFedb2a0),
+        area: Rect.fromLTWH(1457, 629, 403, 415),
+        dongTagArea: Rect.fromLTWH(1553, 784, 155, 52),
+        areaAsset: 'assets/map/dong_화정2.webp',
+        lifeArea: '성장하는 생활권',
         merchantList : [
-          Merchant(id: 9, name: "광천동상인회", x: 1389, y: 234),
+          Merchant(id: 79, name: "고은상인회", x: 1502, y: 742),
+          Merchant(id: 80, name: "화운로상인회", x: 1495, y: 692),
+          Merchant(id: 81, name: "화정역상인회", x: 1503, y: 643),
+          Merchant(id: 82, name: "짚봉산상인회", x: 1711, y: 973),
+          Merchant(id: 83, name: "염주골상인회", x: 1740, y: 914),
+          Merchant(id: 84, name: "힐스상인회", x: 1727, y: 831),
+          Merchant(id: 85, name: "화정금화로상인회", x: 1799, y: 826),
+          Merchant(id: 86, name: "화정로상인회", x: 1696, y: 741),
         ]
     ),
+    // 92-100
+    Dong(name: '금호2동', color: Color(0xFF8c5425),
+        area: Rect.fromLTWH(852, 1425, 517, 409),
+        dongTagArea: Rect.fromLTWH(1211, 1591, 155, 52),
+        areaAsset: 'assets/map/dong_금호2.webp',
+        lifeArea: '성장하는 생활권',
+        merchantList : [
+          Merchant(id: 92, name: "금호푸른상인회", x: 964, y: 1668),
+          Merchant(id: 93, name: "금호아파트상인회", x: 1041, y: 1617),
+          Merchant(id: 93, name: "금호아파트상인회1", x: 1045, y: 1735),
+          Merchant(id: 93, name: "금호아파트상인회2", x: 1264, y: 1461),
+          Merchant(id: 94, name: "금호상인회", x: 1079, y: 1578),
+          Merchant(id: 95, name: "화개1로78번길상인회", x: 1130, y: 1543),
+          Merchant(id: 96, name: "금화상인회", x: 1180, y: 1492),
+          Merchant(id: 97, name: "화개상인회", x: 1078, y: 1693),
+          Merchant(id: 98, name: "중앙상인회", x: 1183, y: 1688),
+          Merchant(id: 99, name: "중앙공원상인회", x: 1290, y: 1729),
+          Merchant(id: 100, name: "마재상인회", x: 1319, y: 1769),
+        ]
+    ),
+
+    /// 살기좋은 생활권
     // 10-27
     Dong(name: '치평동', color: Color(0xFF6e73b5),
         area: Rect.fromLTWH(420, 735, 501, 606),
@@ -90,29 +185,17 @@ class DongList {
           Merchant(id: 27, name: "상무평화상인회", x: 799, y: 940),
         ]
     ),
-    // 28-39
-    Dong(name: '상무1동', color: Color(0xFF35a280),
-        area: Rect.fromLTWH(773, 525, 437, 429),
-        dongTagArea: Rect.fromLTWH(913, 763, 155, 52),
-        areaAsset: 'assets/map/dong_상무1.webp',
-        lifeArea: '행복한 생활권',
+    // 9
+    Dong(name: '광천동', color: Color(0xFFabcd6e),
+        area: Rect.fromLTWH(1232, 115, 342, 274),
+        dongTagArea: Rect.fromLTWH(1228, 101, 133, 52),
+        areaAsset: 'assets/map/dong_광천.webp',
+        lifeArea: '살기좋은 생활권',
         merchantList : [
-          Merchant(id: 28, name: "계수마을상인회", x: 786, y: 582),
-          Merchant(id: 29, name: "상무1동아파트상인회1", x: 884, y: 573),
-          Merchant(id: 119, name: "상무1동아파트상인회2", x: 1024, y: 533),
-          Merchant(id: 120, name: "상무1동아파트상인회3", x: 1086, y: 690),
-          Merchant(id: 30, name: "상암마을상인회", x: 974, y: 577),
-          Merchant(id: 31, name: "상무오월로상인회", x: 908, y: 645),
-          Merchant(id: 32, name: "518먹자골목상인회", x: 932, y: 693),
-          Merchant(id: 33, name: "파랑새원룸상인회", x: 994, y: 659),
-          Merchant(id: 34, name: "참샘상인회", x: 1099, y: 590),
-          Merchant(id: 35, name: "운천역상인회", x: 910, y: 900),
-          Merchant(id: 36, name: "상무민주로상인회", x: 950, y: 878),
-          Merchant(id: 37, name: "서광주세무서앞상인회", x: 1022, y: 845),
-          Merchant(id: 38, name: "쌍촌골상인회", x: 1089, y: 758),
-          Merchant(id: 39, name: "쌍촌역상인회", x: 1143, y: 767),
+          Merchant(id: 9, name: "광천동상인회", x: 1389, y: 234),
         ]
     ),
+
     // 40-45
     Dong(name: '화정1동', color: Color(0xFFc5acd0),
         area: Rect.fromLTWH(1135, 428, 448, 343),
@@ -128,80 +211,6 @@ class DongList {
           Merchant(id: 45, name: "온누리상인회", x: 1472, y: 532),
         ]
     ),
-    // 46-50
-    Dong(name: '농성1동', color: Color(0xFF626db2),
-        area: Rect.fromLTWH(1516, 284, 399, 271),
-        dongTagArea: Rect.fromLTWH(1542, 370, 155, 52),
-        areaAsset: 'assets/map/dong_농성1.webp',
-        lifeArea: '함께하는 생활권',
-        merchantList : [
-          Merchant(id: 46, name: "신세계앞상인회", x: 1523, y: 328),
-          Merchant(id: 47, name: "광주캠코앞상인회", x: 1609, y: 502),
-          Merchant(id: 48, name: "상록벚꽃상인회1", x: 1630, y: 443),
-          Merchant(id: 48, name: "상록벚꽃상인회2", x: 1803, y: 390),
-          Merchant(id: 49, name: "농성동벚꽃상인회", x: 1712, y: 389),
-          Merchant(id: 50, name: "월산로상인회", x: 1791, y: 474),
-        ]
-    ),
-    // 51
-    Dong(name: '양3동', color: Color(0xFFf5aa4e),
-        area: Rect.fromLTWH(1685, 244, 260, 136),
-        dongTagArea: Rect.fromLTWH(1962, 320, 132, 52),
-        areaAsset: 'assets/map/dong_양동.webp',
-        lifeArea: '행복한 생활권',
-        merchantList : [
-          Merchant(id: 51, name: "발산마을상인회", x: 1794, y: 267),
-        ]
-    ),
-    // 54-64
-    Dong(name: '상무2동', color: Color(0xFF429bd5),
-        area: Rect.fromLTWH(843, 774, 511, 496),
-        dongTagArea: Rect.fromLTWH(1123, 861, 155, 52),
-        areaAsset: 'assets/map/dong_상무2.webp',
-        lifeArea: '함께하는 생활권',
-        merchantList : [
-          Merchant(id: 54, name: "운천호수공원상인회", x: 854, y: 1092),
-          Merchant(id: 55, name: "운천테라스길상인회", x: 938, y: 1004),
-          Merchant(id: 56, name: "쌍촌명지상인회", x: 992, y: 1051),
-          Merchant(id: 57, name: "상무운천역상인회", x: 1062, y: 1017),
-          Merchant(id: 58, name: "운천상무시장상인회", x: 1062, y: 912),
-          Merchant(id: 59, name: "쌍촌로상인회", x: 1228, y: 923),
-          Merchant(id: 60, name: "상무쌍촌역상인회", x: 1264, y: 783),
-          Merchant(id: 61, name: "상무백운상인회", x: 983, y: 1180),
-          Merchant(id: 62, name: "상무중앙공원상인회1", x: 1049, y: 1151),
-          Merchant(id: 62, name: "상무중앙공원상인회2", x: 1090, y: 1066),
-          Merchant(id: 63, name: "상무운천로상인회", x: 1088, y: 1186),
-          Merchant(id: 64, name: "쌍학로상인회", x: 1188, y: 1015),
-        ]
-    ),
-    // 65-68
-    Dong(name: '금호1동', color: Color(0xFFe27c7a),
-        area: Rect.fromLTWH(993, 1213, 332, 328),
-        dongTagArea: Rect.fromLTWH(899, 1404, 155, 52),
-        areaAsset: 'assets/map/dong_금호1.webp',
-        lifeArea: '함께하는 생활권',
-        merchantList : [
-          Merchant(id: 65, name: "금호운천로상인회", x: 1075, y: 1327),
-          Merchant(id: 66, name: "금호1동상가번영회", x: 1127, y: 1396),
-          Merchant(id: 67, name: "금부로상인회", x: 1160, y: 1288),
-          Merchant(id: 68, name: "금화로상인회", x: 1202, y: 1363),
-        ]
-    ),
-    // 69-74
-    Dong(name: '화정4동', color: Color(0xFFb960a2),
-        area: Rect.fromLTWH(1321, 975, 264, 273),
-        dongTagArea: Rect.fromLTWH(1275, 1133, 155, 52),
-        areaAsset: 'assets/map/dong_화정4.webp',
-        lifeArea: '행복한 생활권',
-        merchantList : [
-          Merchant(id: 69, name: "화정로상가상인회", x: 1377, y: 972),
-          Merchant(id: 70, name: "염주먹자골목B구역상인회", x: 1419, y: 998),
-          Merchant(id: 71, name: "염주먹자골목A구역상인회", x: 1451, y: 1053),
-          Merchant(id: 72, name: "염주포스코상인회", x: 1494, y: 1074),
-          Merchant(id: 73, name: "염주B상인회", x: 1445, y: 1114),
-          Merchant(id: 74, name: "염주상인회", x: 1461, y: 1178),
-        ]
-    ),
     // 75-78
     Dong(name: '화정3동', color: Color(0xFFe77117),
         area: Rect.fromLTWH(1354, 748, 324, 371),
@@ -215,57 +224,8 @@ class DongList {
           Merchant(id: 78, name: "화정한울타리상인회", x: 1592, y: 1022),
         ]
     ),
-    // 79-86
-    Dong(name: '화정2동', color: Color(0xFFedb2a0),
-        area: Rect.fromLTWH(1457, 629, 403, 415),
-        dongTagArea: Rect.fromLTWH(1553, 784, 155, 52),
-        areaAsset: 'assets/map/dong_화정2.webp',
-        lifeArea: '성장하는 생활권',
-        merchantList : [
-          Merchant(id: 79, name: "고은상인회", x: 1502, y: 742),
-          Merchant(id: 80, name: "화운로상인회", x: 1495, y: 692),
-          Merchant(id: 81, name: "화정역상인회", x: 1503, y: 643),
-          Merchant(id: 82, name: "짚봉산상인회", x: 1711, y: 973),
-          Merchant(id: 83, name: "염주골상인회", x: 1740, y: 914),
-          Merchant(id: 84, name: "힐스상인회", x: 1727, y: 831),
-          Merchant(id: 85, name: "화정금화로상인회", x: 1799, y: 826),
-          Merchant(id: 86, name: "화정로상인회", x: 1696, y: 741),
-        ]
-    ),
-    // 87-91
-    Dong(name: '농성2동', color: Color(0xFFbfa37c),
-        area: Rect.fromLTWH(1591, 551, 311, 185),
-        dongTagArea: Rect.fromLTWH(1656, 611, 155, 52),
-        areaAsset: 'assets/map/dong_농성2.webp',
-        lifeArea: '성장하는 생활권',
-        merchantList : [
-          Merchant(id: 87, name: "군분로꽁양상인회", x: 1626, y: 676),
-          Merchant(id: 88, name: "상공회의소누리상인회", x: 1605, y: 606),
-          Merchant(id: 89, name: "농성누리상인회", x: 1743, y: 669),
-          Merchant(id: 90, name: "서구청먹자골목상인회", x: 1690, y: 563),
-          Merchant(id: 91, name: "농성세대공감상인회", x: 1818, y: 586),
-        ]
-    ),
-    // 92-100
-    Dong(name: '금호2동', color: Color(0xFF8c5425),
-        area: Rect.fromLTWH(852, 1425, 517, 409),
-        dongTagArea: Rect.fromLTWH(1211, 1591, 155, 52),
-        areaAsset: 'assets/map/dong_금호2.webp',
-        lifeArea: '성장하는 생활권',
-        merchantList : [
-          Merchant(id: 92, name: "금호푸른상인회", x: 964, y: 1668),
-          Merchant(id: 93, name: "금호아파트상인회", x: 1041, y: 1617),
-          Merchant(id: 93, name: "금호아파트상인회1", x: 1045, y: 1735),
-          Merchant(id: 93, name: "금호아파트상인회2", x: 1264, y: 1461),
-          Merchant(id: 94, name: "금호상인회", x: 1079, y: 1578),
-          Merchant(id: 95, name: "화개1로78번길상인회", x: 1130, y: 1543),
-          Merchant(id: 96, name: "금화상인회", x: 1180, y: 1492),
-          Merchant(id: 97, name: "화개상인회", x: 1078, y: 1693),
-          Merchant(id: 98, name: "중앙상인회", x: 1183, y: 1688),
-          Merchant(id: 99, name: "중앙공원상인회", x: 1290, y: 1729),
-          Merchant(id: 100, name: "마재상인회", x: 1319, y: 1769),
-        ]
-    ),
+
+    /// 행복한 생활권
     // 101-117
     Dong(name: '풍암동', color: Color(0xFF50bdb8),
         area: Rect.fromLTWH(1393, 1265, 648, 638),
@@ -291,6 +251,58 @@ class DongList {
           Merchant(id: 115, name: "풍암당산상인회", x: 1859, y: 1483),
           Merchant(id: 116, name: "금당산길상인회", x: 1948, y: 1450),
           Merchant(id: 117, name: "풍암신암상인회", x: 1951, y: 1533),
+        ]
+    ),
+    // 51
+    Dong(name: '양3동', color: Color(0xFFf5aa4e),
+        area: Rect.fromLTWH(1685, 244, 260, 136),
+        dongTagArea: Rect.fromLTWH(1962, 320, 132, 52),
+        areaAsset: 'assets/map/dong_양동.webp',
+        lifeArea: '행복한 생활권',
+        merchantList : [
+          Merchant(id: 51, name: "발산마을상인회", x: 1794, y: 267),
+        ]
+    ),
+    // 28-39
+    Dong(name: '상무1동', color: Color(0xFF35a280),
+        area: Rect.fromLTWH(773, 525, 437, 429),
+        dongTagArea: Rect.fromLTWH(913, 763, 155, 52),
+        areaAsset: 'assets/map/dong_상무1.webp',
+        lifeArea: '행복한 생활권',
+        merchantList : [
+          Merchant(id: 28, name: "계수마을상인회", x: 786, y: 582),
+          Merchant(id: 29, name: "상무1동아파트상인회1", x: 884, y: 573),
+          Merchant(id: 119, name: "상무1동아파트상인회2", x: 1024, y: 533),
+          Merchant(id: 120, name: "상무1동아파트상인회3", x: 1086, y: 690),
+          Merchant(id: 30, name: "상암마을상인회", x: 974, y: 577),
+          Merchant(id: 31, name: "상무오월로상인회", x: 908, y: 645),
+          Merchant(id: 32, name: "518먹자골목상인회", x: 932, y: 693),
+          Merchant(id: 33, name: "파랑새원룸상인회", x: 994, y: 659),
+          Merchant(id: 34, name: "참샘상인회", x: 1099, y: 590),
+          Merchant(id: 35, name: "운천역상인회", x: 910, y: 900),
+          Merchant(id: 36, name: "상무민주로상인회", x: 950, y: 878),
+          Merchant(id: 37, name: "서광주세무서앞상인회", x: 1022, y: 845),
+          Merchant(id: 38, name: "쌍촌골상인회", x: 1089, y: 758),
+          Merchant(id: 39, name: "쌍촌역상인회", x: 1143, y: 767),
+        ]
+    ),
+
+
+
+
+    // 69-74
+    Dong(name: '화정4동', color: Color(0xFFb960a2),
+        area: Rect.fromLTWH(1321, 975, 264, 273),
+        dongTagArea: Rect.fromLTWH(1275, 1133, 155, 52),
+        areaAsset: 'assets/map/dong_화정4.webp',
+        lifeArea: '행복한 생활권',
+        merchantList : [
+          Merchant(id: 69, name: "화정로상가상인회", x: 1377, y: 972),
+          Merchant(id: 70, name: "염주먹자골목B구역상인회", x: 1419, y: 998),
+          Merchant(id: 71, name: "염주먹자골목A구역상인회", x: 1451, y: 1053),
+          Merchant(id: 72, name: "염주포스코상인회", x: 1494, y: 1074),
+          Merchant(id: 73, name: "염주B상인회", x: 1445, y: 1114),
+          Merchant(id: 74, name: "염주상인회", x: 1461, y: 1178),
         ]
     ),
     // 52-53
