@@ -22,14 +22,18 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
   /// 색상을 밝게 만드는 헬퍼 함수
   Color _lightenColor(Color color, double amount) {
     final hsl = HSLColor.fromColor(color);
-    final lightened = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+    final lightened = hsl.withLightness(
+      (hsl.lightness + amount).clamp(0.0, 1.0),
+    );
     return lightened.toColor();
   }
 
-  /// 색상을 어둡게 만드는 헬퍼 함수  
+  /// 색상을 어둡게 만드는 헬퍼 함수
   Color _darkenColor(Color color, double amount) {
     final hsl = HSLColor.fromColor(color);
-    final darkened = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+    final darkened = hsl.withLightness(
+      (hsl.lightness - amount).clamp(0.0, 1.0),
+    );
     return darkened.toColor();
   }
 
@@ -74,7 +78,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
       // 로딩 상태에서도 기본 그라데이션 적용
       final topColor = _lightenColor(SeoguColors.surface, 0.1);
       final bottomColor = _darkenColor(SeoguColors.surface, 0.1);
-      
+
       return Container(
         height: 160,
         padding: const EdgeInsets.all(20),
@@ -101,7 +105,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
       // 에러 상태에서도 기본 그라데이션 적용
       final topColor = _lightenColor(SeoguColors.surface, 0.1);
       final bottomColor = _darkenColor(SeoguColors.surface, 0.1);
-      
+
       return Container(
         height: 160,
         padding: const EdgeInsets.all(20),
@@ -134,31 +138,31 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
         ),
       );
     }
-    
+
     if (_response == null || _response!.bbs2Data.isEmpty) {
       return emptyDataMessage();
     }
 
     //double height = 88.0 + (42 * _response!.bbs2Data.length);
-    
+
     // 배경색 결정
-    final baseColor = _response!.backgroundColor != null 
+    final baseColor = _response!.backgroundColor != null
         ? Color(int.parse('FF${_response!.backgroundColor}', radix: 16))
         : SeoguColors.surface;
 
     backgroundColor = baseColor;
-    
+
     // 그라데이션용 색상 생성 (위: 밝게, 아래: 어둡게)
-    var topColor = _lightenColor(baseColor, 0.1);  // 10% 밝게
+    var topColor = _lightenColor(baseColor, 0.1); // 10% 밝게
     var bottomColor = _darkenColor(baseColor, 0.1); // 10% 어둡게
 
     // 흰색이면
     // 그라데이션도 흰색
-    if(baseColor == Colors.white) {
+    if (baseColor == Colors.white) {
       topColor = Colors.white;
       bottomColor = Colors.white;
     }
-    
+
     return Container(
       //height: height,
       padding: const EdgeInsets.all(20),
@@ -188,8 +192,10 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
                   style: TextStyle(
                     fontSize: 23,
                     fontWeight: FontWeight.bold,
-                    color: _response!.titleColor != null 
-                        ? Color(int.parse('FF${_response!.titleColor}', radix: 16))
+                    color: _response!.titleColor != null
+                        ? Color(
+                            int.parse('FF${_response!.titleColor}', radix: 16),
+                          )
                         : SeoguColors.textPrimary,
                   ),
                 ),
@@ -201,31 +207,31 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
                     Icons.zoom_out_map,
                     color: Color(0xFF64748B),
                   ),
-                )
+                ),
               ],
             ),
           const SizedBox(height: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _response!.bbs2Data.map((trendData) {
-              return SizedBox(
-                height: 42,
-                child: _buildBbs2Item(
-                  context,
-                  trendData.title,
-                  trendData.detail,
-                ),
-              );
-            }).toList(),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _response!.bbs2Data.map((trendData) {
+                  return SizedBox(
+                    height: 42,
+                    child: _buildBbs2Item(
+                      context,
+                      trendData.title,
+                      trendData.detail,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
-
-
-
-
 
   Widget _buildBbs2Item(BuildContext context, String title, String detail) {
     return InkWell(
@@ -246,7 +252,9 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
               title,
               style: TextStyle(
                 fontSize: 21,
-                color: _isDarkColor(backgroundColor)?Colors.white:SeoguColors.textPrimary,
+                color: _isDarkColor(backgroundColor)
+                    ? Colors.white
+                    : SeoguColors.textPrimary,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -259,7 +267,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
 
   void _showExpandedView() {
     if (_response == null) return;
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -272,7 +280,11 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
     );
   }
 
-  void _showBbs2DetailDialog(BuildContext context, String title, String detail) {
+  void _showBbs2DetailDialog(
+    BuildContext context,
+    String title,
+    String detail,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -364,10 +376,7 @@ class _ExpandedBbs2View extends StatelessWidget {
   final Bbs2Response response;
   final VoidCallback onClose;
 
-  const _ExpandedBbs2View({
-    required this.response,
-    required this.onClose,
-  });
+  const _ExpandedBbs2View({required this.response, required this.onClose});
 
   @override
   Widget build(BuildContext context) {
@@ -477,7 +486,8 @@ class _ExpandedBbs2View extends StatelessWidget {
                       child: ListView.separated(
                         padding: const EdgeInsets.all(20),
                         itemCount: response.bbs2Data.length,
-                        separatorBuilder: (context, index) => const SizedBox(height: 16),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 16),
                         itemBuilder: (context, index) {
                           final item = response.bbs2Data[index];
                           return _buildExpandedBbs2Item(
@@ -499,24 +509,22 @@ class _ExpandedBbs2View extends StatelessWidget {
     );
   }
 
-
-
-  Widget _buildExpandedBbs2Item(BuildContext context, String title, String detail, int index) {
-
-        // 배경이 어두우면 흰색 텍스트, 밝으면 검은색 텍스트
-    final primaryTextColor =  SeoguColors.textPrimary;
+  Widget _buildExpandedBbs2Item(
+    BuildContext context,
+    String title,
+    String detail,
+    int index,
+  ) {
+    // 배경이 어두우면 흰색 텍스트, 밝으면 검은색 텍스트
+    final primaryTextColor = SeoguColors.textPrimary;
     final secondaryTextColor = SeoguColors.textSecondary;
     final dividerColor = const Color(0xFFE2E8F0);
-
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFE2E8F0),
-          width: 1,
-        ),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
