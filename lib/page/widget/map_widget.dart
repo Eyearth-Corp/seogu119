@@ -1,9 +1,9 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:glass_kit/glass_kit.dart';
 import 'package:speech_balloon/speech_balloon.dart';
-import 'dart:math';
-import 'dart:async';
 
 // Import the Dong data
 import '../data/dong_list.dart';
@@ -26,15 +26,22 @@ class MapWidget extends StatefulWidget {
   final Function(Dong?)? onDongSelected;
   final MapWidgetController? controller;
   final bool isMapLeft;
-  
-  const MapWidget({super.key, this.onMerchantSelected, this.onDongSelected, this.controller, this.isMapLeft = false});
+
+  const MapWidget({
+    super.key,
+    this.onMerchantSelected,
+    this.onDongSelected,
+    this.controller,
+    this.isMapLeft = false,
+  });
 
   @override
   State<MapWidget> createState() => _MapWidgetState();
 }
 
 class _MapWidgetState extends State<MapWidget> {
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
   Timer? _autoResetTimer;
 
   // State for layer visibility
@@ -49,7 +56,7 @@ class _MapWidgetState extends State<MapWidget> {
   Dong? _selectedDong;
   Set<int> _selectedMerchants = {};
   bool _isSelectionMode = false;
-  
+
   // State for last selected merchant (for highlighting)
   Merchant? _lastSelectedMerchant;
 
@@ -65,20 +72,21 @@ class _MapWidgetState extends State<MapWidget> {
   static const double _fontSize = 16.0;
   static const Duration _autoResetDuration = Duration(minutes: 5);
 
-  final GlobalKey interactiveViewerKey = GlobalKey(debugLabel: 'map_interactive_viewer');
-
+  final GlobalKey interactiveViewerKey = GlobalKey(
+    debugLabel: 'map_interactive_viewer',
+  );
 
   @override
   void initState() {
     super.initState();
-    
+
     _transformationController.value = Matrix4.identity();
-    
+
     // 컨트롤러에 네비게이션 함수 설정
     widget.controller?._setNavigateFunction(_jumpToMerchant);
-    
+
     _startAutoResetTimer();
-    
+
     // 시작시 전체 지도가 보이게 축소
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _zoomToFitEntireMap();
@@ -121,7 +129,6 @@ class _MapWidgetState extends State<MapWidget> {
     }
   }
 
-
   /// 전체 지도가 화면에 맞도록 줌과 위치를 초기화합니다.
   /// InteractiveViewer의 크기에 맞춰 지도 전체가 보이도록 자동 조절합니다.
   void _zoomToFitEntireMap() {
@@ -130,22 +137,22 @@ class _MapWidgetState extends State<MapWidget> {
 
     final renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
-    
+
     final widgetSize = renderBox.size;
-    
+
     // Calculate scale to fit entire map in the viewport
     final scaleX = widgetSize.width / _mapWidth;
     final scaleY = widgetSize.height / _mapHeight;
     final scale = min(scaleX, scaleY) * 0.9; // 0.9 for some padding
-    
+
     // Center the map
     final dx = (widgetSize.width - _mapWidth * scale) / 2;
     final dy = (widgetSize.height - _mapHeight * scale) / 2;
-    
+
     final matrix = Matrix4.identity()
       ..translate(dx, dy)
       ..scale(scale);
-    
+
     _transformationController.value = matrix;
   }
 
@@ -176,10 +183,7 @@ class _MapWidgetState extends State<MapWidget> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade50,
-                Colors.indigo.shade100,
-              ],
+              colors: [Colors.blue.shade50, Colors.indigo.shade100],
             ),
             boxShadow: [
               BoxShadow(
@@ -223,7 +227,8 @@ class _MapWidgetState extends State<MapWidget> {
                             width: _mapWidth,
                             height: _mapHeight,
                             filterQuality: FilterQuality.medium,
-                            cacheWidth: (_mapWidth * 0.8).toInt(), // Reduce memory usage
+                            cacheWidth: (_mapWidth * 0.8)
+                                .toInt(), // Reduce memory usage
                             cacheHeight: (_mapHeight * 0.8).toInt(),
                           ),
                         ),
@@ -266,21 +271,21 @@ class _MapWidgetState extends State<MapWidget> {
 
                         // 동 지역별 비활성화 (전체 지역을 회색으로 표시)
                         // _showDisableDongAreas가 true이고 전체가 선택된 경우에만 표시
-                        if (_showDisableDongAreas)
-                          RepaintBoundary(
-                            child: Opacity(
-                              opacity: _showDisableDongAreas ? 1.0 : 0.0,
-                              child: Image.asset(
-                                'assets/map/base_gray.webp',
-                                fit: BoxFit.contain,
-                                width: _mapWidth,
-                                height: _mapHeight,
-                                filterQuality: FilterQuality.medium,
-                                cacheWidth: (_mapWidth * 0.8).toInt(),
-                                cacheHeight: (_mapHeight * 0.8).toInt(),
-                              ),
-                            ),
-                          ),
+                        // if (_showDisableDongAreas)
+                        //   RepaintBoundary(
+                        //     child: Opacity(
+                        //       opacity: _showDisableDongAreas ? 1.0 : 0.0,
+                        //       child: Image.asset(
+                        //         'assets/map/base_gray.webp',
+                        //         fit: BoxFit.contain,
+                        //         width: _mapWidth,
+                        //         height: _mapHeight,
+                        //         filterQuality: FilterQuality.medium,
+                        //         cacheWidth: (_mapWidth * 0.8).toInt(),
+                        //         cacheHeight: (_mapHeight * 0.8).toInt(),
+                        //       ),
+                        //     ),
+                        //   ),
 
                         // 동 선택 지역 표시 (선택된 동의 지역만 표시)
                         // _showDongAreas가 true이고 특정 동이 선택된 경우에만 표시
@@ -337,7 +342,9 @@ class _MapWidgetState extends State<MapWidget> {
     final renderBox = context.findRenderObject() as RenderBox;
     final widgetSize = renderBox.size;
 
-    final scale = min(widgetSize.width / rect.width, widgetSize.height / rect.height) * 0.55;
+    final scale =
+        min(widgetSize.width / rect.width, widgetSize.height / rect.height) *
+        0.55;
     final dx = (widgetSize.width - rect.width * scale) / 2 - rect.left * scale;
     final dy = (widgetSize.height - rect.height * scale) / 2 - rect.top * scale;
 
@@ -352,7 +359,7 @@ class _MapWidgetState extends State<MapWidget> {
   /// 지도 위에 상인회 번호 마커들을 생성합니다.
   /// 현재 선택된 동과 설정에 따라 표시할 상인회들을 필터링하고,
   /// 각 상인회의 위치에 번호와 선택 상태를 표시하는 위젯을 생성합니다.
-  /// 
+  ///
   /// Returns: 상인회 마커 위젯들의 리스트
   List<Widget> _buildMerchantNumbers() {
     if (!_showNumber) return [];
@@ -361,98 +368,101 @@ class _MapWidgetState extends State<MapWidget> {
 
     for (var dong in DongList.all) {
       if (_selectedDong != null && dong != _selectedDong) continue;
-      
+
       for (var merchant in dong.merchantList) {
         final isSelected = _selectedMerchants.contains(merchant.id);
         final isHighlighted = _isSelectionMode && isSelected;
         final isLastSelected = _lastSelectedMerchant?.id == merchant.id;
-        
+
         widgets.add(
           Positioned(
             left: merchant.x,
             top: merchant.y,
             child: RepaintBoundary(
               key: ValueKey('merchant_${merchant.id}'),
-              child: _buildMerchantMarker(merchant, dong, isHighlighted, isLastSelected),
+              child: _buildMerchantMarker(
+                merchant,
+                dong,
+                isHighlighted,
+                isLastSelected,
+              ),
             ),
           ),
         );
       }
     }
-    
+
     return widgets;
   }
 
-  Widget _buildMerchantMarker(Merchant merchant, Dong dong, bool isHighlighted, bool isLastSelected) {
+  Widget _buildMerchantMarker(
+    Merchant merchant,
+    Dong dong,
+    bool isHighlighted,
+    bool isLastSelected,
+  ) {
     final scale = isHighlighted ? 1.1 : 1.0;
-        
-        // 마지막 선택된 상인회는 노란색 배경, 일반 선택 모드에서는 오렌지색 테두리
-        Color backgroundColor = Colors.white;
-        Color borderColor = dong.color;
-        double borderWidth = 3;
-        
-        if (isLastSelected) {
-          backgroundColor = Colors.yellow.shade300;
-          borderColor = Colors.orange;
-          borderWidth = 4;
-        } else if (isHighlighted) {
-          borderColor = Colors.orange;
-          borderWidth = 4;
-        }
-        
-        return Transform.scale(
-          scale: scale,
-          child: Container(
-            width: _touchTargetSize,
-            height: _touchTargetSize,
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              border: Border.all(
-                color: borderColor,
-                width: borderWidth,
-              ),
-              borderRadius: BorderRadius.circular(_touchTargetSize / 2),
-              boxShadow: [
-                BoxShadow(
-                  color: borderColor.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
+
+    // 마지막 선택된 상인회는 노란색 배경, 일반 선택 모드에서는 오렌지색 테두리
+    Color backgroundColor = Colors.white;
+    Color borderColor = dong.color;
+    double borderWidth = 3;
+
+    if (isLastSelected) {
+      backgroundColor = Colors.yellow.shade300;
+      borderColor = Colors.orange;
+      borderWidth = 4;
+    } else if (isHighlighted) {
+      borderColor = Colors.orange;
+      borderWidth = 4;
+    }
+
+    return Transform.scale(
+      scale: scale,
+      child: Container(
+        width: _touchTargetSize,
+        height: _touchTargetSize,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          border: Border.all(color: borderColor, width: borderWidth),
+          borderRadius: BorderRadius.circular(_touchTargetSize / 2),
+          boxShadow: [
+            BoxShadow(
+              color: borderColor.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                merchant.id.toString(),
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: _fontSize,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    merchant.id.toString(),
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: _fontSize,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (isHighlighted)
-                    const Icon(
-                      Icons.check_circle,
-                      color: Colors.orange,
-                      size: 16,
-                    ),
-                ],
               ),
-            ),
+              if (isHighlighted)
+                const Icon(Icons.check_circle, color: Colors.orange, size: 16),
+            ],
           ),
-        );
+        ),
+      ),
+    );
   }
 
   List<Widget> _buildDongTags() {
     if (!_showDongName) return [];
-    
+
     List<Widget> widgets = [];
-    
+
     for (var dong in DongList.all) {
       if (_selectedDong != null && dong != _selectedDong) continue;
-      
+
       widgets.add(
         Positioned.fromRect(
           rect: dong.dongTagArea,
@@ -497,13 +507,13 @@ class _MapWidgetState extends State<MapWidget> {
         ),
       );
     }
-    
+
     return widgets;
   }
 
   Widget _buildDongSelectionPanel() {
     final lifeAreaGroups = _groupDongsByLifeArea();
-    
+
     return Positioned(
       top: 24,
       left: widget.isMapLeft ? 24 : null,
@@ -515,12 +525,18 @@ class _MapWidgetState extends State<MapWidget> {
         padding: EdgeInsets.only(top: 6),
 
         gradient: LinearGradient(
-          colors: [Colors.white.withOpacity(0.40), Colors.white.withOpacity(0.10)],
+          colors: [
+            Colors.white.withOpacity(0.40),
+            Colors.white.withOpacity(0.10),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderGradient: LinearGradient(
-          colors: [Colors.white.withOpacity(0.60), Colors.white.withOpacity(0.10)],
+          colors: [
+            Colors.white.withOpacity(0.60),
+            Colors.white.withOpacity(0.10),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -533,8 +549,8 @@ class _MapWidgetState extends State<MapWidget> {
               child: ListView(
                 children: [
                   _buildDongSelectionItem(null, '전체'),
-                  ...lifeAreaGroups.entries.map((entry) =>
-                    _buildLifeAreaGroup(entry.key, entry.value)
+                  ...lifeAreaGroups.entries.map(
+                    (entry) => _buildLifeAreaGroup(entry.key, entry.value),
                   ),
                 ],
               ),
@@ -547,29 +563,24 @@ class _MapWidgetState extends State<MapWidget> {
 
   Map<String, List<Dong>> _groupDongsByLifeArea() {
     final Map<String, List<Dong>> groups = {};
-    
+
     for (final dong in DongList.all) {
       if (!groups.containsKey(dong.lifeArea)) {
         groups[dong.lifeArea] = [];
       }
       groups[dong.lifeArea]!.add(dong);
     }
-    
+
     // Sort by a specific order for life areas
-    final orderedKeys = [
-      '함께하는 생활권',
-      '성장하는 생활권', 
-      '살기좋은 생활권',
-      '행복한 생활권'
-    ];
-    
+    final orderedKeys = ['함께하는 생활권', '성장하는 생활권', '살기좋은 생활권', '행복한 생활권'];
+
     final Map<String, List<Dong>> orderedGroups = {};
     for (final key in orderedKeys) {
       if (groups.containsKey(key)) {
         orderedGroups[key] = groups[key]!;
       }
     }
-    
+
     return orderedGroups;
   }
 
@@ -597,7 +608,7 @@ class _MapWidgetState extends State<MapWidget> {
 
   Widget _buildDongSelectionItem(Dong? dong, String title) {
     final isSelected = _selectedDong == dong;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
       decoration: BoxDecoration(
@@ -611,23 +622,26 @@ class _MapWidgetState extends State<MapWidget> {
             children: [
               dong != null
                   ? Container(
-                width: 16,
-                height: 16,
-                decoration: BoxDecoration(
-                  color: dong.color,
-                  shape: BoxShape.circle,
-                ),
-              ) : const Icon(Icons.select_all, size: 16),
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: dong.color,
+                        shape: BoxShape.circle,
+                      ),
+                    )
+                  : const Icon(Icons.select_all, size: 16),
               Padding(
                 padding: EdgeInsets.only(left: 8),
                 child: Text(
                   title,
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -648,12 +662,18 @@ class _MapWidgetState extends State<MapWidget> {
           height: 60,
           width: 200,
           gradient: LinearGradient(
-            colors: [Colors.orange.withOpacity(0.40), Colors.orange.withOpacity(0.10)],
+            colors: [
+              Colors.orange.withOpacity(0.40),
+              Colors.orange.withOpacity(0.10),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderGradient: LinearGradient(
-            colors: [Colors.orange.withOpacity(0.60), Colors.orange.withOpacity(0.10)],
+            colors: [
+              Colors.orange.withOpacity(0.60),
+              Colors.orange.withOpacity(0.10),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -684,7 +704,7 @@ class _MapWidgetState extends State<MapWidget> {
 
   /// 동(구역)을 선택하거나 전체 보기로 전환합니다.
   /// [dong]: 선택할 동 객체. null이면 전체 보기로 전환됩니다.
-  /// 
+  ///
   /// 주요 기능:
   /// - 선택된 동 상태 업데이트
   /// - 상인회 선택 상태 초기화
@@ -722,6 +742,4 @@ class _MapWidgetState extends State<MapWidget> {
 
     _startAutoResetTimer();
   }
-
-
 }
