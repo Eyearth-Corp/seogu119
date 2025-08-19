@@ -1,14 +1,15 @@
+import 'dart:html' as html;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/rendering.dart';
-import 'dart:html' as html;
-import 'widget/floating_action_buttons.dart';
-import 'widget/map_widget.dart';
+
+import '../core/colors.dart';
+import 'data/dong_list.dart';
 import 'widget/dashboard/main_dashboard.dart';
 import 'widget/dong_dashboard.dart';
-import 'data/dong_list.dart';
-import '../core/colors.dart';
+import 'widget/floating_action_buttons.dart';
+import 'widget/map_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,19 +22,19 @@ class _HomePageState extends State<HomePage> {
   bool _isMapLeft = false;
   bool _isFullscreen = false;
   Dong? _selectedDong; // 선택된 동
-  
+
   // MapWidget을 제어하기 위한 컨트롤러
   final MapWidgetController _mapController = MapWidgetController();
-  
+
   // 스크린샷 캡처를 위한 GlobalKey
   final GlobalKey _mapRepaintBoundaryKey = GlobalKey();
-  
+
   // MapWidget 인스턴스를 유지하기 위한 키
   final GlobalKey _mapWidgetKey = GlobalKey();
-  
+
   // 메인 콘텐츠 캡처를 위한 키
   final GlobalKey _mainContentKey = GlobalKey();
-  
+
   /// MapWidget을 일관된 키로 생성하여 상태 유지
   Widget _buildMapWidget() {
     return RepaintBoundary(
@@ -52,12 +53,8 @@ class _HomePageState extends State<HomePage> {
 
   /// 선택된 상인회로 지도 이동
   void _navigateToMerchant(Merchant merchant) {
-
-
     _mapController.navigateToMerchant(merchant);
   }
-  
-
 
   void _toggleMapPosition() {
     setState(() {
@@ -104,7 +101,7 @@ class _HomePageState extends State<HomePage> {
       children: [
         // 대시보드 상단 헤더 (동 선택시만 표시)
         if (_selectedDong != null) _buildDashboardHeader(),
-        
+
         // 대시보드 내용
         Expanded(
           child: _selectedDong != null
@@ -122,9 +119,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildDashboardHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-      ),
+      decoration: BoxDecoration(color: Colors.white),
       child: Row(
         children: [
           TextButton.icon(
@@ -187,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                 color: SeoguColors.primary,
               ),
             ),
-            const SizedBox(width: 128)
+            const SizedBox(width: 128),
           ],
         ),
       ),
@@ -195,13 +190,13 @@ class _HomePageState extends State<HomePage> {
         child: Stack(
           children: [
             LayoutBuilder(
-            builder: (context, constraints) {
-              return Row(
-                children: [
-                  Container(
-                    width: 80,
-                    alignment: Alignment.center,
-                    child: FloatingActionButtons(
+              builder: (context, constraints) {
+                return Row(
+                  children: [
+                    Container(
+                      width: 80,
+                      alignment: Alignment.center,
+                      child: FloatingActionButtons(
                         key: const ValueKey('floating_buttons_left'),
                         isFullscreen: _isFullscreen,
                         isMapLeft: _isMapLeft,
@@ -209,45 +204,39 @@ class _HomePageState extends State<HomePage> {
                         onFullscreen: _toggleFullscreen,
                         onMerchant: _navigateToMerchant,
                         heroTagSuffix: '_left',
+                      ),
                     ),
-                  ),
-                  // 동적 레이아웃: _isMapLeft에 따라 지도와 대시보드 위치 변경
-                  Expanded(
-                    child: RepaintBoundary(
-                      key: _mainContentKey,
-                      child: _isMapLeft
-                          ? Row(
-                              children: [
-                                // 지도가 왼쪽일 때
-                                Expanded(
-                                  flex: 7,
-                                  child: _buildMapWidget(),
-                                ),
-                                Expanded(
-                                  flex: 5,
-                                  child: _buildDashboardSpace(),
-                                ),
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                // 대시보드가 왼쪽일 때 (기본)
-                                Expanded(
-                                  flex: 5,
-                                  child: _buildDashboardSpace(),
-                                ),
-                                Expanded(
-                                  flex: 7,
-                                  child: _buildMapWidget(),
-                                ),
-                              ],
-                            ),
+                    // 동적 레이아웃: _isMapLeft에 따라 지도와 대시보드 위치 변경
+                    Expanded(
+                      child: RepaintBoundary(
+                        key: _mainContentKey,
+                        child: _isMapLeft
+                            ? Row(
+                                children: [
+                                  // 지도가 왼쪽일 때
+                                  Expanded(flex: 7, child: _buildMapWidget()),
+                                  Expanded(
+                                    flex: 5,
+                                    child: _buildDashboardSpace(),
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                children: [
+                                  // 대시보드가 왼쪽일 때 (기본)
+                                  Expanded(
+                                    flex: 5,
+                                    child: _buildDashboardSpace(),
+                                  ),
+                                  Expanded(flex: 7, child: _buildMapWidget()),
+                                ],
+                              ),
+                      ),
                     ),
-                  ),
-                  Container(
-                    width: 80,
-                    alignment: Alignment.center,
-                    child: FloatingActionButtons(
+                    Container(
+                      width: 80,
+                      alignment: Alignment.center,
+                      child: FloatingActionButtons(
                         key: const ValueKey('floating_buttons_right'),
                         isFullscreen: _isFullscreen,
                         isMapLeft: _isMapLeft,
@@ -256,13 +245,13 @@ class _HomePageState extends State<HomePage> {
                         onMerchant: _navigateToMerchant,
                         heroTagSuffix: '_right',
                         mainContentKey: _mainContentKey,
+                      ),
                     ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ],
+                  ],
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
