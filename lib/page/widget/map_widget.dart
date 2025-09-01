@@ -515,7 +515,7 @@ class _MapWidgetState extends State<MapWidget> {
     final lifeAreaGroups = _groupDongsByLifeArea();
 
     return Positioned(
-      top: 24,
+      top: 80,
       left: widget.isMapLeft ? 24 : null,
       right: widget.isMapLeft ? null : 24,
 
