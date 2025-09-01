@@ -674,7 +674,10 @@ class _MerchantEditDialogState extends State<_MerchantEditDialog> {
     _nameController = TextEditingController(text: widget.merchant['merchant_name']);
     _presidentController = TextEditingController(text: widget.merchant['president'] ?? '');
     _storeCountController = TextEditingController(text: widget.merchant['store_count'].toString());
-    _memberStoreCountController = TextEditingController(text: widget.merchant['member_store_count'].toString());
+    
+    // Parse member_store_count properly - it comes as a string with decimal value
+    double memberStoreCountValue = double.tryParse(widget.merchant['member_store_count'].toString()) ?? 0.0;
+    _memberStoreCountController = TextEditingController(text: memberStoreCountValue.toInt().toString());
   }
 
   @override
