@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/services.dart';
-import 'package:screenshot/screenshot.dart';
-import 'package:seogu119/page/widget/dashboard/dashboard_percent_widget.dart';
-import 'package:seogu119/page/widget/dashboard/dashboard_type3_widget.dart';
-import 'package:seogu119/page/widget/dashboard/dashboard_type4_widget.dart';
-import '../../../core/colors.dart';
+
 import '../../../core/api_service.dart';
+import '../../../core/colors.dart';
 import '../../data/main_data_parser.dart';
-import 'dashboard_bbs1_widget.dart';
 import 'dashboard_bbs2_widget.dart';
-import 'dashboard_chart_widget.dart';
-import 'dashboard_type1_widget.dart';
-import 'dashboard_type2_widget.dart';
+import 'dashboard_custom1.dart';
 import 'dashboard_type5_widget.dart';
-import 'dashboard_widget.dart';
 
 class MainDashboard extends StatefulWidget {
   const MainDashboard({super.key});
@@ -64,15 +55,10 @@ class _MainDashboardState extends State<MainDashboard> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.blue.shade50,
-              Colors.indigo.shade100,
-            ],
+            colors: [Colors.blue.shade50, Colors.indigo.shade100],
           ),
         ),
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        child: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -84,10 +70,7 @@ class _MainDashboardState extends State<MainDashboard> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.blue.shade50,
-            Colors.indigo.shade100,
-          ],
+          colors: [Colors.blue.shade50, Colors.indigo.shade100],
         ),
         boxShadow: [
           BoxShadow(
@@ -106,39 +89,29 @@ class _MainDashboardState extends State<MainDashboard> {
             //   dashboardId: 1,
             // ),
             // const SizedBox(height: 20),
-
             Container(
               alignment: Alignment.centerRight,
               padding: EdgeInsets.only(right: 20, bottom: 16),
-              child: Text(_dashboardTitle,
-                style: TextStyle(
-                  fontSize: 22,
-                  color: Colors.black
-                ),
+              child: Text(
+                _dashboardTitle,
+                style: TextStyle(fontSize: 22, color: Colors.black),
               ),
             ),
 
-            DashBoardType5Widget(
-              dashboardId: 1,
-            ),
+            DashBoardType5Widget(dashboardId: 1),
             const SizedBox(height: 20),
-            
+
+            DashBoardCustom1(),
+            const SizedBox(height: 20),
+
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                      child: DashBoardBbs2Widget(
-                        dashboardId: 1,
-                      )
-                  ),
+                  Expanded(child: DashBoardBbs2Widget(dashboardId: 1)),
                   SizedBox(width: 20),
-                  Expanded(
-                      child: DashBoardBbs2Widget(
-                        dashboardId: 2,
-                      )
-                  ),
+                  Expanded(child: DashBoardBbs2Widget(dashboardId: 2)),
                 ],
               ),
             ),
@@ -148,17 +121,9 @@ class _MainDashboardState extends State<MainDashboard> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: DashBoardBbs2Widget(
-                      dashboardId: 3,
-                    )
-                  ),
+                  Expanded(child: DashBoardBbs2Widget(dashboardId: 3)),
                   SizedBox(width: 20),
-                  Expanded(
-                    child: DashBoardBbs2Widget(
-                      dashboardId: 4,
-                    )
-                  ),
+                  Expanded(child: DashBoardBbs2Widget(dashboardId: 4)),
                 ],
               ),
             ),
@@ -182,7 +147,6 @@ class _MainDashboardState extends State<MainDashboard> {
 
   /// 빈 데이터 메시지를 표시하는 공통 위젯
 
-
   Widget baseView({required Widget child}) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -204,9 +168,9 @@ class _MainDashboardState extends State<MainDashboard> {
   // 타입 4
   Widget _buildType4(String title, processed, rate) {
     final complaintPerformance = Type4Data(
-        title: title,
-        processed: processed,
-        rate: rate
+      title: title,
+      processed: processed,
+      rate: rate,
     );
 
     return Container(
@@ -243,10 +207,7 @@ class _MainDashboardState extends State<MainDashboard> {
                   children: [
                     const Text(
                       '처리됨',
-                      style: TextStyle(
-                        fontSize: 21,
-                        color: Color(0xFF64748B),
-                      ),
+                      style: TextStyle(fontSize: 21, color: Color(0xFF64748B)),
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -260,21 +221,14 @@ class _MainDashboardState extends State<MainDashboard> {
                   ],
                 ),
               ),
-              Container(
-                width: 1,
-                height: 40,
-                color: const Color(0xFFE2E8F0),
-              ),
+              Container(width: 1, height: 40, color: const Color(0xFFE2E8F0)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Text(
                       '처리율',
-                      style: TextStyle(
-                        fontSize: 21,
-                        color: Color(0xFF64748B),
-                      ),
+                      style: TextStyle(fontSize: 21, color: Color(0xFF64748B)),
                     ),
                     const SizedBox(height: 6),
                     Text(
