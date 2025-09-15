@@ -92,7 +92,7 @@ class _DashBoardCustom1State extends State<DashBoardCustom1> {
                   '온누리가맹 가능 상점수',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFFd2ffe9),
                     wordSpacing: 2.0,
@@ -108,7 +108,7 @@ class _DashBoardCustom1State extends State<DashBoardCustom1> {
                     Text(
                       '8,311',
                       style: const TextStyle(
-                        fontSize: 28,
+                        fontSize: 32,
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
                       ),
@@ -210,7 +210,7 @@ class _DashBoardCustom1State extends State<DashBoardCustom1> {
                   '온누리 실 가맹률',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFFd2ffe9),
                     wordSpacing: 2.0,
@@ -226,7 +226,7 @@ class _DashBoardCustom1State extends State<DashBoardCustom1> {
                     Text(
                       '69.04',
                       style: const TextStyle(
-                        fontSize: 28,
+                        fontSize: 32,
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
                       ),
