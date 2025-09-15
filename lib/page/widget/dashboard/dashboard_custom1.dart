@@ -73,7 +73,7 @@ class _DashBoardCustom1State extends State<DashBoardCustom1> {
             ),
             Positioned(
               top: 12,
-              right: 22,
+              right: 42,
               child: Container(
                 height: 80,
                 child: Text(
@@ -89,7 +89,7 @@ class _DashBoardCustom1State extends State<DashBoardCustom1> {
               children: [
                 SizedBox(height: 40),
                 Text(
-                  '민생회복 소비쿠폰\n골목상권 활성화 효과',
+                  '온누리가맹 가능 상점수',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 24,
@@ -106,7 +106,7 @@ class _DashBoardCustom1State extends State<DashBoardCustom1> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '75.5',
+                      '8,311',
                       style: const TextStyle(
                         fontSize: 28,
                         color: Colors.white,
@@ -117,7 +117,7 @@ class _DashBoardCustom1State extends State<DashBoardCustom1> {
                     Padding(
                       padding: EdgeInsets.only(bottom: 3),
                       child: Text(
-                        '%',
+                        '점포',
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.white70,
@@ -190,7 +190,7 @@ class _DashBoardCustom1State extends State<DashBoardCustom1> {
             ),
             Positioned(
               top: 12,
-              right: 12,
+              right: 22,
               child: Container(
                 width: 80,
                 height: 80,
@@ -207,7 +207,7 @@ class _DashBoardCustom1State extends State<DashBoardCustom1> {
               children: [
                 SizedBox(height: 40),
                 Text(
-                  '민생회복 소비쿠폰\n소상공인 만족도',
+                  '온누리 실 가맹률',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 24,
@@ -224,7 +224,7 @@ class _DashBoardCustom1State extends State<DashBoardCustom1> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '70.3',
+                      '69.04',
                       style: const TextStyle(
                         fontSize: 28,
                         color: Colors.white,
