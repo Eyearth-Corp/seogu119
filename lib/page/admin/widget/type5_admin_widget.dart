@@ -213,11 +213,11 @@ class _Type5AdminWidgetState extends State<Type5AdminWidget> {
                 'Type5 위젯 데이터 (${_items.length}개)',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              ElevatedButton.icon(
-                onPressed: () => _showDialog(),
-                icon: const Icon(Icons.add),
-                label: const Text('추가'),
-              ),
+              // ElevatedButton.icon(
+              //   onPressed: () => _showDialog(),
+              //   icon: const Icon(Icons.add),
+              //   label: const Text('추가'),
+              // ),
             ],
           ),
         ),
