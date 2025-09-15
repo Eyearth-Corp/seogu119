@@ -495,20 +495,20 @@ class DashboardMasterList extends StatelessWidget {
                   ),
                 ],
               ),
-              ElevatedButton.icon(
-                onPressed: () => _showCreateDialog(context),
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('추가'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3B82F6),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  elevation: 0,
-                ),
-              ),
+              // ElevatedButton.icon(
+              //   onPressed: () => _showCreateDialog(context),
+              //   icon: const Icon(Icons.add, size: 18),
+              //   label: const Text('추가'),
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: const Color(0xFF3B82F6),
+              //     foregroundColor: Colors.white,
+              //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(8),
+              //     ),
+              //     elevation: 0,
+              //   ),
+              // ),
             ],
           ),
         ),
