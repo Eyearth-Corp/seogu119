@@ -247,10 +247,10 @@ class _Type5AdminWidgetState extends State<Type5AdminWidget> {
                                   icon: const Icon(Icons.edit),
                                   onPressed: () => _showDialog(item: item),
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () => _deleteItem(item.id),
-                                ),
+                                // IconButton(
+                                //   icon: const Icon(Icons.delete, color: Colors.red),
+                                //   onPressed: () => _deleteItem(item.id),
+                                // ),
                               ],
                             ),
                           ),
