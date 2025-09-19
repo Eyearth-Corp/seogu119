@@ -183,6 +183,7 @@ class DongList {
           Merchant(id: 25, name: "치평상무역상인회", x: 738, y: 1053),
           Merchant(id: 26, name: "치평광명상가상인회", x: 738, y: 980),
           Merchant(id: 27, name: "상무평화상인회", x: 799, y: 940),
+          //Merchant(id: 121, name: "121_치평동", x: 736, y: 875),
         ]
     ),
     // 9
@@ -316,6 +317,8 @@ class DongList {
           Merchant(id: 53, name: "마륵동상인회", x: 873, y: 1286),
           Merchant(id: 118, name: "전평제상인회", x: 1119, y: 2160),
           Merchant(id: 119, name: "매월동상인회", x: 1273, y: 2157),
+          //Merchant(id: 120, name: "120_서창동1", x: 1365, y: 1953),
+          //Merchant(id: 120, name: "120_서창동2", x: 1381, y: 2074),
         ]
     ),
     // // 118-119
