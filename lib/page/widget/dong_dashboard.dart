@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
+
 import '../../core/colors.dart';
-import '../data/dong_dashboard_data.dart';
 import '../../services/dong_api_service.dart';
+import '../data/dong_dashboard_data.dart';
 
 class DongDashboard extends StatefulWidget {
   final String dongName;
-  
-  const DongDashboard({
-    super.key,
-    required this.dongName,
-  });
+
+  const DongDashboard({super.key, required this.dongName});
 
   @override
   State<DongDashboard> createState() => _DongDashboardState();
@@ -40,7 +37,9 @@ class _DongDashboardState extends State<DongDashboard> {
     });
 
     try {
-      final data = await DongApiService.getCompleteDongDashboard(widget.dongName);
+      final data = await DongApiService.getCompleteDongDashboard(
+        widget.dongName,
+      );
       if (mounted) {
         setState(() {
           _dashboardData = data;
@@ -67,15 +66,10 @@ class _DongDashboardState extends State<DongDashboard> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.green.shade50,
-              Colors.teal.shade100,
-            ],
+            colors: [Colors.green.shade50, Colors.teal.shade100],
           ),
         ),
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        child: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -87,15 +81,10 @@ class _DongDashboardState extends State<DongDashboard> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.green.shade50,
-              Colors.teal.shade100,
-            ],
+            colors: [Colors.green.shade50, Colors.teal.shade100],
           ),
         ),
-        child: const Center(
-          child: Text('데이터를 불러올 수 없습니다.'),
-        ),
+        child: const Center(child: Text('데이터를 불러올 수 없습니다.')),
       );
     }
 
@@ -106,10 +95,7 @@ class _DongDashboardState extends State<DongDashboard> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.green.shade50,
-            Colors.teal.shade100,
-          ],
+          colors: [Colors.green.shade50, Colors.teal.shade100],
         ),
         boxShadow: [
           BoxShadow(
@@ -204,22 +190,34 @@ class _DongDashboardState extends State<DongDashboard> {
   /// 상단 메트릭 카드들
   Widget _buildTopMetrics() {
     final metrics = _dashboardData?.dongMetrics ?? [];
-    
+
     if (metrics.isEmpty) {
       return _buildEmptyDataMessage();
     }
-    
-    final colors = [SeoguColors.primary, SeoguColors.secondary, SeoguColors.accent, SeoguColors.info];
+
+    final colors = [
+      SeoguColors.primary,
+      SeoguColors.secondary,
+      SeoguColors.accent,
+      SeoguColors.info,
+    ];
 
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: metrics.asMap().entries.map((entry) {
-            final index = entry.key;
-            final metric = entry.value;
-            final color = index < colors.length ? colors[index] : SeoguColors.primary;
-            return _buildMetricCard(metric.title, metric.value, metric.unit, color);
-          }).toList(),
+        children: metrics.asMap().entries.map((entry) {
+          final index = entry.key;
+          final metric = entry.value;
+          final color = index < colors.length
+              ? colors[index]
+              : SeoguColors.primary;
+          return _buildMetricCard(
+            metric.title,
+            metric.value,
+            metric.unit,
+            color,
+          );
+        }).toList(),
       ),
     );
 
@@ -240,7 +238,12 @@ class _DongDashboardState extends State<DongDashboard> {
   }
 
   /// 개별 메트릭 카드
-  Widget _buildMetricCard(String title, String value, String unit, Color color) {
+  Widget _buildMetricCard(
+    String title,
+    String value,
+    String unit,
+    Color color,
+  ) {
     return Expanded(
       flex: 1,
       child: Container(
@@ -303,12 +306,10 @@ class _DongDashboardState extends State<DongDashboard> {
   /// 상인회 목록
   Widget _buildMerchantsList() {
     final merchants = _dashboardData?.merchants ?? [];
-    
+
     if (merchants.isEmpty) {
       return _buildEmptyDataMessage();
     }
-
-
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -341,8 +342,6 @@ class _DongDashboardState extends State<DongDashboard> {
             itemCount: merchants.length,
             separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
-
-
               final merchant = merchants[index];
               return _buildMerchantItem(merchant, index);
             },
@@ -364,7 +363,7 @@ class _DongDashboardState extends State<DongDashboard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "${seoguId}. ${merchant.merchantName}",
+                  "${merchant.merchantName}",
                   style: const TextStyle(
                     fontSize: 19,
                     fontWeight: FontWeight.w600,
@@ -422,7 +421,12 @@ class _DongDashboardState extends State<DongDashboard> {
   }
 
   /// 분석 아이템
-  Widget _buildAnalysisItem(String label, String count, String range, Color color) {
+  Widget _buildAnalysisItem(
+    String label,
+    String count,
+    String range,
+    Color color,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       padding: const EdgeInsets.all(12),
@@ -465,7 +469,7 @@ class _DongDashboardState extends State<DongDashboard> {
   /// 최근 공지사항
   Widget _buildRecentNotices() {
     final notices = _dashboardData?.notices ?? [];
-    
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -495,13 +499,13 @@ class _DongDashboardState extends State<DongDashboard> {
           if (notices.isEmpty)
             const Text(
               '등록된 공지사항이 없습니다.',
-              style: TextStyle(
-                fontSize: 14,
-                color: SeoguColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 14, color: SeoguColors.textSecondary),
             )
           else
-            ...notices.take(3).map((notice) => _buildNoticeItem(notice)).toList(),
+            ...notices
+                .take(3)
+                .map((notice) => _buildNoticeItem(notice))
+                .toList(),
         ],
       ),
     );
@@ -700,7 +704,9 @@ class _DongDashboardState extends State<DongDashboard> {
                         const SizedBox(height: 16),
                         // 내용
                         Text(
-                          notice.content.isNotEmpty ? notice.content : '내용이 없습니다.',
+                          notice.content.isNotEmpty
+                              ? notice.content
+                              : '내용이 없습니다.',
                           style: const TextStyle(
                             fontSize: 16,
                             color: SeoguColors.textPrimary,
@@ -726,7 +732,10 @@ class _DongDashboardState extends State<DongDashboard> {
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
                         style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
                           backgroundColor: SeoguColors.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
