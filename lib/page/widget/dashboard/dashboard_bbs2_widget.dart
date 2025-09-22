@@ -294,7 +294,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
           ),
           child: Container(
             padding: const EdgeInsets.all(24),
-            constraints: const BoxConstraints(maxWidth: 800),
+            constraints: const BoxConstraints(maxWidth: 1200, maxHeight: 1200),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -318,7 +318,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
                       child: Text(
                         title,
                         style: const TextStyle(
-                          fontSize: 22,
+                          fontSize: 32,
                           fontWeight: FontWeight.bold,
                           color: SeoguColors.textPrimary,
                         ),
@@ -326,22 +326,11 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                const Divider(color: Color(0xFFE2E8F0)),
-                const SizedBox(height: 16),
-                const Text(
-                  '상세 내용',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF64748B),
-                  ),
-                ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 24),
                 Text(
                   detail,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 24,
                     height: 1.5,
                     color: SeoguColors.textPrimary,
                   ),
@@ -355,7 +344,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
                       child: const Text(
                         '닫기',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 24,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF64748B),
                         ),

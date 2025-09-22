@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../data/admin_service.dart';
 
 class Bbs2AdminWidget extends StatefulWidget {
@@ -35,8 +36,9 @@ class _Bbs2AdminWidgetState extends State<Bbs2AdminWidget> {
 
     try {
       final response = await AdminService.fetchFromURL(
-          '${AdminService.baseUrl}/api/DashBoardBbs2?id=${widget.dashboardId}');
-      
+        '${AdminService.baseUrl}/api/DashBoardBbs2?id=${widget.dashboardId}',
+      );
+
       if (response != null && response['success'] == true) {
         final bbs2Data = response['data']['bbs2_data'] as List<dynamic>;
         setState(() {
@@ -77,10 +79,7 @@ class _Bbs2AdminWidgetState extends State<Bbs2AdminWidget> {
     try {
       final response = await AdminService.putToURL(
         '${AdminService.baseUrl}/api/DashBoardBbs2/$id',
-        {
-          'title': title,
-          'detail': detail,
-        },
+        {'title': title, 'detail': detail},
       );
 
       if (response != null && response['success'] == true) {
@@ -95,7 +94,8 @@ class _Bbs2AdminWidgetState extends State<Bbs2AdminWidget> {
   Future<void> _deleteItem(int id) async {
     try {
       final response = await AdminService.deleteFromURL(
-          '${AdminService.baseUrl}/api/DashBoardBbs2/$id');
+        '${AdminService.baseUrl}/api/DashBoardBbs2/$id',
+      );
 
       if (response != null && response['success'] == true) {
         _showSuccessSnackBar('BBS2 아이템이 성공적으로 삭제되었습니다.');
@@ -145,10 +145,7 @@ class _Bbs2AdminWidgetState extends State<Bbs2AdminWidget> {
             onPressed: () {
               Navigator.of(context).pop();
               if (item == null) {
-                _createItem(
-                  titleController.text,
-                  detailController.text,
-                );
+                _createItem(titleController.text, detailController.text);
               } else {
                 _updateItem(
                   item.id,
@@ -167,10 +164,7 @@ class _Bbs2AdminWidgetState extends State<Bbs2AdminWidget> {
   void _showErrorSnackBar(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
       );
     }
   }
@@ -178,10 +172,7 @@ class _Bbs2AdminWidgetState extends State<Bbs2AdminWidget> {
   void _showSuccessSnackBar(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.green,
-        ),
+        SnackBar(content: Text(message), backgroundColor: Colors.green),
       );
     }
   }
@@ -197,7 +188,10 @@ class _Bbs2AdminWidgetState extends State<Bbs2AdminWidget> {
             children: [
               Text(
                 'BBS2 위젯 데이터 (${_items.length}개)',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               ElevatedButton.icon(
                 onPressed: () => _showDialog(),
@@ -211,37 +205,37 @@ class _Bbs2AdminWidgetState extends State<Bbs2AdminWidget> {
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _items.isEmpty
-                  ? const Center(child: Text('BBS2 아이템이 없습니다.'))
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _items.length,
-                      itemBuilder: (context, index) {
-                        final item = _items[index];
-                        return Card(
-                          child: ListTile(
-                            title: Text(item.title),
-                            subtitle: Text(
-                              item.detail,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+              ? const Center(child: Text('BBS2 아이템이 없습니다.'))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _items.length,
+                  itemBuilder: (context, index) {
+                    final item = _items[index];
+                    return Card(
+                      child: ListTile(
+                        title: Text(item.title),
+                        subtitle: Text(
+                          item.detail,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () => _showDialog(item: item),
                             ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () => _showDialog(item: item),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () => _deleteItem(item.id),
-                                ),
-                              ],
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _deleteItem(item.id),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
         ),
       ],
     );
@@ -254,11 +248,7 @@ class Bbs2Item {
   final String title;
   final String detail;
 
-  Bbs2Item({
-    required this.id,
-    required this.title,
-    required this.detail,
-  });
+  Bbs2Item({required this.id, required this.title, required this.detail});
 
   factory Bbs2Item.fromJson(Map<String, dynamic> json) {
     return Bbs2Item(
