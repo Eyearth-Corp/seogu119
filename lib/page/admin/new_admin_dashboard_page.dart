@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
+
 import '../data/admin_service.dart';
 import '../data/dong_list.dart';
-import 'widget_managers.dart' show DashboardMaster;
-import 'widget/type1_admin_widget.dart';
+import 'dong_admin_dashboard_page.dart';
 import 'widget/bbs1_admin_widget.dart';
 import 'widget/bbs2_admin_widget.dart';
 import 'widget/chart_admin_widget.dart';
 import 'widget/percent_admin_widget.dart';
+import 'widget/type1_admin_widget.dart';
 import 'widget/type2_admin_widget.dart';
 import 'widget/type3_admin_widget.dart';
 import 'widget/type4_admin_widget.dart';
 import 'widget/type5_admin_widget.dart';
-import 'dong_admin_dashboard_page.dart';
+import 'widget_managers.dart' show DashboardMaster;
 
 class NewAdminDashboardPage extends StatefulWidget {
   const NewAdminDashboardPage({super.key});
@@ -41,12 +42,15 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
 
     try {
       final response = await AdminService.fetchFromURL(
-          '${AdminService.baseUrl}/api/dashboard-master');
-      
+        '${AdminService.baseUrl}/api/dashboard-master',
+      );
+
       if (response != null && response['success'] == true) {
         final dashboards = response['data']['dashboards'] as List<dynamic>;
         setState(() {
-          _dashboards = dashboards.map((item) => DashboardMaster.fromJson(item)).toList();
+          _dashboards = dashboards
+              .map((item) => DashboardMaster.fromJson(item))
+              .toList();
         });
       }
     } catch (e) {
@@ -61,10 +65,7 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
   void _showErrorSnackBar(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
       );
     }
   }
@@ -72,10 +73,7 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
   void _showSuccessSnackBar(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.green,
-        ),
+        SnackBar(content: Text(message), backgroundColor: Colors.green),
       );
     }
   }
@@ -88,35 +86,30 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
   }
 
   bool _isItemSelected(DashboardMaster dashboard) {
-    return _selectedDashboardId == dashboard.id && 
-           _selectedWidgetType == dashboard.widgetType;
+    return _selectedDashboardId == dashboard.id &&
+        _selectedWidgetType == dashboard.widgetType;
   }
 
   Map<String, List<Dong>> _groupDongsByLifeArea() {
     final Map<String, List<Dong>> groups = {};
-    
+
     for (final dong in DongList.all) {
       if (!groups.containsKey(dong.lifeArea)) {
         groups[dong.lifeArea] = [];
       }
       groups[dong.lifeArea]!.add(dong);
     }
-    
+
     // Sort by a specific order for life areas
-    final orderedKeys = [
-      '함께하는 생활권',
-      '성장하는 생활권', 
-      '살기좋은 생활권',
-      '행복한 생활권'
-    ];
-    
+    final orderedKeys = ['함께하는 생활권', '성장하는 생활권', '살기좋은 생활권', '행복한 생활권'];
+
     final Map<String, List<Dong>> orderedGroups = {};
     for (final key in orderedKeys) {
       if (groups.containsKey(key)) {
         orderedGroups[key] = groups[key]!;
       }
     }
-    
+
     return orderedGroups;
   }
 
@@ -156,66 +149,64 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
                   ),
                 ],
               ),
-              SizedBox(width: 12,),
+              SizedBox(width: 12),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: dongs.map((dong) =>
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => DongAdminDashboardPage(dongName: dong.name),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
+                children: dongs
+                    .map(
+                      (dong) => Material(
+                        color: Colors.transparent,
+                        child: InkWell(
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: const Color(0xFFE2E8F0),
-                            width: 1,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DongAdminDashboardPage(dongName: dong.name),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8FAFC),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFFE2E8F0),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: dong.color,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  dong.name,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF1E293B),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: dong.color,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              dong.name,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF1E293B),
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              '${dong.merchantList.length}',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF64748B),
-                              ),
-                            ),
-                          ],
                         ),
                       ),
-                    ),
-                  ),
-                ).toList(),
+                    )
+                    .toList(),
               ),
             ],
           ),
@@ -278,10 +269,7 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     border: Border(
-                      bottom: BorderSide(
-                        color: Color(0xFFE2E8F0),
-                        width: 1,
-                      ),
+                      bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
                     ),
                   ),
                   child: Column(
@@ -373,7 +361,8 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
                             child: _selectedDashboardId == null
                                 ? Center(
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.dashboard_outlined,
@@ -405,7 +394,7 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
                           child: ImageLibraryPanel(
                             onCopy: _showSuccessSnackBar,
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -431,12 +420,10 @@ class DashboardMasterList extends StatelessWidget {
     required this.onRefresh,
   });
 
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-
         // 대시보드 타이틀 수정 섹션
         Container(
           width: double.infinity,
@@ -444,73 +431,10 @@ class DashboardMasterList extends StatelessWidget {
           decoration: const BoxDecoration(
             color: Colors.white,
             border: Border(
-              bottom: BorderSide(
-                color: Color(0xFFE2E8F0),
-                width: 1,
-              ),
+              bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
             ),
           ),
           child: DashboardTitleEditor(),
-        ),
-
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: Color(0xFFE2E8F0),
-                width: 1,
-              ),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    '대시보드 목록',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1E293B),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEFF6FF),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.2)),
-                    ),
-                    child: Text(
-                      '${dashboards.length}개',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF3B82F6),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              // ElevatedButton.icon(
-              //   onPressed: () => _showCreateDialog(context),
-              //   icon: const Icon(Icons.add, size: 18),
-              //   label: const Text('추가'),
-              //   style: ElevatedButton.styleFrom(
-              //     backgroundColor: const Color(0xFF3B82F6),
-              //     foregroundColor: Colors.white,
-              //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(8),
-              //     ),
-              //     elevation: 0,
-              //   ),
-              // ),
-            ],
-          ),
         ),
         Expanded(
           child: dashboards.isEmpty
@@ -543,27 +467,36 @@ class DashboardMasterList extends StatelessWidget {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
+                        color: isSelected
+                            ? const Color(0xFFEFF6FF)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSelected 
+                          color: isSelected
                               ? const Color(0xFF3B82F6)
                               : const Color(0xFFE2E8F0),
                           width: isSelected ? 2 : 1,
                         ),
-                        boxShadow: isSelected ? [
-                          BoxShadow(
-                            color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ] : null,
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFF3B82F6,
+                                  ).withValues(alpha: 0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : null,
                       ),
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
-                          onTap: () => onDashboardSelected(dashboard.id, dashboard.widgetType),
+                          onTap: () => onDashboardSelected(
+                            dashboard.id,
+                            dashboard.widgetType,
+                          ),
                           child: Padding(
                             padding: const EdgeInsets.all(16),
                             child: Column(
@@ -576,7 +509,9 @@ class DashboardMasterList extends StatelessWidget {
                                         dashboard.dashboardName,
                                         style: TextStyle(
                                           fontSize: 16,
-                                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                          fontWeight: isSelected
+                                              ? FontWeight.w600
+                                              : FontWeight.w500,
                                           color: const Color(0xFF1E293B),
                                         ),
                                       ),
@@ -585,8 +520,9 @@ class DashboardMasterList extends StatelessWidget {
                                       onPressed: () {
                                         _showEditDialog(context, dashboard);
                                       },
-                                      child: Text('수정')
-                                    )
+                                      child: Text('수정'),
+                                    ),
+
                                     // PopupMenuButton<String>(
                                     //   onSelected: (value) {
                                     //     switch (value) {
@@ -633,13 +569,15 @@ class DashboardMasterList extends StatelessWidget {
                                     //     ),
                                     //   ),
                                     // ),
-
                                   ],
                                 ),
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    _buildInfoChip('ID', dashboard.id.toString()),
+                                    _buildInfoChip(
+                                      'ID',
+                                      dashboard.id.toString(),
+                                    ),
                                     const SizedBox(width: 8),
                                     _buildInfoChip('타입', dashboard.widgetType),
                                   ],
@@ -660,29 +598,23 @@ class DashboardMasterList extends StatelessWidget {
   void _showCreateDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => DashboardCreateDialog(
-        onRefresh: onRefresh,
-      ),
+      builder: (context) => DashboardCreateDialog(onRefresh: onRefresh),
     );
   }
 
   void _showEditDialog(BuildContext context, DashboardMaster dashboard) {
     showDialog(
       context: context,
-      builder: (context) => DashboardEditDialog(
-        dashboard: dashboard,
-        onRefresh: onRefresh,
-      ),
+      builder: (context) =>
+          DashboardEditDialog(dashboard: dashboard, onRefresh: onRefresh),
     );
   }
 
   void _showDeleteDialog(BuildContext context, DashboardMaster dashboard) {
     showDialog(
       context: context,
-      builder: (context) => DashboardDeleteDialog(
-        dashboard: dashboard,
-        onRefresh: onRefresh,
-      ),
+      builder: (context) =>
+          DashboardDeleteDialog(dashboard: dashboard, onRefresh: onRefresh),
     );
   }
 
@@ -739,7 +671,9 @@ class _WidgetDataManagerState extends State<WidgetDataManager> {
     // Remove 'dashboard_' prefix if present and convert to lowercase
     String cleanWidgetType = widget.widgetType.toLowerCase();
     if (cleanWidgetType.startsWith('dashboard_')) {
-      cleanWidgetType = cleanWidgetType.substring(10); // Remove 'dashboard_' prefix
+      cleanWidgetType = cleanWidgetType.substring(
+        10,
+      ); // Remove 'dashboard_' prefix
     }
 
     switch (cleanWidgetType) {
@@ -762,9 +696,7 @@ class _WidgetDataManagerState extends State<WidgetDataManager> {
       case 'type5':
         return Type5AdminWidget(dashboardId: widget.dashboardId);
       default:
-        return Center(
-          child: Text('지원하지 않는 위젯 타입: ${widget.widgetType}'),
-        );
+        return Center(child: Text('지원하지 않는 위젯 타입: ${widget.widgetType}'));
     }
   }
 }
@@ -773,10 +705,7 @@ class _WidgetDataManagerState extends State<WidgetDataManager> {
 class DashboardCreateDialog extends StatefulWidget {
   final VoidCallback onRefresh;
 
-  const DashboardCreateDialog({
-    super.key,
-    required this.onRefresh,
-  });
+  const DashboardCreateDialog({super.key, required this.onRefresh});
 
   @override
   State<DashboardCreateDialog> createState() => _DashboardCreateDialogState();
@@ -816,7 +745,7 @@ class _DashboardCreateDialogState extends State<DashboardCreateDialog> {
           'dashboard_bbs1': 'BBS1 위젯 (공지사항)',
           'dashboard_bbs2': 'BBS2 위젯 (트렌드)',
           'dashboard_chart': '차트 위젯',
-          'dashboard_percent': '퍼센트 위젯'
+          'dashboard_percent': '퍼센트 위젯',
         };
         _selectedWidgetType = _widgetTypes!.keys.first;
       });
@@ -833,8 +762,8 @@ class _DashboardCreateDialogState extends State<DashboardCreateDialog> {
         id: int.parse(_idController.text),
         widgetType: _selectedWidgetType!,
         dashboardName: _nameController.text.trim(),
-        dashboardDescription: _descriptionController.text.trim().isEmpty 
-            ? null 
+        dashboardDescription: _descriptionController.text.trim().isEmpty
+            ? null
             : _descriptionController.text.trim(),
       );
 
@@ -923,9 +852,7 @@ class _DashboardCreateDialogState extends State<DashboardCreateDialog> {
                   },
                 )
               else
-                const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                const Center(child: CircularProgressIndicator()),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _nameController,
@@ -1015,10 +942,18 @@ class _DashboardEditDialogState extends State<DashboardEditDialog> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.dashboard.dashboardName);
-    _descriptionController = TextEditingController(text: widget.dashboard.dashboardDescription);
-    _titleColorController = TextEditingController(text: widget.dashboard.titleColor ?? '000000');
-    _backgroundColorController = TextEditingController(text: widget.dashboard.backgroundColor ?? 'FFFFFF');
+    _nameController = TextEditingController(
+      text: widget.dashboard.dashboardName,
+    );
+    _descriptionController = TextEditingController(
+      text: widget.dashboard.dashboardDescription,
+    );
+    _titleColorController = TextEditingController(
+      text: widget.dashboard.titleColor ?? '000000',
+    );
+    _backgroundColorController = TextEditingController(
+      text: widget.dashboard.backgroundColor ?? 'FFFFFF',
+    );
   }
 
   Future<void> _updateDashboard() async {
@@ -1031,8 +966,8 @@ class _DashboardEditDialogState extends State<DashboardEditDialog> {
         id: widget.dashboard.id,
         widgetType: widget.dashboard.widgetType,
         dashboardName: _nameController.text.trim(),
-        dashboardDescription: _descriptionController.text.trim().isEmpty 
-            ? null 
+        dashboardDescription: _descriptionController.text.trim().isEmpty
+            ? null
             : _descriptionController.text.trim(),
         titleColor: _titleColorController.text.trim(),
         backgroundColor: _backgroundColorController.text.trim(),
@@ -1230,7 +1165,10 @@ class _DashboardEditDialogState extends State<DashboardEditDialog> {
                   decoration: const InputDecoration(
                     prefixText: '#',
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
                   ),
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'[0-9A-Fa-f]')),
@@ -1358,10 +1296,7 @@ class _DashboardDeleteDialogState extends State<DashboardDeleteDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '정말로 삭제하시겠습니까?',
-            style: TextStyle(fontSize: 16),
-          ),
+          const Text('정말로 삭제하시겠습니까?', style: TextStyle(fontSize: 16)),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(16),
@@ -1438,10 +1373,7 @@ class _DashboardDeleteDialogState extends State<DashboardDeleteDialog> {
 class ImageLibraryPanel extends StatelessWidget {
   final Function(String) onCopy;
 
-  const ImageLibraryPanel({
-    super.key,
-    required this.onCopy,
-  });
+  const ImageLibraryPanel({super.key, required this.onCopy});
 
   static const List<Map<String, String>> _imageList = [
     // 기본 상태/반응
@@ -1458,7 +1390,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '보라 동그라미', 'image': '🟣'},
     {'title': '검은 동그라미', 'image': '⚫'},
     {'title': '흰 동그라미', 'image': '⚪'},
-    
+
     // 화살표 및 방향
     {'title': '화살표 위', 'image': '⬆️'},
     {'title': '화살표 아래', 'image': '⬇️'},
@@ -1473,7 +1405,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '새로고침', 'image': '🔄'},
     {'title': '되돌리기', 'image': '↩️'},
     {'title': '앞으로', 'image': '↪️'},
-    
+
     // 감정 및 반응
     {'title': '별', 'image': '⭐'},
     {'title': '반짝이는 별', 'image': '✨'},
@@ -1488,7 +1420,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '브이', 'image': '✌️'},
     {'title': '근육', 'image': '💪'},
     {'title': '기도', 'image': '🙏'},
-    
+
     // 특수 효과
     {'title': '불', 'image': '🔥'},
     {'title': '번개', 'image': '⚡'},
@@ -1498,7 +1430,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '무지개', 'image': '🌈'},
     {'title': '다이아몬드', 'image': '💎'},
     {'title': '왕관', 'image': '👑'},
-    
+
     // 아이디어 및 도구
     {'title': '전구', 'image': '💡'},
     {'title': '로켓', 'image': '🚀'},
@@ -1508,7 +1440,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '현미경', 'image': '🔬'},
     {'title': '실험관', 'image': '🧪'},
     {'title': 'DNA', 'image': '🧬'},
-    
+
     // 경고 및 주의
     {'title': '경고', 'image': '⚠️'},
     {'title': '금지', 'image': '🚫'},
@@ -1518,7 +1450,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '위험', 'image': '⚡'},
     {'title': '독', 'image': '☠️'},
     {'title': '온도계', 'image': '🌡️'},
-    
+
     // 시간 및 날짜
     {'title': '시계', 'image': '⏰'},
     {'title': '모래시계', 'image': '⏳'},
@@ -1528,7 +1460,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '스톱워치', 'image': '⏱️'},
     {'title': '타이머', 'image': '⏲️'},
     {'title': '시계 12시', 'image': '🕐'},
-    
+
     // 차트 및 데이터
     {'title': '그래프', 'image': '📊'},
     {'title': '트렌드 상승', 'image': '📈'},
@@ -1538,7 +1470,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '통계', 'image': '📋'},
     {'title': '클립보드', 'image': '📋'},
     {'title': '체크리스트', 'image': '✅'},
-    
+
     // 파일 및 문서
     {'title': '폴더', 'image': '📁'},
     {'title': '열린 폴더', 'image': '📂'},
@@ -1550,7 +1482,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '신문', 'image': '📰'},
     {'title': 'PDF', 'image': '📕'},
     {'title': '스크롤', 'image': '📜'},
-    
+
     // 검색 및 도구
     {'title': '돋보기', 'image': '🔍'},
     {'title': '돋보기 왼쪽', 'image': '🔎'},
@@ -1561,7 +1493,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '펜치', 'image': '🔩'},
     {'title': '자', 'image': '📏'},
     {'title': '삼각자', 'image': '📐'},
-    
+
     // 보안 및 키
     {'title': '열쇠', 'image': '🔑'},
     {'title': '금열쇠', 'image': '🗝️'},
@@ -1571,7 +1503,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '검', 'image': '⚔️'},
     {'title': 'ID카드', 'image': '🪪'},
     {'title': '지문', 'image': '👆'},
-    
+
     // 목표 및 성취
     {'title': '목표', 'image': '🎯'},
     {'title': '트로피', 'image': '🏆'},
@@ -1583,7 +1515,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '선물', 'image': '🎁'},
     {'title': '파티', 'image': '🎉'},
     {'title': '축하', 'image': '🎊'},
-    
+
     // 통신 및 연결
     {'title': '전화', 'image': '📞'},
     {'title': '이메일', 'image': '✉️'},
@@ -1593,7 +1525,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '위성', 'image': '🛰️'},
     {'title': 'Wi-Fi', 'image': '📶'},
     {'title': '링크', 'image': '🔗'},
-    
+
     // 위치 및 이동
     {'title': '핀', 'image': '📍'},
     {'title': '위치', 'image': '📌'},
@@ -1603,7 +1535,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '비행기', 'image': '✈️'},
     {'title': '배', 'image': '🚢'},
     {'title': '기차', 'image': '🚂'},
-    
+
     // 날씨 및 자연
     {'title': '태양', 'image': '☀️'},
     {'title': '구름', 'image': '☁️'},
@@ -1613,7 +1545,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '달', 'image': '🌙'},
     {'title': '지구', 'image': '🌍'},
     {'title': '산', 'image': '⛰️'},
-    
+
     // 음식 및 음료
     {'title': '커피', 'image': '☕'},
     {'title': '차', 'image': '🍵'},
@@ -1623,7 +1555,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '사과', 'image': '🍎'},
     {'title': '당근', 'image': '🥕'},
     {'title': '빵', 'image': '🍞'},
-    
+
     // 스포츠 및 활동
     {'title': '축구공', 'image': '⚽'},
     {'title': '농구공', 'image': '🏀'},
@@ -1633,7 +1565,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '주사위', 'image': '🎲'},
     {'title': '카드놀이', 'image': '🃏'},
     {'title': '조깅', 'image': '🏃'},
-    
+
     // 얼굴 표정
     {'title': '웃음', 'image': '😀'},
     {'title': '크게 웃음', 'image': '😃'},
@@ -1645,7 +1577,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '놀람', 'image': '😱'},
     {'title': '졸림', 'image': '😴'},
     {'title': '안경', 'image': '🤓'},
-    
+
     // 동물
     {'title': '고양이', 'image': '🐱'},
     {'title': '강아지', 'image': '🐶'},
@@ -1655,7 +1587,7 @@ class ImageLibraryPanel extends StatelessWidget {
     {'title': '팬더', 'image': '🐼'},
     {'title': '원숭이', 'image': '🐵'},
     {'title': '사자', 'image': '🦁'},
-    
+
     // 기술 및 디지털
     {'title': '컴퓨터', 'image': '💻'},
     {'title': '핸드폰', 'image': '📱'},
@@ -1698,16 +1630,16 @@ class ImageLibraryPanel extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             decoration: const BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                  color: Color(0xFFE2E8F0),
-                  width: 1,
-                ),
+                bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
               ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.image_outlined, 
-                     color: Color(0xFF475569), size: 18),
+                const Icon(
+                  Icons.image_outlined,
+                  color: Color(0xFF475569),
+                  size: 18,
+                ),
                 const SizedBox(width: 8),
                 const Text(
                   '이모지',
@@ -1719,11 +1651,16 @@ class ImageLibraryPanel extends StatelessWidget {
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEFF6FF),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.2)),
+                    border: Border.all(
+                      color: const Color(0xFF3B82F6).withValues(alpha: 0.2),
+                    ),
                   ),
                   child: Text(
                     '${_imageList.length}개',
@@ -1754,7 +1691,8 @@ class ImageLibraryPanel extends StatelessWidget {
                     color: Colors.transparent,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(12),
-                      onTap: () => _copyToClipboard(item['image']!, item['title']!),
+                      onTap: () =>
+                          _copyToClipboard(item['image']!, item['title']!),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -1809,7 +1747,9 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
     super.initState();
     // 현재 선택된 색상으로 초기화
     try {
-      selectedColor = Color(int.parse('FF${widget.controller.text}', radix: 16));
+      selectedColor = Color(
+        int.parse('FF${widget.controller.text}', radix: 16),
+      );
     } catch (e) {
       selectedColor = Color(int.parse('FF${widget.defaultColor}', radix: 16));
     }
@@ -1857,7 +1797,7 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                 ),
               ),
               const SizedBox(height: 20),
-              
+
               // HSV 컬러 휠
               ColorPicker(
                 color: selectedColor,
@@ -1867,76 +1807,226 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                   });
                 },
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // 사전 정의된 색상 팔레트
               const Text(
                 '추천 색상',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              
+
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
-                children: [
-                  // 기본 색상들
-                  ...['000000', 'FFFFFF', 'FF0000', '00FF00', '0000FF', 'FFFF00',
-                      'FF00FF', '00FFFF', '800000', '008000', '000080', '808000',
-                      '800080', '008080', 'C0C0C0', '808080'],
-                  // 추가 색상들
-                  ...['FFA500', 'FF4500', 'DC143C', 'B22222', '8B0000', 'FF1493',
-                      'FF69B4', 'FFB6C1', 'FFC0CB', 'DDA0DD', '9370DB', '8A2BE2',
-                      '4B0082', '6A5ACD', '7B68EE', '9400D3', '9932CC', 'BA55D3',
-                      'DA70D6', 'EE82EE', 'FF00FF', 'FF1493', 'C71585', 'DB7093'],
-                  // 그린 계열
-                  ...['00FF00', '32CD32', '98FB98', '90EE90', '00FA9A', '00FF7F',
-                      '7CFC00', '7FFF00', 'ADFF2F', '9AFF9A', '00FF00', '00EE00',
-                      '00CD00', '228B22', '008000', '006400', '8FBC8F', '20B2AA'],
-                  // 블루 계열
-                  ...['0000FF', '4169E1', '6495ED', '87CEEB', '87CEFA', '00BFFF',
-                      '1E90FF', '6495ED', '4682B4', '5F9EA0', '008B8B', '2F4F4F',
-                      '00CED1', '48D1CC', '40E0D0', '00FFFF', 'E0FFFF', 'B0E0E6'],
-                  // 오렌지/레드 계열  
-                  ...['FFE4B5', 'FFDEAD', 'F5DEB3', 'DEB887', 'D2B48C', 'BC8F8F',
-                      'F4A460', 'DAA520', 'B8860B', 'CD853F', 'D2691E', 'A0522D',
-                      '8B4513', 'A52A2A', '800000', 'B22222', 'DC143C', 'FF0000'],
-                  // 퍼플/바이올렛 계열
-                  ...['E6E6FA', 'DDA0DD', 'DA70D6', 'EE82EE', 'FF00FF', 'BA55D3',
-                      '9932CC', '9400D3', '8A2BE2', '9370DB', '6A5ACD', '483D8B',
-                      '4B0082', '663399', '800080', '4B0082', '9932CC', 'DA70D6'],
-                  // 브라운/베이지 계열
-                  ...['F5F5DC', 'FAEBD7', 'FFE4C4', 'FFDAB9', 'EEE8AA', 'F0E68C',
-                      'BDB76B', 'D2B48C', 'DEB887', 'BC8F8F', 'CD853F', 'D2691E',
-                      'A0522D', '8B4513', 'A52A2A', '800000', '654321', '3C1810'],
-                  // 그레이 계열
-                  ...['F8F8FF', 'F5F5F5', 'DCDCDC', 'D3D3D3', 'C0C0C0', 'A9A9A9',
-                      '808080', '696969', '778899', '708090', '2F4F4F', '000000'],
-                ].map((colorHex) => GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedColor = Color(int.parse('FF$colorHex', radix: 16));
-                    });
-                  },
-                  child: Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: Color(int.parse('FF$colorHex', radix: 16)),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(
-                        color: selectedColor == Color(int.parse('FF$colorHex', radix: 16)) 
-                            ? Colors.black 
-                            : Colors.grey.shade300,
-                        width: selectedColor == Color(int.parse('FF$colorHex', radix: 16)) ? 2 : 1,
-                      ),
-                    ),
-                  ),
-                )).toList(),
+                children:
+                    [
+                          // 기본 색상들
+                          ...[
+                            '000000',
+                            'FFFFFF',
+                            'FF0000',
+                            '00FF00',
+                            '0000FF',
+                            'FFFF00',
+                            'FF00FF',
+                            '00FFFF',
+                            '800000',
+                            '008000',
+                            '000080',
+                            '808000',
+                            '800080',
+                            '008080',
+                            'C0C0C0',
+                            '808080',
+                          ],
+                          // 추가 색상들
+                          ...[
+                            'FFA500',
+                            'FF4500',
+                            'DC143C',
+                            'B22222',
+                            '8B0000',
+                            'FF1493',
+                            'FF69B4',
+                            'FFB6C1',
+                            'FFC0CB',
+                            'DDA0DD',
+                            '9370DB',
+                            '8A2BE2',
+                            '4B0082',
+                            '6A5ACD',
+                            '7B68EE',
+                            '9400D3',
+                            '9932CC',
+                            'BA55D3',
+                            'DA70D6',
+                            'EE82EE',
+                            'FF00FF',
+                            'FF1493',
+                            'C71585',
+                            'DB7093',
+                          ],
+                          // 그린 계열
+                          ...[
+                            '00FF00',
+                            '32CD32',
+                            '98FB98',
+                            '90EE90',
+                            '00FA9A',
+                            '00FF7F',
+                            '7CFC00',
+                            '7FFF00',
+                            'ADFF2F',
+                            '9AFF9A',
+                            '00FF00',
+                            '00EE00',
+                            '00CD00',
+                            '228B22',
+                            '008000',
+                            '006400',
+                            '8FBC8F',
+                            '20B2AA',
+                          ],
+                          // 블루 계열
+                          ...[
+                            '0000FF',
+                            '4169E1',
+                            '6495ED',
+                            '87CEEB',
+                            '87CEFA',
+                            '00BFFF',
+                            '1E90FF',
+                            '6495ED',
+                            '4682B4',
+                            '5F9EA0',
+                            '008B8B',
+                            '2F4F4F',
+                            '00CED1',
+                            '48D1CC',
+                            '40E0D0',
+                            '00FFFF',
+                            'E0FFFF',
+                            'B0E0E6',
+                          ],
+                          // 오렌지/레드 계열
+                          ...[
+                            'FFE4B5',
+                            'FFDEAD',
+                            'F5DEB3',
+                            'DEB887',
+                            'D2B48C',
+                            'BC8F8F',
+                            'F4A460',
+                            'DAA520',
+                            'B8860B',
+                            'CD853F',
+                            'D2691E',
+                            'A0522D',
+                            '8B4513',
+                            'A52A2A',
+                            '800000',
+                            'B22222',
+                            'DC143C',
+                            'FF0000',
+                          ],
+                          // 퍼플/바이올렛 계열
+                          ...[
+                            'E6E6FA',
+                            'DDA0DD',
+                            'DA70D6',
+                            'EE82EE',
+                            'FF00FF',
+                            'BA55D3',
+                            '9932CC',
+                            '9400D3',
+                            '8A2BE2',
+                            '9370DB',
+                            '6A5ACD',
+                            '483D8B',
+                            '4B0082',
+                            '663399',
+                            '800080',
+                            '4B0082',
+                            '9932CC',
+                            'DA70D6',
+                          ],
+                          // 브라운/베이지 계열
+                          ...[
+                            'F5F5DC',
+                            'FAEBD7',
+                            'FFE4C4',
+                            'FFDAB9',
+                            'EEE8AA',
+                            'F0E68C',
+                            'BDB76B',
+                            'D2B48C',
+                            'DEB887',
+                            'BC8F8F',
+                            'CD853F',
+                            'D2691E',
+                            'A0522D',
+                            '8B4513',
+                            'A52A2A',
+                            '800000',
+                            '654321',
+                            '3C1810',
+                          ],
+                          // 그레이 계열
+                          ...[
+                            'F8F8FF',
+                            'F5F5F5',
+                            'DCDCDC',
+                            'D3D3D3',
+                            'C0C0C0',
+                            'A9A9A9',
+                            '808080',
+                            '696969',
+                            '778899',
+                            '708090',
+                            '2F4F4F',
+                            '000000',
+                          ],
+                        ]
+                        .map(
+                          (colorHex) => GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedColor = Color(
+                                  int.parse('FF$colorHex', radix: 16),
+                                );
+                              });
+                            },
+                            child: Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: Color(
+                                  int.parse('FF$colorHex', radix: 16),
+                                ),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color:
+                                      selectedColor ==
+                                          Color(
+                                            int.parse('FF$colorHex', radix: 16),
+                                          )
+                                      ? Colors.black
+                                      : Colors.grey.shade300,
+                                  width:
+                                      selectedColor ==
+                                          Color(
+                                            int.parse('FF$colorHex', radix: 16),
+                                          )
+                                      ? 2
+                                      : 1,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
               ),
             ],
           ),
@@ -1949,7 +2039,10 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
         ),
         ElevatedButton(
           onPressed: () {
-            final hexColor = selectedColor.toARGB32().toRadixString(16).substring(2);
+            final hexColor = selectedColor
+                .toARGB32()
+                .toRadixString(16)
+                .substring(2);
             widget.controller.text = hexColor.toUpperCase();
             widget.onColorSelected();
             Navigator.of(context).pop();
@@ -1962,11 +2055,7 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
 }
 
 class DashboardTitleEditor extends StatefulWidget {
-
-
-  const DashboardTitleEditor({
-    super.key
-  });
+  const DashboardTitleEditor({super.key});
 
   @override
   State<DashboardTitleEditor> createState() => _DashboardTitleEditorState();
@@ -1995,7 +2084,6 @@ class _DashboardTitleEditorState extends State<DashboardTitleEditor> {
         });
       }
     } catch (e) {
-
     } finally {
       setState(() => _isLoading = false);
     }
@@ -2019,7 +2107,6 @@ class _DashboardTitleEditorState extends State<DashboardTitleEditor> {
         setState(() => _currentTitle = _titleController.text.trim());
       }
     } catch (e) {
-
     } finally {
       setState(() => _isLoading = false);
     }
@@ -2056,7 +2143,10 @@ class _DashboardTitleEditorState extends State<DashboardTitleEditor> {
                     decoration: const InputDecoration(
                       hintText: '새로운 대시보드 타이틀을 입력하세요',
                       border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
                     ),
                     enabled: !_isLoading,
                     onSubmitted: (_) => _updateTitle(),
@@ -2070,7 +2160,10 @@ class _DashboardTitleEditorState extends State<DashboardTitleEditor> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF3B82F6),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -2091,4 +2184,3 @@ class _DashboardTitleEditorState extends State<DashboardTitleEditor> {
     super.dispose();
   }
 }
-
