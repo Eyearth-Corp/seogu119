@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/api_service.dart';
+import '../../data/main_data_parser.dart';
+
 class DashBoardCustom1 extends StatefulWidget {
   const DashBoardCustom1({super.key});
 
@@ -8,14 +11,281 @@ class DashBoardCustom1 extends StatefulWidget {
 }
 
 class _DashBoardCustom1State extends State<DashBoardCustom1> {
+  Type5Response? _response;
+  bool _isLoading = true;
+  String? _error;
+
+  Future<void> _loadData() async {
+    try {
+      final response = await ApiService.getDashBoardType5(2);
+      if (mounted) {
+        setState(() {
+          _response = response;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _loadData();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [item1(), item2()]);
+    return Row(
+      children: _response!.type5Data.asMap().entries.map((entry) {
+        final index = entry.key;
+        final data = entry.value;
+        final gradientColors = [
+          [const Color(0xAAFFB300), const Color(0xFFFFB300)],
+          [const Color(0xAAff6a88), const Color(0xFFff6a88)],
+          [const Color(0xAAFFB300), const Color(0xFFFFB300)],
+          [const Color(0xAAff6a88), const Color(0xFFff6a88)],
+          [const Color(0xAAFFB300), const Color(0xFFFFB300)],
+          [const Color(0xAAff6a88), const Color(0xFFff6a88)],
+        ];
+
+        final colors = gradientColors[index % gradientColors.length];
+
+        return Expanded(
+          child: Container(
+            height: 220,
+            margin: EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                //colors: [const Color(0xAAFFB300), const Color(0xFFFFB300)],
+                colors: colors,
+              ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xAAFFB300).withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                  spreadRadius: 0,
+                ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                // 배경 패턴
+                Positioned(
+                  top: -20,
+                  right: -20,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.1),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: -30,
+                  left: -30,
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.05),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 12,
+                  right: 42,
+                  child: Container(
+                    height: 80,
+                    child: Text(
+                      data.emoji,
+                      style: const TextStyle(fontSize: 42, color: Colors.white),
+                    ),
+                  ),
+                ),
+                // 메인 컨텐츠
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 40),
+                    Text(
+                      data.title,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFd2ffe9),
+                        wordSpacing: 2.0,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // 내용
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          data.content1,
+                          style: const TextStyle(
+                            fontSize: 32,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 3),
+                          child: Text(
+                            data.content2,
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // child: Container(
+          //   height: 220,
+          //   margin: EdgeInsets.symmetric(horizontal: 10),
+          //   decoration: BoxDecoration(
+          //     gradient: LinearGradient(
+          //       begin: Alignment.topCenter,
+          //       end: Alignment.bottomCenter,
+          //       colors: colors,
+          //     ),
+          //     borderRadius: BorderRadius.circular(20),
+          //     boxShadow: [
+          //       BoxShadow(
+          //         color: colors[0].withOpacity(0.3),
+          //         blurRadius: 20,
+          //         offset: const Offset(0, 8),
+          //         spreadRadius: 0,
+          //       ),
+          //       BoxShadow(
+          //         color: Colors.black.withOpacity(0.1),
+          //         blurRadius: 10,
+          //         offset: const Offset(0, 4),
+          //       ),
+          //     ],
+          //   ),
+          //   child: Stack(
+          //     children: [
+          //       // 배경 패턴
+          //       Positioned(
+          //         top: -20,
+          //         right: -20,
+          //         child: Container(
+          //           width: 100,
+          //           height: 100,
+          //           decoration: BoxDecoration(
+          //             shape: BoxShape.circle,
+          //             color: Colors.white.withOpacity(0.1),
+          //           ),
+          //         ),
+          //       ),
+          //       Positioned(
+          //         bottom: -30,
+          //         left: -30,
+          //         child: Container(
+          //           width: 80,
+          //           height: 80,
+          //           decoration: BoxDecoration(
+          //             shape: BoxShape.circle,
+          //             color: Colors.white.withOpacity(0.05),
+          //           ),
+          //         ),
+          //       ),
+          //       Positioned(
+          //         top: 12,
+          //         right: 12,
+          //         child: Container(
+          //           width: 80,
+          //           height: 80,
+          //           child: Text(
+          //             data.emoji,
+          //             style: const TextStyle(fontSize: 42, color: Colors.white),
+          //           ),
+          //         ),
+          //       ),
+          //       // 메인 컨텐츠
+          //       Column(
+          //         crossAxisAlignment: CrossAxisAlignment.center,
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         children: [
+          //           SizedBox(height: 80),
+          //           Text(
+          //             data.title,
+          //             style: const TextStyle(
+          //               fontSize: 24,
+          //               fontWeight: FontWeight.bold,
+          //               color: Color(0xFFd2ffe9),
+          //               wordSpacing: 2.0,
+          //               height: 1.2,
+          //             ),
+          //           ),
+          //           const SizedBox(height: 16),
+          //           // 내용
+          //           Row(
+          //             mainAxisAlignment: MainAxisAlignment.center,
+          //             crossAxisAlignment: CrossAxisAlignment.end,
+          //             children: [
+          //               Text(
+          //                 data.content1,
+          //                 style: const TextStyle(
+          //                   fontSize: 28,
+          //                   color: Colors.white,
+          //                   fontWeight: FontWeight.w700,
+          //                 ),
+          //               ),
+          //               const SizedBox(width: 8),
+          //               Padding(
+          //                 padding: EdgeInsets.only(bottom: 3),
+          //                 child: Text(
+          //                   data.content2,
+          //                   style: TextStyle(
+          //                     fontSize: 20,
+          //                     color: Colors.white70,
+          //                     fontWeight: FontWeight.w400,
+          //                   ),
+          //                 ),
+          //               ),
+          //             ],
+          //           ),
+          //         ],
+          //       ),
+          //     ],
+          //   ),
+          // ),
+        );
+      }).toList(),
+    );
   }
 
   Widget item1() {
