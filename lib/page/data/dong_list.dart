@@ -214,7 +214,7 @@ class DongList {
         Merchant(id: 25, name: "치평상무역상인회", x: 738, y: 1053),
         Merchant(id: 26, name: "치평광명상가상인회", x: 738, y: 980),
         Merchant(id: 27, name: "상무평화상인회", x: 799, y: 940),
-        Merchant(id: 121, name: "121_치평동", x: 736, y: 875),
+        Merchant(id: 121, name: "치평1230상인회", x: 736, y: 875),
       ],
     ),
     // 9
