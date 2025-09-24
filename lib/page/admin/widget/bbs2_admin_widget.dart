@@ -161,6 +161,33 @@ class _Bbs2AdminWidgetState extends State<Bbs2AdminWidget> {
     );
   }
 
+  void _showDeleteDialog(Bbs2Item item) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('삭제 확인'),
+        content: Text('\'${item.title}\'을(를) 정말로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _deleteItem(item.id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showErrorSnackBar(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -228,7 +255,7 @@ class _Bbs2AdminWidgetState extends State<Bbs2AdminWidget> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteItem(item.id),
+                              onPressed: () => _showDeleteDialog(item),
                             ),
                           ],
                         ),
