@@ -357,8 +357,8 @@ class DongList {
         Merchant(id: 53, name: "마륵동상인회", x: 873, y: 1286),
         Merchant(id: 118, name: "전평제상인회", x: 1119, y: 2160),
         Merchant(id: 119, name: "매월동상인회", x: 1273, y: 2157),
-        Merchant(id: 120, name: "서구유통단지상인회", x: 1365, y: 1953),
-        Merchant(id: 120, name: "서구유통단지상인회", x: 1381, y: 2074),
+        Merchant(id: 120, name: "서구유통단지상인회", x: 1355, y: 1953),
+        Merchant(id: 120, name: "서구유통단지상인회", x: 1401, y: 2074),
       ],
     ),
     // // 118-119
