@@ -289,21 +289,21 @@ class _MapWidgetState extends State<MapWidget> {
 
                         // 동 선택 지역 표시 (선택된 동의 지역만 표시)
                         // _showDongAreas가 true이고 특정 동이 선택된 경우에만 표시
-                        if (_showDongAreas && _selectedDong != null)
-                          RepaintBoundary(
-                            child: Opacity(
-                              opacity: 1.0,
-                              child: Image.asset(
-                                _selectedDong!.areaAsset,
-                                fit: BoxFit.contain,
-                                width: _mapWidth,
-                                height: _mapHeight,
-                                filterQuality: FilterQuality.medium,
-                                cacheWidth: (_mapWidth * 0.8).toInt(),
-                                cacheHeight: (_mapHeight * 0.8).toInt(),
-                              ),
-                            ),
-                          ),
+                        // if (_showDongAreas && _selectedDong != null)
+                        //   RepaintBoundary(
+                        //     child: Opacity(
+                        //       opacity: 1.0,
+                        //       child: Image.asset(
+                        //         _selectedDong!.areaAsset,
+                        //         fit: BoxFit.contain,
+                        //         width: _mapWidth,
+                        //         height: _mapHeight,
+                        //         filterQuality: FilterQuality.medium,
+                        //         cacheWidth: (_mapWidth * 0.8).toInt(),
+                        //         cacheHeight: (_mapHeight * 0.8).toInt(),
+                        //       ),
+                        //     ),
+                        //   ),
                         ..._buildDongTags(),
                         ..._buildMerchantNumbers(),
                       ],
