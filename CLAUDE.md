@@ -65,7 +65,7 @@ Dynamic data visualization with:
 ### API Integration
 
 **Dual Environment Setup:**
-- Production: `https://seogu119-api.eyearth.net/api`
+- Production: `https://api.seogu119.co.kr/api`
 - Development: `http://localhost:8000` (debug mode)
 
 **Service Architecture:**

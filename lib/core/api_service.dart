@@ -5,8 +5,8 @@ import 'package:flutter/foundation.dart';
 import '../page/data/main_data_parser.dart';
 
 class ApiService {
-  static const String _prodBaseUrl = 'https://seogu119-api.eyearth.net/api';
-  static const String _devBaseUrl = 'https://seogu119-api.eyearth.net';
+  static const String _prodBaseUrl = 'https://api.seogu119.co.kr/api';
+  static const String _devBaseUrl = 'https://api.seogu119.co.kr';
   
   static String get baseUrl => kDebugMode ? '$_devBaseUrl/api' : _prodBaseUrl;
   

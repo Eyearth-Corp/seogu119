@@ -4,9 +4,9 @@ import 'package:flutter/foundation.dart';
 import '../page/data/dong_dashboard_data.dart';
 
 class DongApiService {
-  static const String _baseUrl = kDebugMode 
-      ? 'https://seogu119-api.eyearth.net/api'
-      : 'https://seogu119-api.eyearth.net/api';
+  static const String _baseUrl = kDebugMode
+      ? 'https://api.seogu119.co.kr/api'
+      : 'https://api.seogu119.co.kr/api';
 
   /// 모든 동 목록을 조회합니다.
   static Future<Map<String, dynamic>> getAllDistricts() async {

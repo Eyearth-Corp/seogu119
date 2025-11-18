@@ -5,8 +5,8 @@
 ## 기본 정보
 
 ### Base URL
-- **Production**: `https://seogu119-api.eyearth.net/api`
-- **Development**: `https://seogu119-api.eyearth.net/api` (debug mode)
+- **Production**: `https://api.seogu119.co.kr/api`
+- **Development**: `https://api.seogu119.co.kr/api` (debug mode)
 
 ### API 응답 형식
 모든 API는 다음과 같은 공통 응답 형식을 사용합니다:
