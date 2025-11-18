@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Flutter web application called "서구 골목" (Seogu Alley) - an interactive dashboard for tracking merchant statistics in Seogu District. The app displays 119 designated merchant areas with 11,426 stores across 18 administrative districts (dong), featuring both public viewing and admin management capabilities.
+This is a Flutter web application called "서구 골목경제 119" (Seogu Alley Economy 119) - an interactive dashboard for tracking merchant statistics in Seogu District. The app displays 119 designated merchant areas with 11,426 stores across 18 administrative districts (dong), featuring both public viewing and admin management capabilities.
 
 ## Development Commands
 

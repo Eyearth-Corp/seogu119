@@ -219,7 +219,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 const SizedBox(height: 24),
                 
                 Text(
-                  '서구 골목 관리자',
+                  '서구 골목경제 119 관리자',
                   style: TextStyle(
                     fontFamily: 'NotoSans',
                     fontSize: 24,

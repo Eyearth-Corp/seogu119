@@ -39,7 +39,7 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: '서구 골목 관리자',
+      title: '서구 골목경제 119 관리자',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: SeoguFonts.primaryFont,

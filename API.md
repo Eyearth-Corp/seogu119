@@ -1,6 +1,6 @@
 # API 문서
 
-서구 골목 프로젝트의 REST API 사용 내역 정리 문서입니다.
+서구 골목경제 119 프로젝트의 REST API 사용 내역 정리 문서입니다.
 
 ## 기본 정보
 
@@ -326,7 +326,7 @@ Content-Type: application/json
 {
   "success": true,
   "data": {
-    "title": "서구 골목상권 현황"
+    "title": "서구 골목경제 119 상권 현황"
   }
 }
 ```

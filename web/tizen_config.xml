@@ -14,7 +14,7 @@
     <name xml:lang="ko">서구 골목경제 119 상황판</name>
     <name xml:lang="en">Seogu Alley Economy 119 Dashboard</name>
     
-    <description xml:lang="ko">광주광역시 서구 골목경제 현황 및 상인회 통계 대시보드</description>
+    <description xml:lang="ko">광주광역시 서구 골목경제 119 현황 및 상인회 통계 대시보드</description>
     <description xml:lang="en">Gwangju Seogu District Alley Economy Statistics Dashboard</description>
     
     <author href="https://seogu.gwangju.kr" email="webmaster@seogu.gwangju.kr">광주광역시 서구청</author>
@@ -37,5 +37,5 @@
                    install-location="auto"/>
     
     <preference name="tizen-app-version" value="1.0.0"/>
-    <preference name="tizen-app-description" value="서구 골목경제 대시보드"/>
+    <preference name="tizen-app-description" value="서구 골목경제 119 대시보드"/>
 </widget>

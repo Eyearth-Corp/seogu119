@@ -5,7 +5,7 @@
     "display": "standalone",
     "background_color": "#1E3A8A",
     "theme_color": "#1E3A8A",
-    "description": "광주광역시 서구 골목경제 현황 및 상인회 통계 대시보드",
+    "description": "광주광역시 서구 골목경제 119 현황 및 상인회 통계 대시보드",
     "orientation": "landscape-primary",
     "prefer_related_applications": false,
     "categories": ["government", "productivity", "utilities"],
