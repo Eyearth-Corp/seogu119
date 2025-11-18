@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../core/colors.dart';
+import '../services/analytics_service.dart';
 import 'data/dong_list.dart';
 import 'widget/dashboard/main_dashboard.dart';
 import 'widget/dong_dashboard.dart';
@@ -35,6 +36,16 @@ class _HomePageState extends State<HomePage> {
   // 메인 콘텐츠 캡처를 위한 키
   final GlobalKey _mainContentKey = GlobalKey();
 
+  @override
+  void initState() {
+    super.initState();
+    // 페이지 뷰 추적
+    AnalyticsService.trackPageView(
+      route: '/dashboard',
+      name: '메인 대시보드',
+    );
+  }
+
   /// MapWidget을 일관된 키로 생성하여 상태 유지
   Widget _buildMapWidget() {
     return RepaintBoundary(
@@ -44,6 +55,12 @@ class _HomePageState extends State<HomePage> {
         controller: _mapController,
         onMerchantSelected: (merchant) {
           print('Selected merchant: ${merchant.id} - ${merchant.name}');
+          // Analytics: 상인회 마커 클릭 추적
+          AnalyticsService.trackMapClick(
+            '/dashboard',
+            merchantId: merchant.id,
+            merchantName: merchant.name,
+          );
         },
         onDongSelected: _onDongSelected,
         isMapLeft: _isMapLeft,
@@ -54,15 +71,38 @@ class _HomePageState extends State<HomePage> {
   /// 선택된 상인회로 지도 이동
   void _navigateToMerchant(Merchant merchant) {
     _mapController.navigateToMerchant(merchant);
+    // Analytics: 상인회 목록에서 상인회 선택
+    AnalyticsService.trackClick(
+      '/dashboard',
+      'merchant_list_item',
+      elementText: merchant.name,
+      metadata: {
+        'merchant_id': merchant.id,
+      },
+    );
   }
 
   void _toggleMapPosition() {
+    // Analytics: 지도 위치 전환 버튼 클릭
+    AnalyticsService.trackClick(
+      '/dashboard',
+      'btn_toggle_map',
+      elementText: '지도 전환',
+      metadata: {'new_position': _isMapLeft ? 'right' : 'left'},
+    );
     setState(() {
       _isMapLeft = !_isMapLeft;
     });
   }
 
   void _toggleFullscreen() {
+    // Analytics: 전체화면 토글 버튼 클릭
+    AnalyticsService.trackClick(
+      '/dashboard',
+      'btn_toggle_fullscreen',
+      elementText: '전체화면',
+      metadata: {'is_fullscreen': !_isFullscreen},
+    );
     setState(() {
       _isFullscreen = !_isFullscreen;
       if (kIsWeb) {
@@ -83,6 +123,13 @@ class _HomePageState extends State<HomePage> {
 
   /// 선택된 동 변경 콜백
   void _onDongSelected(Dong? dong) {
+    if (dong != null) {
+      // Analytics: 지도에서 동 클릭
+      AnalyticsService.trackMapClick(
+        '/dashboard',
+        dongName: dong.name,
+      );
+    }
     setState(() {
       _selectedDong = dong;
     });
@@ -90,6 +137,12 @@ class _HomePageState extends State<HomePage> {
 
   /// 메인 대시보드로 돌아가기
   void _goToMainDashboard() {
+    // Analytics: 메인 대시보드로 돌아가기 버튼 클릭
+    AnalyticsService.trackClick(
+      '/dashboard',
+      'btn_back_to_main',
+      elementText: '메인 대시보드로 돌아가기',
+    );
     setState(() {
       _selectedDong = null;
     });

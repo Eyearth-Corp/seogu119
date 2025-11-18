@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../services/analytics_service.dart';
 import '../data/admin_service.dart';
-import 'new_admin_dashboard_page.dart';
+import '../home_page.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({super.key});
@@ -20,6 +21,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   @override
   void initState() {
     super.initState();
+    // Analytics: 페이지 뷰 추적
+    AnalyticsService.trackPageView(
+      route: '/admin/login',
+      name: '관리자 로그인',
+    );
     _checkAutoLogin();
   }
 
@@ -33,11 +39,18 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       if (AdminService.isLoggedIn) {
         final isValid = await AdminService.validateToken();
         if (isValid && mounted) {
-          print('🔄 자동 로그인 성공! 관리자 대시보드로 이동');
+          print('🔄 자동 로그인 성공! 대시보드로 이동');
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const NewAdminDashboardPage(),
+              builder: (context) => FittedBox(
+                fit: BoxFit.contain,
+                child: SizedBox(
+                  width: 2560,
+                  height: 1440,
+                  child: HomePage(),
+                ),
+              ),
             ),
           );
           return;
@@ -66,6 +79,13 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
+    // Analytics: 로그인 시도 추적
+    AnalyticsService.trackClick(
+      '/admin/login',
+      'btn_login',
+      elementText: '로그인',
+    );
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -78,18 +98,49 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       );
 
       if (success && mounted) {
+        // Analytics: 로그인 성공
+        AnalyticsService.trackCustomEvent(
+          eventType: 'login_success',
+          pageRoute: '/admin/login',
+          eventData: {
+            'username': _usernameController.text.trim(),
+          },
+        );
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const NewAdminDashboardPage(),
+            builder: (context) => FittedBox(
+              fit: BoxFit.contain,
+              child: SizedBox(
+                width: 2560,
+                height: 1440,
+                child: HomePage(),
+              ),
+            ),
           ),
         );
       } else {
+        // Analytics: 로그인 실패
+        AnalyticsService.trackCustomEvent(
+          eventType: 'login_failure',
+          pageRoute: '/admin/login',
+          eventData: {
+            'reason': 'invalid_credentials',
+          },
+        );
         setState(() {
           _errorMessage = '로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.';
         });
       }
     } catch (e) {
+      // Analytics: 로그인 에러
+      AnalyticsService.trackCustomEvent(
+        eventType: 'login_error',
+        pageRoute: '/admin/login',
+        eventData: {
+          'error': e.toString(),
+        },
+      );
       setState(() {
         _errorMessage = '로그인 중 오류가 발생했습니다: ${e.toString()}';
       });
@@ -295,22 +346,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // 홈으로 돌아가기
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/');
-                  },
-                  child: Text(
-                    '홈으로 돌아가기',
-                    style: TextStyle(
-                    fontFamily: 'NotoSans',
-                      color: const Color(0xFF718096),
-                      fontSize: 14,
-                    ),
                   ),
                 ),
               ],

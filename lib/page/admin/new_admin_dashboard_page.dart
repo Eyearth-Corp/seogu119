@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
 
+import '../../services/analytics_service.dart';
 import '../data/admin_service.dart';
 import '../data/dong_list.dart';
 import 'dong_admin_dashboard_page.dart';
@@ -32,6 +33,11 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
   @override
   void initState() {
     super.initState();
+    // Analytics: 페이지 뷰 추적
+    AnalyticsService.trackPageView(
+      route: '/admin/dashboard',
+      name: '관리자 대시보드',
+    );
     _loadDashboards();
   }
 
@@ -75,6 +81,28 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message), backgroundColor: Colors.green),
       );
+    }
+  }
+
+  /// 관리자 관리 다이얼로그 표시
+  void _showAdminManagement() async {
+    try {
+      // 현재 관리자 정보 가져오기
+      final adminInfo = await AdminService.getCurrentAdmin();
+
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (context) => _AdminManagementDialog(
+          adminInfo: adminInfo,
+          onPasswordChanged: () {
+            _showSuccessSnackBar('비밀번호가 성공적으로 변경되었습니다.');
+          },
+        ),
+      );
+    } catch (e) {
+      _showErrorSnackBar('관리자 정보 로드 실패: ${AdminService.getErrorMessage(e)}');
     }
   }
 
@@ -232,6 +260,21 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
         shadowColor: Colors.black.withValues(alpha: 0.1),
         surfaceTintColor: Colors.transparent,
         actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              icon: const Icon(Icons.manage_accounts_rounded),
+              onPressed: _showAdminManagement,
+              tooltip: '관리자 관리',
+              style: IconButton.styleFrom(
+                backgroundColor: const Color(0xFFF1F5F9),
+                foregroundColor: const Color(0xFF475569),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
           Container(
             margin: const EdgeInsets.only(right: 8),
             child: IconButton(
@@ -2182,5 +2225,386 @@ class _DashboardTitleEditorState extends State<DashboardTitleEditor> {
   void dispose() {
     _titleController.dispose();
     super.dispose();
+  }
+}
+
+/// 관리자 관리 다이얼로그
+class _AdminManagementDialog extends StatefulWidget {
+  final Map<String, dynamic>? adminInfo;
+  final VoidCallback onPasswordChanged;
+
+  const _AdminManagementDialog({
+    required this.adminInfo,
+    required this.onPasswordChanged,
+  });
+
+  @override
+  State<_AdminManagementDialog> createState() => _AdminManagementDialogState();
+}
+
+class _AdminManagementDialogState extends State<_AdminManagementDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _currentPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool _isChangingPassword = false;
+  bool _showPasswordFields = false;
+
+  @override
+  void dispose() {
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _changePassword() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isChangingPassword = true;
+    });
+
+    try {
+      final success = await AdminService.changePassword(
+        _currentPasswordController.text,
+        _newPasswordController.text,
+      );
+
+      if (success && mounted) {
+        widget.onPasswordChanged();
+        Navigator.of(context).pop();
+      } else {
+        _showError('비밀번호 변경에 실패했습니다. 현재 비밀번호를 확인해주세요.');
+      }
+    } catch (e) {
+      _showError('비밀번호 변경 중 오류가 발생했습니다: ${AdminService.getErrorMessage(e)}');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isChangingPassword = false;
+        });
+      }
+    }
+  }
+
+  void _showError(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Container(
+        width: 500,
+        constraints: const BoxConstraints(maxHeight: 600),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 헤더
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: const BoxDecoration(
+                color: Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.manage_accounts_rounded,
+                      color: Colors.deepPurple,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '관리자 관리',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1E293B),
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          '관리자 정보 및 비밀번호 변경',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+
+            // 내용
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 관리자 정보 카드
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(
+                                Icons.account_circle,
+                                color: Color(0xFF475569),
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                '현재 로그인 정보',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF475569),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          _buildInfoRow(
+                            '아이디',
+                            widget.adminInfo?['username']?.toString() ?? '-',
+                          ),
+                          const Divider(height: 24),
+                          _buildInfoRow(
+                            '이메일',
+                            widget.adminInfo?['email']?.toString() ?? '-',
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // 비밀번호 변경 섹션
+                    if (!_showPasswordFields)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            setState(() {
+                              _showPasswordFields = true;
+                            });
+                          },
+                          icon: const Icon(Icons.lock_reset),
+                          label: const Text('비밀번호 변경'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '비밀번호 변경',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF1E293B),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // 현재 비밀번호
+                            TextFormField(
+                              controller: _currentPasswordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                labelText: '현재 비밀번호',
+                                prefixIcon: const Icon(Icons.lock_outline),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return '현재 비밀번호를 입력하세요';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+
+                            // 새 비밀번호
+                            TextFormField(
+                              controller: _newPasswordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                labelText: '새 비밀번호',
+                                prefixIcon: const Icon(Icons.lock),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return '새 비밀번호를 입력하세요';
+                                }
+                                if (value.length < 6) {
+                                  return '비밀번호는 최소 6자 이상이어야 합니다';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+
+                            // 비밀번호 확인
+                            TextFormField(
+                              controller: _confirmPasswordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                labelText: '새 비밀번호 확인',
+                                prefixIcon: Icon(Icons.check_circle_outline),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return '비밀번호 확인을 입력하세요';
+                                }
+                                if (value != _newPasswordController.text) {
+                                  return '비밀번호가 일치하지 않습니다';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+
+                            // 버튼들
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton(
+                                    onPressed: _isChangingPassword
+                                        ? null
+                                        : () {
+                                            setState(() {
+                                              _showPasswordFields = false;
+                                              _currentPasswordController.clear();
+                                              _newPasswordController.clear();
+                                              _confirmPasswordController.clear();
+                                            });
+                                          },
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: const Text('취소'),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: _isChangingPassword ? null : _changePassword,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.deepPurple,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: _isChangingPassword
+                                        ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                            ),
+                                          )
+                                        : const Text('변경하기'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 80,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF64748B),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF1E293B),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

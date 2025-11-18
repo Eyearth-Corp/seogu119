@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:seogu119/page/home_page.dart';
 import 'package:seogu119/page/admin/admin_login_page.dart';
-import 'package:seogu119/page/admin/new_admin_dashboard_page.dart';
 import 'package:seogu119/page/admin/dong_admin_dashboard_page.dart';
+import 'package:seogu119/page/home_page.dart';
 import 'package:seogu119/page/data/admin_service.dart';
+import 'package:seogu119/services/analytics_service.dart';
 import 'core/fonts.dart';
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  @override
+  void initState() {
+    super.initState();
+    // Analytics 세션 시작
+    AnalyticsService.startSession();
+  }
 
   /// 관리자 인증 상태 확인
   Future<bool> _checkAdminAuth() async {
@@ -27,7 +39,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: '서구 골목',
+      title: '서구 골목 관리자',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: SeoguFonts.primaryFont,
@@ -36,16 +48,15 @@ class App extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        // !변경하지 말것
-        '/': (context) => FittedBox(
+        '/': (context) => const AdminLoginPage(),
+        '/dashboard': (context) => FittedBox(
           fit: BoxFit.contain,
           child: SizedBox(
-              width: 2560, //고정
-              height: 1440, //고정
-              child: HomePage()
+            width: 2560,
+            height: 1440,
+            child: HomePage(),
           ),
         ),
-        '/admin': (context) => const AdminLoginPage(),
       },
       onGenerateRoute: (settings) {
         // 관리자 관련 라우팅 처리
@@ -85,9 +96,16 @@ class App extends StatelessWidget {
                         ),
                       );
                     }
-                    
+
                     if (snapshot.data == true) {
-                      return const NewAdminDashboardPage();
+                      return FittedBox(
+                        fit: BoxFit.contain,
+                        child: SizedBox(
+                          width: 2560,
+                          height: 1440,
+                          child: HomePage(),
+                        ),
+                      );
                     } else {
                       return const AdminLoginPage();
                     }

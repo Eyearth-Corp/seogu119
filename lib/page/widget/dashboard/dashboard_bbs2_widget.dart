@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/api_service.dart';
 import '../../../core/colors.dart';
+import '../../../services/analytics_service.dart';
 import '../../data/main_data_parser.dart';
 import 'dashboard_widget.dart';
 
@@ -268,6 +269,17 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
   void _showExpandedView() {
     if (_response == null) return;
 
+    // Analytics: 전체화면 보기 클릭 추적
+    AnalyticsService.trackWidgetInteraction(
+      '/dashboard',
+      widgetType: 'dashboard_bbs2',
+      widgetId: widget.dashboardId,
+      action: 'open_fullscreen',
+      metadata: {
+        'title': _response!.title,
+      },
+    );
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -285,6 +297,18 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
     String title,
     String detail,
   ) {
+    // Analytics: BBS2 상세 다이얼로그 열기 추적
+    AnalyticsService.trackWidgetInteraction(
+      '/dashboard',
+      widgetType: 'dashboard_bbs2',
+      widgetId: widget.dashboardId,
+      action: 'open_detail',
+      metadata: {
+        'item_title': title,
+        'has_detail': detail.isNotEmpty,
+      },
+    );
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
