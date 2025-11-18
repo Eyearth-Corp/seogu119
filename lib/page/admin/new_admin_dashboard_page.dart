@@ -5,6 +5,7 @@ import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
 import '../../services/analytics_service.dart';
 import '../data/admin_service.dart';
 import '../data/dong_list.dart';
+import 'analytics_stats_page.dart';
 import 'dong_admin_dashboard_page.dart';
 import 'widget/bbs1_admin_widget.dart';
 import 'widget/bbs2_admin_widget.dart';
@@ -82,6 +83,15 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
         SnackBar(content: Text(message), backgroundColor: Colors.green),
       );
     }
+  }
+
+  /// 통계 페이지 표시
+  void _showAnalyticsPage() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const AnalyticsStatsPage(),
+      ),
+    );
   }
 
   /// 관리자 관리 다이얼로그 표시
@@ -260,6 +270,21 @@ class _NewAdminDashboardPageState extends State<NewAdminDashboardPage> {
         shadowColor: Colors.black.withValues(alpha: 0.1),
         surfaceTintColor: Colors.transparent,
         actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              icon: const Icon(Icons.analytics_outlined),
+              onPressed: _showAnalyticsPage,
+              tooltip: '통계 보기',
+              style: IconButton.styleFrom(
+                backgroundColor: const Color(0xFFF1F5F9),
+                foregroundColor: const Color(0xFF475569),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
           Container(
             margin: const EdgeInsets.only(right: 8),
             child: IconButton(
