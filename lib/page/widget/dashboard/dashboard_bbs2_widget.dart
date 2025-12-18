@@ -318,7 +318,7 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
           ),
           child: Container(
             padding: const EdgeInsets.all(24),
-            constraints: const BoxConstraints(maxWidth: 1200, maxHeight: 1200),
+            constraints: const BoxConstraints(maxWidth: 1200, maxHeight: 800),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,15 +348,26 @@ class _DashBoardBbs2WidgetState extends State<DashBoardBbs2Widget> {
                         ),
                       ),
                     ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(
+                        Icons.close,
+                        color: Color(0xFF64748B),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                Text(
-                  detail,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    height: 1.5,
-                    color: SeoguColors.textPrimary,
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Text(
+                      detail,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        height: 1.5,
+                        color: SeoguColors.textPrimary,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
