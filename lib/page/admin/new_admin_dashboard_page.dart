@@ -2183,13 +2183,14 @@ class _DashboardTitleEditorState extends State<DashboardTitleEditor> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
+      height: 110,
       decoration: BoxDecoration(
         color: const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -2201,7 +2202,7 @@ class _DashboardTitleEditorState extends State<DashboardTitleEditor> {
               color: Color(0xFF3B82F6),
             ),
           ),
-          SizedBox(width: 20),
+          SizedBox(height: 8),
           Expanded(
             child: Row(
               children: [

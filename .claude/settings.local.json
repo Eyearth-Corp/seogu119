@@ -3,7 +3,8 @@
     "allow": [
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\n타이젠 OS 터치 TV 최적화\n\n- site.webmanifest 앱 정보 업데이트\n- tizen.js 터치 이벤트 지원 추가\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nBBS2 다이얼로그 스크롤 추가\n\n- 긴 내용 스크롤 가능하도록 SingleChildScrollView 추가\n- 상단 닫기 버튼 추가\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
