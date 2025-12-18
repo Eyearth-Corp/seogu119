@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/analytics_service.dart';
 import '../data/admin_service.dart';
-import '../home_page.dart';
+import 'new_admin_dashboard_page.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({super.key});
@@ -39,18 +39,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       if (AdminService.isLoggedIn) {
         final isValid = await AdminService.validateToken();
         if (isValid && mounted) {
-          print('🔄 자동 로그인 성공! 대시보드로 이동');
+          print('🔄 자동 로그인 성공! 관리자 대시보드로 이동');
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => FittedBox(
-                fit: BoxFit.contain,
-                child: SizedBox(
-                  width: 2560,
-                  height: 1440,
-                  child: HomePage(),
-                ),
-              ),
+              builder: (context) => const NewAdminDashboardPage(),
             ),
           );
           return;
@@ -109,14 +102,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => FittedBox(
-              fit: BoxFit.contain,
-              child: SizedBox(
-                width: 2560,
-                height: 1440,
-                child: HomePage(),
-              ),
-            ),
+            builder: (context) => const NewAdminDashboardPage(),
           ),
         );
       } else {

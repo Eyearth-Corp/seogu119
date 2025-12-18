@@ -7,7 +7,7 @@ import 'dart:convert';
 class AnalyticsService {
   // Debug 모드에서는 localhost, 프로덕션에서는 실제 서버 사용
   static String get baseUrl => kDebugMode
-      ? 'http://localhost:8000/api/analytics'
+      ? 'https://api.seogu119.co.kr/api/analytics'
       : 'https://api.seogu119.co.kr/api/analytics';
 
   static String? _sessionId;

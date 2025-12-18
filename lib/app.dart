@@ -39,7 +39,7 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: '서구 골목경제 119 관리자',
+      title: '서구 골목경제 119',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         fontFamily: SeoguFonts.primaryFont,
@@ -48,8 +48,7 @@ class _AppState extends State<App> {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const AdminLoginPage(),
-        '/dashboard': (context) => FittedBox(
+        '/': (context) => FittedBox(
           fit: BoxFit.contain,
           child: SizedBox(
             width: 2560,
@@ -57,6 +56,7 @@ class _AppState extends State<App> {
             child: HomePage(),
           ),
         ),
+        '/admin': (context) => const AdminLoginPage(),
       },
       onGenerateRoute: (settings) {
         // 관리자 관련 라우팅 처리
