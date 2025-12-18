@@ -1,6 +1,7 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "서구 골목경제 119 상황판",
+  "short_name": "서구119",
+  "description": "광주광역시 서구 골목경제 119 상황판 - 서구지역 상인회 현황 및 통계 대시보드",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -15,7 +16,10 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#ffffff",
+  "theme_color": "#1a365d",
   "background_color": "#ffffff",
-  "display": "standalone"
+  "display": "standalone",
+  "orientation": "landscape",
+  "start_url": "/",
+  "scope": "/"
 }
